@@ -21,7 +21,7 @@
   --shadow-lg:0 8px 32px rgba(35,45,70,0.14);
   --tr:all 0.2s ease;
 }
-body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--text);font-size:14px;line-height:1.6}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
 
 /* ── TABS ── */
 .tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:4px;margin-bottom:22px;width:fit-content;flex-wrap:wrap}
@@ -132,7 +132,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .b-attr{background:var(--green-bg);color:var(--green)}
 .b-prog{background:var(--blue-light);color:var(--blue)}
 .b-done{background:rgba(42,125,82,.15);color:var(--green)}
-.b-done{background:rgba(42,125,82,.15);color:var(--green)}
 .b-urg{background:var(--red-bg);color:var(--red)}
 
 /* ── TABLE ── */
@@ -162,39 +161,12 @@ tbody tr:hover{background:var(--bg)}
 .refresh-btn svg{transition:transform .4s}
 .refresh-btn:hover svg{transform:rotate(180deg)}
 .tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:10px;color:var(--text);margin:2px}
-</style>
-<style>
-/* ── LOGIN ── */
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
-.login-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:360px;box-shadow:var(--shadow-lg);text-align:center}
-.login-logo{font-size:22px;font-weight:900;color:var(--blue);letter-spacing:-0.5px;margin-bottom:4px}
-.login-sub{font-size:12px;color:var(--text-light);margin-bottom:28px}
-.login-label{display:block;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;text-align:left}
-.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--dark);outline:none;transition:var(--tr);margin-bottom:16px}
-.login-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
-.login-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:40px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:var(--tr)}
-.login-btn:hover{background:var(--blue-dark)}
-.login-err{color:var(--red);font-size:12px;margin-top:10px;display:none}
-.login-bar{width:100%;height:4px;background:var(--yellow);border-radius:0}
-.app-content{display:none}
-.app-content.visible{display:block}
+
+/* L'application s'affiche directement par défaut */
+.app-content{display:block}
 </style>
 </head>
 <body>
-
-<div class="login-screen" id="login-screen">
-  <div class="login-bar"></div>
-  <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
-    <div class="login-card">
-      <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial</div>
-      <label class="login-label">Mot de passe</label>
-      <input type="password" class="login-input" id="login-pwd" placeholder="••••••••">
-      <button class="login-btn" onclick="checkLogin()">Accéder au portail</button>
-      <div class="login-err" id="login-err">Mot de passe incorrect.</div>
-    </div>
-  </div>
-</div>
 
 <div class="app-content" id="app-content">
 
@@ -406,35 +378,19 @@ tbody tr:hover{background:var(--bg)}
   </div>
 </section>
 
-</div><div class="toast" id="toast"><span id="toast-msg"></span></div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
 // ══════════════════════════════════════════════════
 // ⚙️  CONFIG — À ADAPTER
 // ══════════════════════════════════════════════════
-var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUdS700NnWQilLf6H_Is6qe5AvVn3vSDBuu4ZEr8lsLtiTXZHBX0NvNA_9EdMKVlZP/exec';
-
-// Mot de passe portail commercial
-var PWD_PORTAIL = '0000';
+var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbyUdS700NnWQilLf6H_Is6qe5AvVn3vSDBuu4ZEr8lsLtiTXZHBX0NvNA_9EdMKVlZP/exec';
 
 // URL raw du config.json sur GitHub
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 // ══════════════════════════════════════════════════
-
-// ── Login ─────────────────────────────────────────
-function checkLogin() {
-  var pwd = document.getElementById('login-pwd').value;
-  if (pwd === PWD_PORTAIL) {
-    sessionStorage.setItem('portail_auth', '1');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-content').classList.add('visible');
-    chargerConfigFormulaire();
-  } else {
-    document.getElementById('login-err').style.display = 'block';
-    document.getElementById('login-pwd').value = '';
-    document.getElementById('login-pwd').focus();
-  }
-}
 
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('[data-tab]').forEach(function(el) {
@@ -443,19 +399,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('[data-filter]').forEach(function(el) {
     el.addEventListener('click', function() { filtrer(this.dataset.filter); });
   });
-  var lpwd = document.getElementById('login-pwd');
-  if (lpwd) {
-    lpwd.addEventListener('keydown', function(e) { if(e.key==='Enter') checkLogin(); });
-  }
+  
+  // Démarrage automatique unifié (Sécurisé par Google Workspace)
+  chargerConfigFormulaire();
 });
-
-if (sessionStorage.getItem('portail_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-content').classList.add('visible');
-}
 
 // ── Chargement config depuis GitHub Pages ─────────
 var QUESTIONS_LP3_2N = null;
+var RawConfig = null; 
 
 function chargerConfigFormulaire() {
   if (!CONFIG_URL || CONFIG_URL.indexOf('VOTRE_USER') !== -1) {
@@ -465,6 +416,10 @@ function chargerConfigFormulaire() {
   fetch(CONFIG_URL + '?v=' + Date.now())
   .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
   .then(function(cfg) {
+    RawConfig = cfg; 
+    if (cfg.liste_produits && cfg.liste_produits.length) {
+      PRODUITS = cfg.liste_produits;
+    }
     if (cfg.proplus_lp3    && cfg.proplus_lp3.length)    QUESTIONS_PROPLUS     = cfg.proplus_lp3;
     if (cfg.install_ext    && cfg.install_ext.length)    QUESTIONS_INSTALL_EXT = cfg.install_ext;
     if (cfg.proplus_lp3_2n && cfg.proplus_lp3_2n.length) QUESTIONS_LP3_2N      = cfg.proplus_lp3_2n;
@@ -645,13 +600,21 @@ function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container');
   if(!container) return;
   container.innerHTML = '';
+  
+  var sourceQuestions = RawConfig || {
+    proplus_lp3: QUESTIONS_PROPLUS,
+    proplus_lp3_2n: QUESTIONS_LP3_2N || QUESTIONS_PROPLUS,
+    install_ext: QUESTIONS_INSTALL_EXT
+  };
+
   state.selectedProduits.forEach(function(pid) {
     var produit = PRODUITS.find(function(p) { return p.id === pid; });
-    var questions = pid === 'install_ext' ? QUESTIONS_INSTALL_EXT :
-                 (pid === 'proplus_lp3_2n' ? (QUESTIONS_LP3_2N || QUESTIONS_PROPLUS) : QUESTIONS_PROPLUS);
+    var questions = sourceQuestions[pid] || [];
+    
     var block = document.createElement('div');
     block.className = 'card';
-    block.innerHTML = '<div class="q-produit-header">'+produit.label+'</div>';
+    block.innerHTML = '<div class="q-produit-header">'+(produit ? produit.label : pid)+'</div>';
+    
     questions.forEach(function(q) {
       var qDiv = document.createElement('div');
       qDiv.style.marginBottom = '14px';
@@ -677,7 +640,7 @@ function buildDiagnostic() {
         var optsDiv = document.createElement('div');
         optsDiv.className = 'q-options';
         var isMulti = q.multi || q.type === 'checkbox';
-        q.options.forEach(function(opt) {
+        (q.options || []).forEach(function(opt) {
           var o = document.createElement('div');
           o.className = 'q-option';
           o.dataset.field = pid+'_'+q.id;
@@ -729,7 +692,8 @@ function buildRecap() {
   document.getElementById('recap-obj').textContent = edeal;
 
   var produitLabels = state.selectedProduits.map(function(pid) {
-    return PRODUITS.find(function(p){ return p.id===pid; }).label;
+    var prod = PRODUITS.find(function(p){ return p.id===pid; });
+    return prod ? prod.label : pid;
   }).join(', ');
 
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
@@ -758,7 +722,10 @@ function collectFormData() {
     ville: document.getElementById('f-ville').value.trim(),
     dateChantier: document.getElementById('f-date').value.trim(),
     commentaire: document.getElementById('f-commentaire').value.trim(),
-    produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
+    produits: state.selectedProduits.map(function(pid){ 
+      var prod = PRODUITS.find(function(p){return p.id===pid;});
+      return prod ? prod.label : pid;
+    }),
     infos: {
       contraintes: getOptionValues('contraintes'),
       acces: getOptionValues('acces'),
@@ -813,7 +780,6 @@ function genererPDFBase64(fData) {
         '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
     }
 
-    var pm = {proplus_lp3:'Proplus LP3', proplus_lp3_2n:'Proplus LP3 - 2 Niveaux', install_ext:'Installation extérieure'};
     var sections = '';
     sections += section('Informations générales',
       row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
@@ -828,11 +794,14 @@ function genererPDFBase64(fData) {
     );
     Object.keys(diag).forEach(function(pid) {
       var pd = diag[pid]; var rows = '';
+      var produit = PRODUITS.find(function(p) { return p.id === pid; });
+      var labelProduit = produit ? produit.label : pid;
+      
       Object.keys(pd).forEach(function(label) {
         var v = pd[label];
         rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
       });
-      if (rows) sections += section(pm[pid]||pid, rows);
+      if (rows) sections += section(labelProduit, rows);
     });
 
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
