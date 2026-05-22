@@ -22,7 +22,7 @@
 }
 body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--text);font-size:14px;line-height:1.6}
 .tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:4px;margin-bottom:22px;width:fit-content}
-.tab{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer}
 .tab.active{background:var(--blue);color:var(--white);box-shadow:0 2px 8px rgba(45,75,140,.25)}
 .tab:hover:not(.active){background:var(--blue-light);color:var(--blue)}
 .section{display:none}.section.active{display:block;animation:fadeUp .3s ease}
@@ -72,7 +72,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .q-text-input.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
 .q-option.selected{border-color:var(--green)!important;background:rgba(42,125,82,0.07)!important;color:var(--green)!important;font-weight:700}
 .q-option.selected .opt-dot{background:var(--green)!important;border-color:var(--green)!important}
-.q-option.selected .opt-sq{background:var(--green)!important;border-color:var(--green)!important;color:white}
+.q-option.selected .opt-sq{background:var(--green)!important;border-color:var(--green)!important;color:white!important}
 .finput.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
 .dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;background:var(--bg);position:relative}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -133,7 +133,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial</div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v2.2-BrouillonFix</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -146,6 +146,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v2.2-BrouillonFix</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -380,7 +381,7 @@ function goStep2() {
   buildDiagnostic(); goStep(2);
 }
 
-// 🛠️ VÉRITABLE CORRECTION DES PRE-DEMANDES (DIAGNOSTIC HÉRITÉ) : Interroge les listes locales si le fichier GitHub n'est pas prêt
+// 👑 LE SECOURS ABSOLU DU DIAGNOSTIC : Ré-injection des variables dures indispensables à la pré-demande
 function getQuestionsListForProduct(pid) {
   if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid];
   if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS;
@@ -559,7 +560,6 @@ function envoyerDemande() {
   });
 }
 
-// ── RESTAURATION INTEGRALE DU RENDU PREMIUM DU RECAP PDF ──
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
