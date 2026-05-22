@@ -102,7 +102,7 @@ tr:last-child td{border-bottom:none}
     <div class="login-logo">⚙️ ADMIN BE</div>
     <div class="login-sub">Portail Administration — Provost</div>
     <input type="password" class="login-input" id="login-pwd" placeholder="Mot de passe admin"
-      onkeydown="if(event.key==='Enter') checkLogin()">
+      id="admin-pwd-input">
     <button class="login-btn" onclick="checkLogin()">Accéder</button>
     <div class="login-err" id="login-err">Mot de passe incorrect.</div>
   </div>
@@ -119,9 +119,9 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <nav class="tabs">
-  <button class="tab active" onclick="showTab('questions', event)">Éditeur de questions</button>
-  <button class="tab" onclick="showTab('suivi', event)">Suivi & Attributions</button>
-  <button class="tab" onclick="showTab('parametres', event)">Paramètres</button>
+  <button class="tab active" data-tab="questions">Éditeur de questions</button>
+  <button class="tab" data-tab="suivi">Suivi & Attributions</button>
+  <button class="tab" data-tab="parametres">Paramètres</button>
 </nav>
 
 <!-- ÉDITEUR QUESTIONS -->
@@ -129,9 +129,9 @@ tr:last-child td{border-bottom:none}
   <div class="card">
     <div class="card-title">Formulaire à modifier</div>
     <div class="produit-tab">
-      <button class="produit-btn active" onclick="switchProduit('proplus_lp3', event)">Proplus LP3</button>
-      <button class="produit-btn" onclick="switchProduit('proplus_lp3_2n', event)">Proplus LP3 - 2 Niveaux</button>
-      <button class="produit-btn" onclick="switchProduit('install_ext', event)">Installation extérieure</button>
+      <button class="produit-btn active" data-produit="proplus_lp3">Proplus LP3</button>
+      <button class="produit-btn" data-produit="proplus_lp3_2n">Proplus LP3 - 2 Niveaux</button>
+      <button class="produit-btn" data-produit="install_ext">Installation extérieure</button>
     </div>
     <div class="q-list" id="q-list-container"></div>
     <div class="btn-row" style="margin-top:16px">
@@ -219,7 +219,7 @@ tr:last-child td{border-bottom:none}
   <div class="modal" style="width:680px;max-height:85vh">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div class="modal-title" style="margin-bottom:0">Demande <span id="detail-edeal" style="color:var(--blue)"></span></div>
-      <button onclick="document.getElementById('detail-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
+      <button id="close-detail-modal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
     </div>
     <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
   </div>
@@ -281,7 +281,7 @@ function majStatusGH() {
 }
 function testerGitHub() {
   var gh = getGHConfig();
-  if (!gh.token) { toast('Configurez d'abord GitHub dans Paramètres', 'err'); return; }
+  if (!gh.token) { toast('Configurez GitHub dans Parametres', 'err'); return; }
   fetch('https://api.github.com/user', {headers:{'Authorization':'token '+gh.token}})
   .then(function(r){return r.json();})
   .then(function(u){ toast('✓ Connecté en tant que : ' + u.login, 'ok'); majStatusGH(); })
@@ -331,7 +331,7 @@ function chargerDepuisGitHub() {
 function sauvegarder() {
   var gh = getGHConfig();
   if (!gh.user || !gh.repo || !gh.token) {
-    toast('Configurez GitHub dans l'onglet Paramètres', 'err');
+    toast('Allez dans Parametres pour configurer GitHub', 'err');
     return;
   }
   var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
@@ -558,6 +558,27 @@ function saveDetail(edeal){
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur : '+(res.error||''),res.success?'ok':'err');}).catch(function(){toast('Erreur réseau','err');});
 }
 function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast '+(type||'');el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3500);}
+
+// ── Event listeners propres (pas d'onclick inline) ────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Login enter key
+  var ap = document.getElementById('admin-pwd-input');
+  if (ap) ap.addEventListener('keydown', function(e){ if(e.key==='Enter') checkLogin(); });
+
+  // Tabs
+  document.querySelectorAll('[data-tab]').forEach(function(el) {
+    el.addEventListener('click', function(e){ showTab(this.dataset.tab, e); });
+  });
+
+  // Produits
+  document.querySelectorAll('[data-produit]').forEach(function(el) {
+    el.addEventListener('click', function(e){ switchProduit(this.dataset.produit, e); });
+  });
+
+  // Fermer modal détail
+  var closeBtn = document.getElementById('close-detail-modal');
+  if (closeBtn) closeBtn.addEventListener('click', function(){ document.getElementById('detail-modal').classList.remove('open'); });
+});
 
 // Démarrage
 if(sessionStorage.getItem('admin_auth')==='1') chargerDepuisGitHub();
