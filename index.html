@@ -163,7 +163,8 @@ tbody tr:hover{background:var(--bg)}
 
 <section class="section" id="section-demande">
   <div class="s-label">Bureau d'Études</div><h2 class="s-title">Saisie de la demande</h2>
-  <div class="wizard">
+  
+ <div class="wizard">
     <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
     <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
     <div class="wz" id="wz3"><span class="wz-n">3</span>Pièces jointes</div>
@@ -183,6 +184,7 @@ tbody tr:hover{background:var(--bg)}
       <hr class="divider"><div class="card-title">Éléments souhaités</div><div id="q-elements" class="q-options"></div>
       <hr class="divider"><div class="card-title">Plan obligatoire</div><div id="q-plan" class="q-options"></div>
       <hr class="divider"><div class="card-title">Photos & Vidéos</div><div id="q-photos" class="q-options"></div><div style="margin-top:8px" id="q-video"></div>
+     
       <hr class="divider"><div class="card-title">Sélection du/des produit(s) <span class="req">*</span></div><div class="produits-grid" id="produits-grid"></div>
       <hr class="divider"><div class="card-title">Commentaires</div><textarea id="f-commentaire" class="ftextarea"></textarea>
       <div class="btn-row" style="justify-content:space-between;width:100%;">
@@ -196,7 +198,7 @@ tbody tr:hover{background:var(--bg)}
     <div id="diagnostic-container"></div>
     <div class="btn-row" style="justify-content:space-between;width:100%;">
       <div><button class="btn btn-outline" onclick="goStep(1)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
-      <button class="btn btn-primary" onclick="goStep(3)">Continuer vers les PJ →</button>
+       <button class="btn btn-primary" onclick="goStep(3)">Continuer vers les PJ →</button>
     </div>
   </div>
 
@@ -291,6 +293,7 @@ var FORM_INFOS = {
   elements: { type:'radio', options:['Dossier complet','Dossier allégé'] },
   plan: { type:'checkbox', options:['OK'] }, photos: { type:'checkbox', options:['OK'] }, video: { type:'checkbox', options:['OK'] }
 };
+
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
 
 var QUESTIONS_PROPLUS = [
@@ -343,7 +346,8 @@ function initFormulaire() {
 }
 
 function buildOptions(cId, conf, fId) {
-  var el = document.getElementById(cId); if (!el) return; el.innerHTML = '';
+  var el = document.getElementById(cId); if (!el) return;
+  el.innerHTML = '';
   conf.options.forEach(function(opt) {
     var div = document.createElement('div'); div.className = 'q-option'; div.dataset.field = fId; div.dataset.val = opt;
     var checkHtml = (conf.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
@@ -366,7 +370,7 @@ function getOptionValues(fId) {
 
 function toggleProduit(id) { 
   document.querySelector(`.produit-cb[data-id="${id}"]`).classList.toggle('checked'); 
-  state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); 
+  state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)});
 }
 
 function goStep(n) {
@@ -378,10 +382,14 @@ function goStep(n) {
 function goStep2() {
   if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
   if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
-  buildDiagnostic(); goStep(2);
+  
+  // Correction : On aspire l'état actuel pour ne pas l'écraser lors de la reconstruction
+  state.loadedDraft = collectFormData(); 
+  
+  buildDiagnostic(); 
+  goStep(2);
 }
 
-// 👑 LE SECOURS ABSOLU DU DIAGNOSTIC : Ré-injection des variables dures indispensables à la pré-demande
 function getQuestionsListForProduct(pid) {
   if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid];
   if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS;
@@ -415,6 +423,22 @@ function buildDiagnostic() {
     });
     container.appendChild(block);
   });
+
+  // Correction : Ré-injection automatique des valeurs mémorisées dans le HTML reconstruit
+  if (state.loadedDraft && state.loadedDraft.diagnostic) {
+    state.selectedProduits.forEach(function(pid){
+      var pd = state.loadedDraft.diagnostic[pid] || {}; 
+      var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'){
+          var el=document.getElementById(fid); if(el && val !== ""){el.value=val; el.classList.add('filled');}
+        } else {
+          (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${fid}"][data-val="${v}"]`); if(o) o.classList.add('selected'); });
+        }
+      });
+    });
+  }
 }
 
 function collectFormData() {
@@ -431,8 +455,7 @@ function collectFormData() {
   state.selectedProduits.forEach(function(pid) {
     var prodData = {}; var questions = getQuestionsListForProduct(pid);
     questions.forEach(function(q) {
-      var fid = pid+'_'+q.id;
-      var el = document.getElementById(fid);
+      var fid = pid+'_'+q.id; var el = document.getElementById(fid);
       if (el) {
         prodData[q.label] = el.value.trim();
       } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector(`.q-option[data-field="${fid}"]`)) {
@@ -453,15 +476,13 @@ function collectFormData() {
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
   if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
-  var fData = collectFormData(); fData.isBrouillon = true;
+  var fData = collectFormData();
+  fData.isBrouillon = true;
   
-  var btn = document.querySelector('button[onclick="sauvegarderBrouillon()"]');
-  if(btn) btn.disabled = true;
+  var btn = document.querySelector('button[onclick="sauvegarderBrouillon()"]'); if(btn) btn.disabled = true;
   toast("⏳ Sauvegarde de la pré-demande...", "ok");
-  
   var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
   var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
-  
   var promises = localFiles.map(function(file) {
     return new Promise(function(resolve) {
       var r = new FileReader();
@@ -469,12 +490,8 @@ function sauvegarderBrouillon() {
       r.readAsDataURL(file);
     });
   });
-  
   Promise.all(promises).then(function(newFiles) {
-    var fd = new FormData();
-    fd.append('action', 'deposerDemande');
-    fd.append('data', JSON.stringify(fData));
-    
+    var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
     serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
     newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
     return fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd});
@@ -508,28 +525,18 @@ function reprendreBrouillon(edeal) {
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); var input = el.querySelector('input'); if(input) input.checked = false;});
     state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
     state.selectedProduits.forEach(function(pid){ 
-      var c=document.querySelector(`.produit-cb[data-id="${pid}"]`); 
-      if(c) { c.classList.add('checked'); var inp = c.querySelector('input'); if(inp) inp.checked = true; } 
+      var c=document.querySelector(`.produit-cb[data-id="${pid}"]`); if(c) { c.classList.add('checked'); var inp = c.querySelector('input'); if(inp) inp.checked = true; } 
     });
     
-    buildDiagnostic();
-    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
-      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
-      questions.forEach(function(q){
-        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
-        if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} }
-        else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${fid}"][data-val="${v}"]`); if(o) o.classList.add('selected'); }); }
-      });
-    });
-
+    buildDiagnostic(); // Appel unique de reconstruction + injection automatique intégrée
+    
     state.selectedFiles = [];
     if (res.fichiers && res.fichiers.length > 0) {
       res.fichiers.forEach(function(f) {
         state.selectedFiles.push({ name: f.nom, size: Math.round(f.b64.length * 0.75), type: f.type, isFromServer: true, b64: f.b64 });
       });
     }
-    renderFiles();
-    showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+    renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
   });
 }
 
@@ -537,10 +544,8 @@ function envoyerDemande() {
   var fData = collectFormData(); fData.isBrouillon = false;
   var btn = document.getElementById('btn-send'); btn.disabled = true;
   toast("⏳ Envoi définitif au BE...", "ok");
-  
   var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
   var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
-  
   genererPDFBase64(fData).then(function(pdfBase64) {
     var promises = localFiles.map(function(file) {
       return new Promise(function(resolve) {
@@ -549,7 +554,6 @@ function envoyerDemande() {
     });
     Promise.all(promises).then(function(newFiles) {
       var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
-      
       serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
       newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
       
@@ -564,8 +568,7 @@ function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
     var produits = (fData.produits||[]).join(', ');
-    var infos = fData.infos || {};
-    var diag  = fData.diagnostic || {};
+    var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
 
     function row(label, val) {
       if (!val || val === '') return '';
@@ -573,10 +576,7 @@ function genererPDFBase64(fData) {
         '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
         '<div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
     }
-    function rowList(label, vals) {
-      if (!vals || !vals.length) return '';
-      return row(label, vals.join(', '));
-    }
+    function rowList(label, vals) { if (!vals || !vals.length) return ''; return row(label, vals.join(', ')); }
     function section(title, rows) {
       if (!rows) return '';
       return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
@@ -598,13 +598,10 @@ function genererPDFBase64(fData) {
     );
     
     Object.keys(diag).forEach(function(pid) {
-      var pd = diag[pid]; var rows = '';
-      var pFound = PRODUITS.find(function(p) { return p.id === pid; });
+      var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; });
       var labelProduit = pFound ? pFound.label : pid;
-      
       Object.keys(pd).forEach(function(label) {
-        var v = pd[label];
-        rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
+        var v = pd[label]; rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
       });
       if (rows) sections += section(labelProduit, rows);
     });
@@ -616,7 +613,6 @@ function genererPDFBase64(fData) {
       '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
       '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
       sections + '</body></html>';
-
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
@@ -646,12 +642,7 @@ function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
 
 function buildRecap() {
   var edeal = document.getElementById('f-edeal').value.trim();
-  document.getElementById('recap-obj').textContent = edeal;
-  var produitLabels = state.selectedProduits.map(function(pid) {
-    var pFound = PRODUITS.find(function(p){ return p.id===pid; });
-    return pFound ? pFound.label : pid;
-  }).join(', ');
-
+  var produitLabels = state.selectedProduits.map(function(pid) { var pFound = PRODUITS.find(function(p){ return p.id===pid; }); return pFound ? pFound.label : pid; }).join(', ');
   var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
     '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div>' +
     '<div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div>' +
@@ -684,6 +675,7 @@ function chargerSuivi() {
     renderSuivi(state.allDemandes);
   });
 }
+
 function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
 
 function renderSuivi(demandes) {
@@ -694,6 +686,7 @@ function renderSuivi(demandes) {
     return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
+
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
