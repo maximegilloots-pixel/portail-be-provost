@@ -242,12 +242,9 @@ var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], sele
 
 function jwtDecode(token) {
   try {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4) { base64 += '='; }
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
     return JSON.parse(jsonPayload);
   } catch (e) { console.error(e); return {}; }
 }
@@ -309,7 +306,6 @@ function buildOptions(cId, conf, fId) {
   var el = document.getElementById(cId); if (!el) return; el.innerHTML = '';
   conf.options.forEach(function(opt) {
     var div = document.createElement('div'); div.className = 'q-option'; div.dataset.field = fId; div.dataset.val = opt;
-    // 🛠️ FIX GRAPHIQUE : La coche n'apparaît plus en tâche de fond sur les boutons radios ronds
     var checkHtml = (conf.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
     div.innerHTML = checkHtml + `<span>${opt}</span>`;
     div.onclick = function() { toggleOption(this); }; el.appendChild(div);
@@ -345,10 +341,20 @@ function goStep2() {
   buildDiagnostic(); goStep(2);
 }
 
+// 🛠️ FIX FALLBACK QUESTIONS : Résout le problème de sauvegarde de la page 2
+function getQuestionsListForProduct(pid) {
+  if (RawConfig && RawConfig[pid]) return RawConfig[pid];
+  if (pid === 'proplus_lp3') return (typeof QUESTIONS_PROPLUS !== 'undefined') ? QUESTIONS_PROPLUS : [];
+  if (pid === 'proplus_lp3_2n') return (typeof QUESTIONS_LP3_2N !== 'undefined') ? QUESTIONS_LP3_2N : ((typeof QUESTIONS_PROPLUS !== 'undefined') ? QUESTIONS_PROPLUS : []);
+  if (pid === 'install_ext') return (typeof QUESTIONS_INSTALL_EXT !== 'undefined') ? QUESTIONS_INSTALL_EXT : [];
+  return [];
+}
+
 function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
-    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = (RawConfig && RawConfig[pid]) || [];
+    var prod = PRODUITS.find(function(p){return p.id===pid}); 
+    var questions = getQuestionsListForProduct(pid);
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = `<div class="q-produit-header">${prod?prod.label:pid}</div>`;
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML=`<div class="q-title">${q.label}</div>`;
@@ -377,12 +383,13 @@ function collectFormData() {
     edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
     client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(),
     dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(),
+    selectedProduits: state.selectedProduits,
     produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
     infos: {}, diagnostic: {}
   };
   Object.keys(FORM_INFOS).forEach(function(k){ data.infos[k] = getOptionValues(k); });
   state.selectedProduits.forEach(function(pid) {
-    var prodData = {}; var questions = (RawConfig && RawConfig[pid]) || [];
+    var prodData = {}; var questions = getQuestionsListForProduct(pid);
     questions.forEach(function(q) {
       var fid = pid+'_'+q.id;
       if (q.type==='text' || q.type==='textarea') { var el=document.getElementById(fid); if(el) prodData[q.label]=el.value.trim(); }
@@ -414,12 +421,17 @@ function reprendreBrouillon(edeal) {
     document.getElementById('f-commentaire').value = fd.commentaire || '';
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
     if(fd.infos) Object.keys(fd.infos).forEach(function(k){ (fd.infos[k]||[]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${k}"][data-val="${v}"]`); if(o) o.classList.add('selected'); })});
-    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked')});
-    state.selectedProduits = Object.keys(fd.diagnostic || {});
-    state.selectedProduits.forEach(function(pid){ var c=document.querySelector(`.produit-cb[data-id="${pid}"]`); if(c) c.classList.add('checked'); });
+    
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); var input = el.querySelector('input'); if(input) input.checked = false;});
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
+    state.selectedProduits.forEach(function(pid){ 
+      var c=document.querySelector(`.produit-cb[data-id="${pid}"]`); 
+      if(c) { c.classList.add('checked'); var inp = c.querySelector('input'); if(inp) inp.checked = true; } 
+    });
+    
     buildDiagnostic();
     if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
-      var pd = fd.diagnostic[pid] || {}; var questions = (RawConfig && RawConfig[pid]) || [];
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
       questions.forEach(function(q){
         var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
         if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} }
@@ -450,9 +462,68 @@ function envoyerDemande() {
   });
 }
 
+// 🛠️ RESTAURATION DUMOTEUR DE RENDU DU PDF COMPLET : Génère un récapitulatif parfait pour le BE
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
-    var html = `<html><body><h2>Demande BE : ${fData.edeal}</h2><p>Client: ${fData.client}</p><p>Commercial: ${fData.commercial}</p></body></html>`;
+    var dateStr = new Date().toLocaleDateString('fr-FR');
+    var produits = (fData.produits||[]).join(', ');
+    var infos = fData.infos || {};
+    var diag  = fData.diagnostic || {};
+
+    function row(label, val) {
+      if (!val || val === '') return '';
+      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
+        '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
+        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
+    }
+    function rowList(label, vals) {
+      if (!vals || !vals.length) return '';
+      return row(label, vals.join(', '));
+    }
+    function section(title, rows) {
+      if (!rows) return '';
+      return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
+        '<div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div>' +
+        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
+    }
+
+    var sections = '';
+    sections += section('Informations générales',
+      row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
+      row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) +
+      row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) +
+      rowList('Contraintes normatives', infos.contraintes) +
+      rowList('Accès pour montage', infos.acces) +
+      rowList('Zone', infos.zone) +
+      rowList('Éléments souhaités', infos.elements) +
+      row('Plan joint', infos.plan && infos.plan.length ? 'OK' : '') +
+      row('Commentaire', fData.commentaire)
+    );
+    Object.keys(diag).forEach(function(pid) {
+      var pd = diag[pid]; var rows = '';
+      var produit = PRODUITS.find(function(p) { return p.id === pid; });
+      var labelProduit = produit ? produit.label : pid;
+      
+      Object.keys(pd).forEach(function(label) {
+        var v = pd[label];
+        rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
+      });
+      if (rows) sections += section(labelProduit, rows);
+    });
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+      '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
+      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
+      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}' +
+      '.sec{margin-bottom:12px;page-break-inside:avoid}' +
+      '.row{display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px}' +
+      '.rl{width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0}' +
+      '.rv{flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px}' +
+      '@media print{body{padding:0}}</style>' +
+      '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
+      '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
+      sections + '</body></html>';
+
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
@@ -474,8 +545,36 @@ function renderFiles() {
   });
 }
 
-function dzOver(e){e.preventDefault();} function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
-function buildRecap() { document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; }
+function dzOver(e){e.preventDefault();}
+function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
+
+// ── Restauration de l'écran d'aperçu de l'étape 4 ─────────
+function buildRecap() {
+  var edeal = document.getElementById('f-edeal').value.trim();
+  document.getElementById('recap-obj').textContent = edeal;
+
+  var produitLabels = state.selectedProduits.map(function(pid) {
+    var pFound = PRODUITS.find(function(p){ return p.id===pid; });
+    return pFound ? pFound.label : pid;
+  }).join(', ');
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div>' +
+    '<div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div>' +
+    '<div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div>' +
+    '<div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div>' +
+    '</div>' +
+    '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Pièces jointes ('+state.selectedFiles.length+')</div>' +
+    state.selectedFiles.map(function(f){ return '<span class="tag">'+f.name+'</span>'; }).join('') +
+    (state.selectedFiles.length === 0 ? '<span style="color:var(--text-light);font-size:11px;font-style:italic">Aucune PJ ajoutée</span>' : '') +
+    '</div>';
+
+  document.getElementById('recap-content').innerHTML = html;
+}
 
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
@@ -502,6 +601,7 @@ function renderSuivi(demandes) {
     return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
+
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
