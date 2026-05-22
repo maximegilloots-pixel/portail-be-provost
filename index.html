@@ -238,7 +238,7 @@ tbody tr:hover{background:var(--bg)}
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
-var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
+var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null };
 
 function jwtDecode(token) {
   try {
@@ -380,7 +380,7 @@ function goStep2() {
   buildDiagnostic(); goStep(2);
 }
 
-// 🛠️ COMPORTEMENT DE SECOURS DE L'ÉTAPE 2 : Garantit la mémorisation des questions si GitHub a un retard de chargement
+// 🛠️ VÉRITABLE CORRECTION DES PRE-DEMANDES (DIAGNOSTIC HÉRITÉ) : Interroge les listes locales si le fichier GitHub n'est pas prêt
 function getQuestionsListForProduct(pid) {
   if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid];
   if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS;
@@ -416,7 +416,6 @@ function buildDiagnostic() {
   });
 }
 
-// 🛠️ PARAFOUDRE D'ÉCRASEMENT DES PAGES SUIVANTES : Ne vide plus les champs de l'étape 2 si on sauve à l'étape 1
 function collectFormData() {
   var data = {
     edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
@@ -450,7 +449,6 @@ function collectFormData() {
   return data;
 }
 
-// ── Gestion des Fichiers dans les Brouillons ───────
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
   if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
@@ -498,6 +496,11 @@ function reprendreBrouillon(edeal) {
     document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || '';
     document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || '';
     document.getElementById('f-commentaire').value = fd.commentaire || '';
+    
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) {
+      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled');
+    });
+
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
     if(fd.infos) Object.keys(fd.infos).forEach(function(k){ (fd.infos[k]||[]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${k}"][data-val="${v}"]`); if(o) o.classList.add('selected'); })});
     
@@ -556,7 +559,7 @@ function envoyerDemande() {
   });
 }
 
-// ── RESTAURATION INTEGRALE DU COMPILATEUR PDF PROVOST ─────
+// ── RESTAURATION INTEGRALE DU RENDU PREMIUM DU RECAP PDF ──
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
@@ -568,7 +571,7 @@ function genererPDFBase64(fData) {
       if (!val || val === '') return '';
       return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
         '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
-        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
+        '<div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
     }
     function rowList(label, vals) {
       if (!vals || !vals.length) return '';
@@ -641,7 +644,6 @@ function renderFiles() {
 function dzOver(e){e.preventDefault();}
 function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
 
-// ── Restauration de la Fiche d'Aperçu Étape 4 ───────
 function buildRecap() {
   var edeal = document.getElementById('f-edeal').value.trim();
   document.getElementById('recap-obj').textContent = edeal;
