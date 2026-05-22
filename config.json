@@ -627,6 +627,10 @@
     {
       "id": "prod_1779436061922",
       "label": "PROPAL 3"
+    },
+    {
+      "id": "prod_1779440938626",
+      "label": "PROSPACE"
     }
   ],
   "prod_1779436061922": [
@@ -634,6 +638,17 @@
       "id": "q_1779436071288",
       "label": "Charge ?",
       "type": "text"
+    }
+  ],
+  "prod_1779440938626": [
+    {
+      "id": "q_1779440955859",
+      "label": "Type de tablettes",
+      "type": "radio",
+      "options": [
+        "Tubulaire",
+        "Tôlé"
+      ]
     }
   ]
 }
