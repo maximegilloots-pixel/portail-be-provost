@@ -96,19 +96,17 @@ tr:last-child td{border-bottom:none}
 </head>
 <body>
 
-<!-- LOGIN ADMIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
     <div class="login-sub">Portail Administration — Provost</div>
     <input type="password" class="login-input" id="login-pwd" placeholder="Mot de passe admin"
-      id="admin-pwd-input">
+      onkeydown="if(event.key==='Enter') checkLogin()">
     <button class="login-btn" onclick="checkLogin()">Accéder</button>
     <div class="login-err" id="login-err">Mot de passe incorrect.</div>
   </div>
 </div>
 
-<!-- CONTENU ADMIN -->
 <div class="app-content" id="app-content">
 <div class="admin-header">
   <div><h1>⚙️ Administration — Portail BE</h1></div>
@@ -119,19 +117,18 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <nav class="tabs">
-  <button class="tab active" data-tab="questions">Éditeur de questions</button>
-  <button class="tab" data-tab="suivi">Suivi & Attributions</button>
-  <button class="tab" data-tab="parametres">Paramètres</button>
+  <button class="tab active" onclick="showTab('questions', event)">Éditeur de questions</button>
+  <button class="tab" onclick="showTab('suivi', event)">Suivi & Attributions</button>
+  <button class="tab" onclick="showTab('parametres', event)">Paramètres</button>
 </nav>
 
-<!-- ÉDITEUR QUESTIONS -->
 <section class="section active" id="section-questions">
   <div class="card">
     <div class="card-title">Formulaire à modifier</div>
     <div class="produit-tab">
-      <button class="produit-btn active" data-produit="proplus_lp3">Proplus LP3</button>
-      <button class="produit-btn" data-produit="proplus_lp3_2n">Proplus LP3 - 2 Niveaux</button>
-      <button class="produit-btn" data-produit="install_ext">Installation extérieure</button>
+      <button class="produit-btn active" onclick="switchProduit('proplus_lp3', event)">Proplus LP3</button>
+      <button class="produit-btn" onclick="switchProduit('proplus_lp3_2n', event)">Proplus LP3 - 2 Niveaux</button>
+      <button class="produit-btn" onclick="switchProduit('install_ext', event)">Installation extérieure</button>
     </div>
     <div class="q-list" id="q-list-container"></div>
     <div class="btn-row" style="margin-top:16px">
@@ -145,7 +142,6 @@ tr:last-child td{border-bottom:none}
   </div>
 </section>
 
-<!-- SUIVI -->
 <section class="section" id="section-suivi">
   <div class="card">
     <div class="card-title">Gestion des demandes</div>
@@ -162,7 +158,6 @@ tr:last-child td{border-bottom:none}
   </div>
 </section>
 
-<!-- PARAMÈTRES -->
 <section class="section" id="section-parametres">
   <div class="card">
     <div class="card-title">Configuration GitHub</div>
@@ -187,10 +182,7 @@ tr:last-child td{border-bottom:none}
   </div>
 </section>
 
-</div><!-- fin app-content -->
-
-<!-- MODALS -->
-<div class="modal-bg" id="modal-bg">
+</div><div class="modal-bg" id="modal-bg">
   <div class="modal">
     <div class="modal-title" id="modal-title">Ajouter une question</div>
     <div class="frow"><label class="flabel">Libellé</label><input class="finput" id="m-label" placeholder="ex : Type de sol"></div>
@@ -219,7 +211,7 @@ tr:last-child td{border-bottom:none}
   <div class="modal" style="width:680px;max-height:85vh">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <div class="modal-title" style="margin-bottom:0">Demande <span id="detail-edeal" style="color:var(--blue)"></span></div>
-      <button id="close-detail-modal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
+      <button onclick="document.getElementById('detail-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
     </div>
     <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
   </div>
@@ -227,6 +219,7 @@ tr:last-child td{border-bottom:none}
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
+<script>
 // ══════════════════════════════════════════════════
 // ⚙️  CONFIG
 // ══════════════════════════════════════════════════
@@ -296,14 +289,12 @@ var allDemandes = [];
 function chargerDepuisGitHub() {
   var gh = getGHConfig();
   majStatusGH();
-  // Remplir les champs paramètres
   if (document.getElementById('gh-user')) {
     document.getElementById('gh-user').value = gh.user;
     document.getElementById('gh-repo').value = gh.repo;
     document.getElementById('gh-token').value = gh.token;
   }
   if (!gh.user || !gh.repo) {
-    // Charger les questions par défaut hardcodées
     formData = getQuestionsDefaut();
     renderQuestions();
     return;
@@ -337,7 +328,6 @@ function sauvegarder() {
   var contenu = JSON.stringify(formData, null, 2);
   var b64 = btoa(unescape(encodeURIComponent(contenu)));
 
-  // Récupérer le SHA actuel du fichier (nécessaire pour le mettre à jour)
   fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}})
   .then(function(r){ return r.json(); })
   .then(function(info) {
@@ -486,24 +476,23 @@ function filtrer(q) {
 function renderSuivi(demandes) {
   var body=document.getElementById('admin-suivi-body');
   if(!demandes||demandes.length===0){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Aucune demande</td></tr>'; return; }
-  var stStyle={'En attente':'background:#fff3cd;color:#7a5500','Attribuée':'background:#d4edda;color:#1a5c36','En cours':'background:#d6e8ff;color:#1a3a7c','Terminée':'background:#d4edda;color:#1a5c36','Urgent':'background:#fce8e6;color:#8b1a1a'};
   body.innerHTML=demandes.map(function(d,i){
     var st=d.statut||'En attente';
     var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="'+s+'"'+(st===s?' selected':'')+'>'+s+'</option>'; }).join('');
-    return '<tr>'+
-      '<td class="td-edeal">'+(d.edeal||'—')+'</td>'+
-      '<td style="font-weight:600">'+(d.client||'—')+'</td>'+
-      '<td>'+(d.commercial||'—')+'</td>'+
-      '<td style="font-size:11px">'+(d.produits||'—')+'</td>'+
-      '<td style="font-size:11px;color:var(--text-light)">'+(d.date||'—')+'</td>'+
-      '<td><select class="st-select" id="st-'+i+'">'+ opts +'</select></td>'+
-      '<td><input class="assign-input" id="ass-'+i+'" value="'+(d.attribueA||'')+'" placeholder="Nom ingénieur"></td>'+
-      '<td><input class="assign-input" style="width:140px" id="com-'+i+'" value="'+(d.commentaireBE||'')+'" placeholder="Commentaire..."></td>'+
-      '<td>'+
-        '<button class="save-row" onclick="saveLine('+i+',\''+(d.edeal||'')+'\')">✓ Sauver</button> '+
-        '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\''+(d.edeal||'')+'\')">📂 Voir</button>'+
-      '</td>'+
-    '</tr>';
+    return `<tr>
+      <td class="td-edeal">${d.edeal || '—'}</td>
+      <td style="font-weight:600">${d.client || '—'}</td>
+      <td>${d.commercial || '—'}</td>
+      <td style="font-size:11px">${d.produits || '—'}</td>
+      <td style="font-size:11px;color:var(--text-light)">${d.date || '—'}</td>
+      <td><select class="st-select" id="st-${i}">${opts}</select></td>
+      <td><input class="assign-input" id="ass-${i}" value="${d.attribueA || ''}" placeholder="Nom ingénieur"></td>
+      <td><input class="assign-input" style="width:140px" id="com-${i}" value="${d.commentaireBE || ''}" placeholder="Commentaire..."></td>
+      <td>
+        <button class="save-row" onclick="saveLine(${i}, '${d.edeal || ''}')">✓ Sauver</button> 
+        <button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande('${d.edeal || ''}')">📂 Voir</button>
+      </td>
+    </tr>`;
   }).join('');
 }
 function saveLine(i,edeal) {
@@ -530,11 +519,11 @@ function renderDetail(res) {
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
   Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
   html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  if(res.pdfBase64){html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\''+res.pdfBase64+'\',\''+res.pdfNom+'\',\'application/pdf\')">⬇️ '+res.pdfNom+'</button></div>';}
-  (res.fichiers||[]).forEach(function(f){html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\''+f.b64+'\',\''+f.nom+'\',\''+f.type+'\')">📎 '+f.nom+'</button></div>';});
+  if(res.pdfBase64){html+=`<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger('${res.pdfBase64}','${res.pdfNom}','application/pdf')">⬇️ ${res.pdfNom}</button></div>`;}
+  (res.fichiers||[]).forEach(function(f){html+=`<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger('${f.b64}','${f.nom}','${f.type}')">📎 ${f.nom}</button></div>`;});
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur"></div></div>';
-  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..."></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\''+res.edeal+'\')">✓ Sauvegarder</button></div>';
+  html+=`<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..."></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail('${res.edeal}')">✓ Sauvegarder</button></div>`;
   document.getElementById('detail-body').innerHTML=html;
 }
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
