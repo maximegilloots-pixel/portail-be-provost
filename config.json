@@ -230,14 +230,15 @@
       "placeholder": "Informations complémentaires..."
     },
     {
-      "id": "q_1779434283938",
+      "id": "q_1779444522385",
       "label": "CECI EST UN TEST",
       "type": "radio",
       "options": [
         "Oui",
         "Non"
       ],
-      "placeholder": "Fonctionne ?"
+      "placeholder": "Fonctionne ?",
+      "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/img_1779444518703_IMG_45761.jpg"
     }
   ],
   "proplus_lp3_2n": [
