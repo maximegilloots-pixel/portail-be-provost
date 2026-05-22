@@ -486,28 +486,67 @@ function filtrer(q) {
   renderSuivi(allDemandes.filter(function(d){ return (d.edeal+d.client+d.commercial).toLowerCase().includes(q); }));
 }
 function renderSuivi(demandes) {
-  var body=document.getElementById('admin-suivi-body');
-  if(!demandes||demandes.length===0){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Aucune demande</td></tr>'; return; }
-  var stStyle={'En attente':'background:#fff3cd;color:#7a5500','Attribuée':'background:#d4edda;color:#1a5c36','En cours':'background:#d6e8ff;color:#1a3a7c','Terminée':'background:#d4edda;color:#1a5c36','Urgent':'background:#fce8e6;color:#8b1a1a'};
-  body.innerHTML=demandes.map(function(d,i){
-    var st=d.statut||'En attente';
-    var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="'+s+'"'+(st===s?' selected':'')+'>'+s+'</option>'; }).join('');
-    return '<tr>'+
-      '<td class="td-edeal">'+(d.edeal||'—')+'</td>'+
-      '<td style="font-weight:600">'+(d.client||'—')+'</td>'+
-      '<td>'+(d.commercial||'—')+'</td>'+
-      '<td style="font-size:11px">'+(d.produits||'—')+'</td>'+
-      '<td style="font-size:11px;color:var(--text-light)">'+(d.date||'—')+'</td>'+
-      '<td><select class="st-select" id="st-'+i+'">'+ opts +'</select></td>'+
-      '<td><input class="assign-input" id="ass-'+i+'" value="'+(d.attribueA||'')+'" placeholder="Nom ingénieur"></td>'+
-      '<td><input class="assign-input" style="width:140px" id="com-'+i+'" value="'+(d.commentaireBE||'')+'" placeholder="Commentaire..."></td>'+
-      '<td>'+
-        '<button class="save-row" onclick="saveLine('+i+',''+d.edeal+'')">✓ Sauver</button> '+
-        '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(''+d.edeal+'')">📂 Voir</button>'+
-      '</td>'+
-    '</tr>';
-  }).join('');
+  var body = document.getElementById('admin-suivi-body');
+  if (!demandes || demandes.length === 0) {
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Aucune demande</td></tr>';
+    return;
+  }
+  var stStyle = {
+    'En attente': 'background:#fff3cd;color:#7a5500',
+    'Attribuée':  'background:#d4edda;color:#1a5c36',
+    'En cours':   'background:#d6e8ff;color:#1a3a7c',
+    'Terminée':   'background:#d4edda;color:#1a5c36',
+    'Urgent':     'background:#fce8e6;color:#8b1a1a'
+  };
+
+  // Construire le HTML via DOM (pas innerHTML avec apostrophes)
+  body.innerHTML = '';
+  demandes.forEach(function(d, i) {
+    var st = d.statut || 'En attente';
+    var tr = document.createElement('tr');
+
+    var opts = ['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s) {
+      return '<option value="' + s + '"' + (st === s ? ' selected' : '') + '>' + s + '</option>';
+    }).join('');
+
+    tr.innerHTML =
+      '<td class="td-edeal">' + (d.edeal || '—') + '</td>' +
+      '<td style="font-weight:600">' + (d.client || '—') + '</td>' +
+      '<td>' + (d.commercial || '—') + '</td>' +
+      '<td style="font-size:11px">' + (d.produits || '—') + '</td>' +
+      '<td style="font-size:11px;color:var(--text-light)">' + (d.date || '—') + '</td>' +
+      '<td><select class="st-select" id="st-' + i + '">' + opts + '</select></td>' +
+      '<td><input class="assign-input" id="ass-' + i + '" value="' + (d.attribueA || '') + '" placeholder="Nom ingénieur"></td>' +
+      '<td><input class="assign-input" style="width:140px" id="com-' + i + '" value="' + (d.commentaireBE || '') + '" placeholder="Commentaire..."></td>' +
+      '<td></td>';
+
+    // Boutons via DOM pour éviter les apostrophes dans onclick
+    var td = tr.querySelector('td:last-child');
+
+    var btnSave = document.createElement('button');
+    btnSave.className = 'save-row';
+    btnSave.textContent = '✓ Sauver';
+    btnSave.addEventListener('click', (function(idx, edeal) {
+      return function() { saveLine(idx, edeal); };
+    })(i, d.edeal));
+    td.appendChild(btnSave);
+
+    td.appendChild(document.createTextNode(' '));
+
+    var btnVoir = document.createElement('button');
+    btnVoir.className = 'save-row';
+    btnVoir.style.background = 'var(--blue)';
+    btnVoir.style.marginLeft = '4px';
+    btnVoir.textContent = '📂 Voir';
+    btnVoir.addEventListener('click', (function(edeal) {
+      return function() { ouvrirDemande(edeal); };
+    })(d.edeal));
+    td.appendChild(btnVoir);
+
+    body.appendChild(tr);
+  });
 }
+
 function saveLine(i,edeal) {
   var fd=new FormData();
   fd.append('action','updateSuivi');
@@ -527,30 +566,123 @@ function ouvrirDemande(edeal) {
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 function renderDetail(res) {
-  var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
-  html+=detailSection('Informations générales',[detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Produit(s)',(fd.produits||[]).join(', ')),detailRow('Contraintes',(infos.contraintes||[]).join(', ')),detailRow('Accès',(infos.acces||[]).join(', ')),detailRow('Zone',(infos.zone||[]).join(', ')),detailRow('Éléments',(infos.elements||[]).join(', ')),detailRow('Commentaire',fd.commentaire)].join(''));
-  var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
-  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
-  html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  if(res.pdfBase64){html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(''+res.pdfBase64+'',''+res.pdfNom+'','application/pdf')">⬇️ '+res.pdfNom+'</button></div>';}
-  (res.fichiers||[]).forEach(function(f){html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(''+f.b64+'',''+f.nom+'',''+f.type+'')">📎 '+f.nom+'</button></div>';});
-  html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur"></div></div>';
-  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..."></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(''+res.edeal+'')">✓ Sauvegarder</button></div>';
-  document.getElementById('detail-body').innerHTML=html;
+  var fd    = res.formData || {};
+  var infos = fd.infos || {};
+  var container = document.getElementById('detail-body');
+  container.innerHTML = '';
+
+  // Infos générales
+  var secGen = buildDetailSection('Informations générales', [
+    ['Client', fd.client], ['Commercial', fd.commercial],
+    ['Département', fd.ville], ['Date chantier', fd.dateChantier],
+    ['Produit(s)', (fd.produits || []).join(', ')],
+    ['Contraintes', (infos.contraintes || []).join(', ')],
+    ['Accès', (infos.acces || []).join(', ')],
+    ['Zone', (infos.zone || []).join(', ')],
+    ['Éléments', (infos.elements || []).join(', ')],
+    ['Commentaire', fd.commentaire]
+  ]);
+  container.appendChild(secGen);
+
+  // Blocs produits
+  var pm = {proplus_lp3:'Proplus LP3', proplus_lp3_2n:'Proplus LP3 - 2N', install_ext:'Installation ext.'};
+  Object.keys(fd.diagnostic || {}).forEach(function(pid) {
+    var pd = fd.diagnostic[pid];
+    var rows = Object.keys(pd).map(function(label) {
+      var v = pd[label]; return [label, Array.isArray(v) ? v.join(', ') : v];
+    });
+    var sec = buildDetailSection(pm[pid] || pid, rows);
+    container.appendChild(sec);
+  });
+
+  // Fichiers joints
+  var fichDiv = document.createElement('div');
+  fichDiv.style.marginTop = '14px';
+  var fichTitle = document.createElement('div');
+  fichTitle.className = 'card-title';
+  fichTitle.textContent = 'Fichiers joints';
+  fichDiv.appendChild(fichTitle);
+
+  if (res.pdfBase64) {
+    var pdfBtn = document.createElement('button');
+    pdfBtn.className = 'btn btn-primary btn-sm';
+    pdfBtn.style.marginBottom = '8px';
+    pdfBtn.textContent = '⬇️ ' + res.pdfNom;
+    pdfBtn.addEventListener('click', function() {
+      telecharger(res.pdfBase64, res.pdfNom, 'application/pdf');
+    });
+    fichDiv.appendChild(pdfBtn);
+  }
+
+  (res.fichiers || []).forEach(function(f) {
+    var btn = document.createElement('button');
+    btn.className = 'btn btn-outline btn-sm';
+    btn.style.marginBottom = '6px';
+    btn.style.display = 'block';
+    btn.textContent = '📎 ' + f.nom;
+    btn.addEventListener('click', function() {
+      telecharger(f.b64, f.nom, f.type);
+    });
+    fichDiv.appendChild(btn);
+  });
+  container.appendChild(fichDiv);
+
+  // Mise à jour statut
+  var hr = document.createElement('hr');
+  hr.style.cssText = 'border:none;border-top:1.5px solid var(--border);margin:16px 0';
+  container.appendChild(hr);
+
+  var majDiv = document.createElement('div');
+  majDiv.innerHTML =
+    '<div class="card-title">Mise à jour</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+      '<div><label class="flabel">Statut</label>' +
+        '<select class="fselect" id="det-statut">' +
+        ['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s) {
+          return '<option value="' + s + '">' + s + '</option>';
+        }).join('') +
+        '</select></div>' +
+      '<div><label class="flabel">Attribué à</label>' +
+        '<input class="finput" id="det-attrib" placeholder="Nom ingénieur"></div>' +
+    '</div>' +
+    '<div><label class="flabel">Commentaire BE</label>' +
+      '<input class="finput" id="det-comment" placeholder="Commentaire..."></div>';
+  container.appendChild(majDiv);
+
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-primary';
+  saveBtn.style.marginTop = '10px';
+  saveBtn.textContent = '✓ Sauvegarder';
+  saveBtn.addEventListener('click', function() { saveDetail(res.edeal); });
+  container.appendChild(saveBtn);
 }
-function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
-function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
-function telecharger(b64,nom,type){
-  try{
-    if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){
-      try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){}
-    }
-    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
-    var blob=new Blob([bytes],{type:type||'application/octet-stream'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
-  }catch(err){alert('Erreur : '+err.message);}
+
+function buildDetailSection(title, rows) {
+  var div = document.createElement('div');
+  div.style.marginBottom = '12px';
+  var titleEl = document.createElement('div');
+  titleEl.style.cssText = 'font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px';
+  titleEl.textContent = title;
+  div.appendChild(titleEl);
+  var body = document.createElement('div');
+  body.style.cssText = 'border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px';
+  var hasContent = false;
+  rows.forEach(function(row) {
+    var label = row[0], val = row[1];
+    if (!val || val === '' || val === 'undefined') return;
+    hasContent = true;
+    var rowEl = document.createElement('div');
+    rowEl.style.cssText = 'display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px';
+    rowEl.innerHTML =
+      '<div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">' + label + '</div>' +
+      '<div style="flex:1;color:var(--dark)">' + val + '</div>';
+    body.appendChild(rowEl);
+  });
+  if (!hasContent) return document.createDocumentFragment();
+  div.appendChild(body);
+  return div;
 }
+
 function saveDetail(edeal){
   var fd=new FormData();
   fd.append('action','updateSuivi');
