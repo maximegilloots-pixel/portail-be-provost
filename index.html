@@ -15,166 +15,112 @@
   --border:#e4e8f0;--white:#fff;--bg:#f5f7fb;
   --green:#2a7d52;--green-bg:rgba(42,125,82,0.09);
   --red:#c0392b;--red-bg:rgba(192,57,43,0.09);
-  --orange:#d4700a;--orange-bg:rgba(212,112,10,0.09);
   --radius:12px;--radius-sm:8px;
   --shadow:0 2px 12px rgba(35,45,70,0.08);
   --shadow-lg:0 8px 32px rgba(35,45,70,0.14);
   --tr:all 0.2s ease;
 }
 body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--text);font-size:14px;line-height:1.6}
-
-/* ── TABS ── */
-.tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:4px;margin-bottom:22px;width:fit-content;flex-wrap:wrap}
-.tab{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--text-light);cursor:pointer;transition:var(--tr);white-space:nowrap}
+.tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:50px;padding:4px;margin-bottom:22px;width:fit-content}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
 .tab.active{background:var(--blue);color:var(--white);box-shadow:0 2px 8px rgba(45,75,140,.25)}
 .tab:hover:not(.active){background:var(--blue-light);color:var(--blue)}
-
-/* ── SECTIONS ── */
 .section{display:none}.section.active{display:block;animation:fadeUp .3s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── LABELS ── */
 .s-label{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:8px;margin-bottom:5px}
 .s-label::before{content:'';width:18px;height:2px;background:var(--yellow);flex-shrink:0}
 .s-title{font-size:26px;font-weight:900;color:var(--dark);letter-spacing:-0.7px;margin-bottom:5px;line-height:1.1}
 .s-desc{font-size:13px;color:var(--text-light);margin-bottom:20px}
-
-/* ── CARDS ── */
 .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
-
-/* ── STEPS ── */
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;margin-top:1px}
-.step strong{display:block;font-size:12px;color:var(--dark);margin-bottom:1px}
+.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
+.step strong{display:block;font-size:12px;color:var(--dark)}
 .step span{font-size:11px;color:var(--text-light)}
-
-/* ── WIZARD ── */
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
-.wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border);transition:var(--tr)}
+.wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
 .wz:last-child{border-right:none}
 .wz.active{background:var(--blue);color:var(--white)}
 .wz.done{background:var(--green-bg);color:var(--green)}
-.wz-n{font-size:15px;font-weight:900;display:block;margin-bottom:1px}
-
-/* ── FORM ── */
+.wz-n{font-size:15px;font-weight:900;display:block}
 .fstep{display:none}.fstep.active{display:block}
 .frow{margin-bottom:14px}
 .flabel{display:block;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
-.finput,.fselect,.ftextarea{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);background:var(--white);transition:var(--tr);outline:none}
+.finput,.fselect,.ftextarea{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);background:var(--white);outline:none}
 .finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
 .ftextarea{min-height:80px;resize:vertical}
 .fhint{font-size:11px;color:var(--text-light);margin-top:3px}
 .req{color:var(--red)}
-
-/* ── PRODUITS CHECKBOXES ── */
 .produits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
-.produit-cb{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--tr);background:var(--white)}
-.produit-cb:hover{border-color:var(--blue);background:var(--blue-lighter)}
+.produit-cb{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--white)}
 .produit-cb.checked{border-color:var(--blue);background:var(--blue-light)}
 .produit-cb input{display:none}
-.cb-box{width:16px;height:16px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;transition:var(--tr);display:flex;align-items:center;justify-content:center}
+.cb-box{width:16px;height:16px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center}
 .produit-cb.checked .cb-box{background:var(--blue);border-color:var(--blue)}
 .cb-check{display:none;color:white;font-size:10px;font-weight:900}
 .produit-cb.checked .cb-check{display:block}
 .produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
-
-/* ── QUESTIONS FORM ── */
-.q-block{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
-.q-produit-header{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);background:var(--blue);padding:6px 12px;border-radius:var(--radius-sm);margin-bottom:14px;display:inline-block}
 .q-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
 .q-options{display:flex;flex-direction:column;gap:5px}
-.q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--tr);font-size:12px;color:var(--text)}
-.q-option:hover{border-color:var(--blue-mid);background:var(--blue-lighter)}
-.q-option.selected{border-color:var(--blue);background:var(--blue-light);color:var(--blue);font-weight:600}
+.q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text)}
 .q-option input[type=radio],.q-option input[type=checkbox]{display:none}
-.opt-dot{width:14px;height:14px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;transition:var(--tr)}
-.q-option.selected .opt-dot{background:var(--blue);border-color:var(--blue)}
-.opt-sq{width:14px;height:14px;border:2px solid var(--border);border-radius:3px;flex-shrink:0;transition:var(--tr);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:transparent}
-.q-option.selected .opt-sq{background:var(--blue);border-color:var(--blue);color:white}
-.q-text-input{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none;transition:var(--tr)}
-.q-text-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
+.opt-dot,.opt-sq{width:14px;height:14px;border:2px solid var(--border);flex-shrink:0}
+.opt-dot{border-radius:50%} .opt-sq{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
+.q-text-input{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none}
 .q-text-input.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
 .q-option.selected{border-color:var(--green)!important;background:rgba(42,125,82,0.07)!important;color:var(--green)!important;font-weight:700}
 .q-option.selected .opt-dot{background:var(--green)!important;border-color:var(--green)!important}
 .q-option.selected .opt-sq{background:var(--green)!important;border-color:var(--green)!important;color:white}
 .finput.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
-
-/* ── DROPZONE ── */
-.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;transition:var(--tr);background:var(--bg);position:relative}
-.dropzone:hover,.dropzone.over{border-color:var(--blue);background:var(--blue-light)}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;background:var(--bg);position:relative}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .dz-title{font-size:13px;font-weight:700;color:var(--dark);margin:8px 0 3px}
 .dz-sub{font-size:11px;color:var(--text-light)}
-.file-list{display:flex;flex-direction:column;gap:5px;margin-top:10px;text-align:left}
+.file-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
 .file-item{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:11px}
-.file-rm{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px;line-height:1;transition:color .2s}
-.file-rm:hover{color:var(--red)}
-
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;cursor:pointer;transition:var(--tr)}
+.file-rm{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
 .btn-primary{background:var(--blue);color:var(--white)}
 .btn-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(45,75,140,.28)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .btn-yellow{background:var(--yellow);color:var(--dark)}
-.btn-yellow:hover{background:#e8a410}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
 .btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
 .btn-sm{padding:7px 14px;font-size:10px}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
-
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase}
 .b-wait{background:var(--yellow-bg);color:#7a5500}
+.b-draft{background:rgba(35,45,70,0.1);color:var(--dark)}
 .b-attr{background:var(--green-bg);color:var(--green)}
 .b-prog{background:var(--blue-light);color:var(--blue)}
 .b-done{background:rgba(42,125,82,.15);color:var(--green)}
 .b-urg{background:var(--red-bg);color:var(--red)}
-
-/* ── TABLE ── */
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:12px}
 thead tr{background:var(--bg)}
 th{padding:9px 13px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);border-bottom:1.5px solid var(--border);white-space:nowrap}
 td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--bg)}
 .td-edeal{font-weight:700;color:var(--blue);font-family:monospace;font-size:12px}
 .empty-td td{text-align:center;padding:28px;color:var(--text-light);font-style:italic}
-
-/* ── MISC ── */
-.info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);line-height:1.6;margin-bottom:14px;display:flex;gap:9px;align-items:flex-start}
-.success-box{background:var(--green-bg);border:1.5px solid rgba(42,125,82,.2);border-radius:var(--radius-sm);padding:11px 14px;font-size:12px;color:var(--green);display:flex;gap:10px;align-items:flex-start}
+.info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;display:flex;gap:9px}
 .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .divider{border:none;border-top:1.5px solid var(--border);margin:16px 0}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:320px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-left:4px solid var(--green)}
 .toast.err{border-left:4px solid var(--red)}
-.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
-.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
-.refresh-btn:hover{border-color:var(--blue);color:var(--blue)}
-.refresh-btn svg{transition:transform .4s}
-.refresh-btn:hover svg{transform:rotate(180deg)}
-.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:10px;color:var(--text);margin:2px}
-</style>
-<style>
-/* ── LOGIN ── */
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
+.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer}
+.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:10px;margin:2px}
+.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
 .login-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:360px;box-shadow:var(--shadow-lg);text-align:center}
-.login-logo{font-size:22px;font-weight:900;color:var(--blue);letter-spacing:-0.5px;margin-bottom:4px}
+.login-logo{font-size:22px;font-weight:900;color:var(--blue);margin-bottom:4px}
 .login-sub{font-size:12px;color:var(--text-light);margin-bottom:28px}
-.login-label{display:block;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;text-align:left}
-.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--dark);outline:none;transition:var(--tr);margin-bottom:16px}
-.login-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
-.login-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:40px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:var(--tr)}
-.login-btn:hover{background:var(--blue-dark)}
 .login-err{color:var(--red);font-size:12px;margin-top:10px;display:none}
-.login-bar{width:100%;height:4px;background:var(--yellow);border-radius:0}
+.login-bar{width:100%;height:4px;background:var(--yellow)}
 .app-content{display:none}
 .app-content.visible{display:block}
 </style>
@@ -188,76 +134,34 @@ tbody tr:hover{background:var(--bg)}
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
       <div class="login-sub">Bureau d'Études — Portail Commercial</div>
-      
-      <div id="g_id_onload"
-           data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com"
-           data-context="signin"
-           data-ux_mode="popup"
-           data-callback="handleCredentialResponse"
-           data-auto_select="true"
-           data-itp_support="true">
-      </div>
-      
-      <div style="display: flex; justify-content: center; margin-bottom: 16px;">
-        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
-      </div>
-      
+      <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="true" data-itp_support="true"></div>
+      <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
     </div>
   </div>
 </div>
 
 <div class="app-content" id="app-content">
-
 <nav class="tabs">
-  <button class="tab active" id="tab-comment" data-tab="comment">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-    Comment ça marche
-  </button>
-  <button class="tab" id="tab-demande" data-tab="demande">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-    Nouvelle demande
-  </button>
-  <button class="tab" id="tab-suivi" data-tab="suivi">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-    Suivi des demandes
-  </button>
+  <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
+  <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
+  <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
 </nav>
 
 <section class="section active" id="section-comment">
-  <div class="s-label">Documentation</div>
-  <h2 class="s-title">Comment ça marche ?</h2>
+  <div class="s-label">Documentation</div><h2 class="s-title">Comment ça marche ?</h2>
   <p class="s-desc">Déposez vos demandes BE en quelques minutes, directement depuis cette page.</p>
   <div class="card">
-    <div class="card-title">Processus de demande</div>
     <div class="steps">
-      <div class="step"><div class="step-n">1</div><div><strong>Renseigner les informations générales</strong><span>N°EDEAL, nom du client, commercial, département...</span></div></div>
-      <div class="step"><div class="step-n">2</div><div><strong>Sélectionner le(s) produit(s)</strong><span>Proplus LP3, Proplus LP3 - 2 Niveaux, Installation extérieure...</span></div></div>
-      <div class="step"><div class="step-n">3</div><div><strong>Remplir le diagnostic technique</strong><span>Les questions s'adaptent automatiquement selon le(s) produit(s) sélectionné(s).</span></div></div>
-      <div class="step"><div class="step-n">4</div><div><strong>Joindre les pièces complémentaires</strong><span>Plan DWG, photos, CDC, vidéos... Le récapitulatif PDF est généré automatiquement.</span></div></div>
-      <div class="step"><div class="step-n">5</div><div><strong>Envoyer la demande au BE</strong><span>Un e-mail est envoyé automatiquement à entrees-be@provost.fr avec toutes les PJ.</span></div></div>
-      <div class="step"><div class="step-n">6</div><div><strong>Suivre l'état de votre demande</strong><span>Consultez l'onglet "Suivi" pour voir le statut en temps réel.</span></div></div>
+      <div class="step"><div class="step-n">1</div><div><strong>Remplir et Sauvegarder</strong><span>Saisissez vos données. Vous pouvez sauver en pré-demande à tout moment.</span></div></div>
+      <div class="step"><div class="step-n">2</div><div><strong>Validation BE</strong><span>Une fois envoyé définitivement, le BE prend en charge le dossier.</span></div></div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-title">Pièces jointes acceptées</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;">
-      <span style="background:var(--blue-light);color:var(--blue);padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;">DWG ✱</span>
-      <span class="tag">PDF</span><span class="tag">Photos</span><span class="tag">Vidéos</span><span class="tag">CDC</span><span class="tag">Schémas</span><span class="tag">Tout document utile</span>
-    </div>
-    <p style="font-size:11px;color:var(--text-light);margin-top:9px;">✱ Le plan DWG is obligatoire pour la prise en charge de votre demande.</p>
-  </div>
-  <button class="btn btn-primary" data-tab="demande">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-    Créer une nouvelle demande
-  </button>
+  <button class="btn btn-primary" data-tab="demande">Créer une nouvelle demande</button>
 </section>
 
 <section class="section" id="section-demande">
-  <div class="s-label">Bureau d'Études</div>
-  <h2 class="s-title">Nouvelle demande</h2>
-  <p class="s-desc">Complétez toutes les étapes puis envoyez votre demande au BE.</p>
-
+  <div class="s-label">Bureau d'Études</div><h2 class="s-title">Saisie de la demande</h2>
   <div class="wizard">
     <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
     <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
@@ -268,82 +172,29 @@ tbody tr:hover{background:var(--bg)}
   <div class="fstep active" id="step1">
     <div class="card">
       <div class="card-title">Informations générales</div>
-      <div class="frow">
-        <label class="flabel">N° EDEAL <span class="req">*</span></label>
-        <input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()">
-        <p class="fhint">Sera utilisé comme référence et objet de l'e-mail envoyé au BE.</p>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="frow" style="margin-bottom:0">
-          <label class="flabel">Nom du commercial <span class="req">*</span></label>
-          <input id="f-commercial" class="finput" placeholder="Prénom NOM">
-        </div>
-        <div class="frow" style="margin-bottom:0">
-          <label class="flabel">Nom du client <span class="req">*</span></label>
-          <input id="f-client" class="finput" placeholder="Société / Client">
-        </div>
-      </div>
-      <div class="frow" style="margin-top:12px">
-        <label class="flabel">Département / Ville — site de l'installation <span class="req">*</span></label>
-        <input id="f-ville" class="finput" placeholder="ex : 59 — Lille">
-      </div>
-      <div class="frow">
-        <label class="flabel">Date chantier souhaitée</label>
-        <input id="f-date" class="finput" type="text" placeholder="Date de début ou période souhaitée">
-        <p class="fhint">Préciser soit une date de début soit un mois cible.</p>
-      </div>
-
-      <hr class="divider">
-      <div class="card-title">Contraintes normatives</div>
-      <div id="q-contraintes" class="q-options"></div>
-
-      <hr class="divider">
-      <div class="card-title">Accès pour montage</div>
-      <div id="q-acces" class="q-options"></div>
-
-      <hr class="divider">
-      <div class="card-title">Zone de montage</div>
-      <div id="q-zone" class="q-options"></div>
-
-      <hr class="divider">
-      <div class="card-title">Éléments souhaités</div>
-      <div id="q-elements" class="q-options"></div>
-
-      <hr class="divider">
-      <div class="card-title">Plan & Documents obligatoires</div>
-      <div class="info-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        Le plan (DWG privilégié, ou PDF/Image) est <strong>&nbsp;OBLIGATOIRE</strong>. À joindre à l'étape 3 ou par mail à entrees-be@provost.fr
-      </div>
-      <div id="q-plan" class="q-options"></div>
-
-      <hr class="divider">
-      <div class="card-title">Photos & Vidéos</div>
-      <div id="q-photos" class="q-options"></div>
-      <div style="margin-top:8px" id="q-video"></div>
-
-      <hr class="divider">
-      <div class="card-title">Sélection du/des produit(s) <span class="req">*</span></div>
-      <p class="fhint" style="margin-bottom:10px">Sélectionnez un ou plusieurs produits à traiter.</p>
-      <div class="produits-grid" id="produits-grid"></div>
-
-      <hr class="divider">
-      <div class="card-title">Commentaires / Remarques</div>
-      <textarea id="f-commentaire" class="ftextarea" placeholder="Informations complémentaires, urgences, contexte particulier..."></textarea>
-
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="goStep2()">
-          Continuer vers le diagnostic →
-          <div class="spinner" id="spin1"></div>
-        </button>
+      <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div><div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div></div>
+      <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
+      <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
+      <hr class="divider"><div class="card-title">Contraintes normatives</div><div id="q-contraintes" class="q-options"></div>
+      <hr class="divider"><div class="card-title">Accès pour montage</div><div id="q-acces" class="q-options"></div>
+      <hr class="divider"><div class="card-title">Zone de montage</div><div id="q-zone" class="q-options"></div>
+      <hr class="divider"><div class="card-title">Éléments souhaités</div><div id="q-elements" class="q-options"></div>
+      <hr class="divider"><div class="card-title">Plan obligatoire</div><div id="q-plan" class="q-options"></div>
+      <hr class="divider"><div class="card-title">Photos & Vidéos</div><div id="q-photos" class="q-options"></div><div style="margin-top:8px" id="q-video"></div>
+      <hr class="divider"><div class="card-title">Sélection du/des produit(s) <span class="req">*</span></div><div class="produits-grid" id="produits-grid"></div>
+      <hr class="divider"><div class="card-title">Commentaires</div><textarea id="f-commentaire" class="ftextarea"></textarea>
+      <div class="btn-row" style="justify-content:space-between;width:100%;">
+        <button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button>
+        <button class="btn btn-primary" onclick="goStep2()">Continuer vers le diagnostic →</button>
       </div>
     </div>
   </div>
 
   <div class="fstep" id="step2">
     <div id="diagnostic-container"></div>
-    <div class="btn-row">
-      <button class="btn btn-outline" onclick="goStep(1)">← Retour</button>
+    <div class="btn-row" style="justify-content:space-between;width:100%;">
+      <div><button class="btn btn-outline" onclick="goStep(1)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
       <button class="btn btn-primary" onclick="goStep(3)">Continuer vers les PJ →</button>
     </div>
   </div>
@@ -351,19 +202,10 @@ tbody tr:hover{background:var(--bg)}
   <div class="fstep" id="step3">
     <div class="card">
       <div class="card-title">Pièces jointes complémentaires</div>
-      <div class="info-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        Joignez le plan DWG et tout document utile. Le récapitulatif PDF sera généré automatiquement lors de l'envoi.
-      </div>
-      <div class="dropzone" id="dropzone" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
-        <input type="file" id="file-input" multiple onchange="addFiles(this.files)">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div class="dz-title">Glissez vos fichiers ici</div>
-        <div class="dz-sub">ou cliquez pour parcourir — tous formats</div>
-      </div>
+      <div class="dropzone" id="dropzone" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)"><input type="file" id="file-input" multiple onchange="addFiles(this.files)"><div class="dz-title">Glissez vos fichiers ici</div></div>
       <div class="file-list" id="file-list"></div>
-      <div class="btn-row">
-        <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
+      <div class="btn-row" style="justify-content:space-between;width:100%;">
+        <div><button class="btn btn-outline" onclick="goStep(2)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
         <button class="btn btn-primary" onclick="goStep(4)">Vérifier et envoyer →</button>
       </div>
     </div>
@@ -371,371 +213,119 @@ tbody tr:hover{background:var(--bg)}
 
   <div class="fstep" id="step4">
     <div class="card">
-      <div class="card-title">Récapitulatif avant envoi</div>
-      <div id="recap-content"></div>
+      <div class="card-title">Récapitulatif avant envoi</div><div id="recap-content"></div>
       <hr class="divider">
-      <div class="info-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        La demande sera déposée dans le portail BE. Le Bureau d'Études y accède depuis la page Admin. Objet : <strong id="recap-obj">&nbsp;</strong>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-outline" onclick="goStep(3)">← Retour</button>
-        <button class="btn btn-primary" id="btn-send" onclick="envoyerDemande()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Déposer la demande
-          <div class="spinner" id="spin-send"></div>
-        </button>
+      <div class="btn-row" style="justify-content:space-between;width:100%;">
+        <div><button class="btn btn-outline" onclick="goStep(3)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
+        <button class="btn btn-primary" id="btn-send" onclick="envoyerDemande()">🚀 Déposer définitivement au BE</button>
       </div>
     </div>
   </div>
 </section>
 
 <section class="section" id="section-suivi">
-  <div class="s-label">Tableau de bord</div>
-  <h2 class="s-title">Suivi des demandes</h2>
-  <p class="s-desc">État en temps réel des demandes déposées.</p>
+  <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
   <div class="table-hd">
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn btn-sm btn-outline" data-filter="tous">Toutes</button>
-      <button class="btn btn-sm btn-outline" data-filter="En attente">En attente</button>
-      <button class="btn btn-sm btn-outline" data-filter="Attribuée">Attribuées</button>
-      <button class="btn btn-sm btn-outline" data-filter="En cours">En cours</button>
-      <button class="btn btn-sm btn-outline" data-filter="Terminée">Terminées</button>
-    </div>
-    <button class="refresh-btn" onclick="chargerSuivi()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-      Actualiser
-    </button>
+    <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-outline" data-filter="tous">Toutes</button><button class="btn btn-sm btn-outline" data-filter="Brouillon">Brouillons / Pré-demandes</button><button class="btn btn-sm btn-outline" data-filter="En attente">En attente</button><button class="btn btn-sm btn-outline" data-filter="Terminée">Terminées</button></div>
+    <button class="refresh-btn" onclick="chargerSuivi()">🔄 Actualiser</button>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Date</th><th>Produit(s)</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th>
-      </tr></thead>
-      <tbody id="suivi-body"><tr class="empty-td"><td colspan="8">Chargement...</td></tr></tbody>
-    </table>
-  </div>
+  <div class="table-wrap"><table><thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Date</th><th>Produit(s)</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead><tbody id="suivi-body"></tbody></table></div>
 </section>
-
 </div>
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
-// ══════════════════════════════════════════════════
-// ⚙️  CONFIG — À ADAPTER
-// ══════════════════════════════════════════════════
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
-
-// URL raw du config.json sur GitHub
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
-// ══════════════════════════════════════════════════
-
-// ── Authentification Google ───────────────────────
-function jwtDecode(token) {
-  var base64Url = token.split('.')[1];
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-  return JSON.parse(jsonPayload);
-}
+var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
 
 function handleCredentialResponse(response) {
   var payload = jwtDecode(response.credential);
-  
   if (payload.email && payload.email.endsWith('@provost.fr')) {
-    sessionStorage.setItem('portail_auth', '1');
-    
-    if (payload.name && !document.getElementById('f-commercial').value) {
-      document.getElementById('f-commercial').value = payload.name;
-      document.getElementById('f-commercial').classList.add('filled');
-    }
-    
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-content').classList.add('visible');
-    chargerConfigFormulaire();
-  } else {
-    var errEl = document.getElementById('login-err');
-    errEl.textContent = "Accès refusé. Utilisez votre compte professionnel @provost.fr.";
-    errEl.style.display = 'block';
+    sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name);
+    setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire();
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('[data-tab]').forEach(function(el) {
-    el.addEventListener('click', function() { showTab(this.dataset.tab); });
-  });
-  document.querySelectorAll('[data-filter]').forEach(function(el) {
-    el.addEventListener('click', function() { filtrer(this.dataset.filter); });
-  });
-});
-
-if (sessionStorage.getItem('portail_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-content').classList.add('visible');
-  window.addEventListener('DOMContentLoaded', chargerConfigFormulaire);
+function setupCommercialField(name) {
+  var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; }
 }
-
-// ── Chargement config depuis GitHub Pages ─────────
-var QUESTIONS_LP3_2N = null;
-var RawConfig = null; 
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('[data-tab]').forEach(function(el) { el.addEventListener('click', function() { showTab(this.dataset.tab); }); });
+  document.querySelectorAll('[data-filter]').forEach(function(el) { el.addEventListener('click', function() { filtrer(this.dataset.filter); }); });
+});
+if (sessionStorage.getItem('portail_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible');
+  window.addEventListener('DOMContentLoaded', function() { setupCommercialField(sessionStorage.getItem('user_name')); chargerConfigFormulaire(); });
+}
 
 function chargerConfigFormulaire() {
-  if (!CONFIG_URL || CONFIG_URL.indexOf('VOTRE_USER') !== -1) {
-    initFormulaire();
-    return;
-  }
-  fetch(CONFIG_URL + '?v=' + Date.now())
-  .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(function(cfg) {
-    RawConfig = cfg; 
-    if (cfg.liste_produits && cfg.liste_produits.length) {
-      PRODUITS = cfg.liste_produits;
-    }
-    if (cfg.proplus_lp3    && cfg.proplus_lp3.length)    QUESTIONS_PROPLUS     = cfg.proplus_lp3;
-    if (cfg.install_ext    && cfg.install_ext.length)    QUESTIONS_INSTALL_EXT = cfg.install_ext;
-    if (cfg.proplus_lp3_2n && cfg.proplus_lp3_2n.length) QUESTIONS_LP3_2N      = cfg.proplus_lp3_2n;
-    initFormulaire();
-  })
-  .catch(function(){ initFormulaire(); });
+  fetch(CONFIG_URL + '?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(cfg) {
+    RawConfig = cfg; if (cfg.liste_produits) PRODUITS = cfg.liste_produits; initFormulaire();
+  }).catch(function(){ initFormulaire(); });
 }
 
-// ── Définition des formulaires par défaut ──────────
 var FORM_INFOS = {
-  contraintes: {
-    type:'checkbox', multi:true,
-    options:['Intervention cabinet de contrôle','Garde corps provisoire + Filet (pendant le montage)','Puits de désenfumage (uniquement si système de désenfumage)','Sprinklage','Autre :']
-  },
+  contraintes: { type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :'] },
   acces: { type:'radio', options:['Sans contraintes particulières','Contraint (photo)'] },
-  zone: { type:'radio', options:['Zone dégagée','Zone encombrée (photo)','Zone en chambre froide','Autre :'] },
-  elements: { type:'radio', options:['Dossier complet (Plan + MR + Synthèse)','Dossier allégé (Plan + MR)',"Plan uniquement (complément d'un devis existant)",'Budget uniquement'] },
-  plan: { type:'checkbox', multi:false, options:['OK'] },
-  photos: { type:'checkbox', multi:false, options:['OK'] },
-  video: { type:'checkbox', multi:false, options:['OK'] }
+  zone: { type:'radio', options:['Zone dégagée','Zone encombrée (photo)'] },
+  elements: { type:'radio', options:['Dossier complet','Dossier allégé'] },
+  plan: { type:'checkbox', options:['OK'] }, photos: { type:'checkbox', options:['OK'] }, video: { type:'checkbox', options:['OK'] }
 };
+var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
 
-var PRODUITS = [
-  {id:'proplus_lp3', label:'Proplus LP3'},
-  {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
-  {id:'install_ext', label:'Installation extérieure'}
-];
-
-var QUESTIONS_PROPLUS = [
-  {id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},
-  {id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},
-  {id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},
-  {id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux, rayonnages...'},
-  {id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},
-  {id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},
-  {id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Agglo P5 BRUT (milieu humide)','Agglo P6 EUB (M1, ignifugé)','Agglo P6 Antidérapant et Sous Face Blanche','Caillebotis','Plancher tôlé','Plancher collaborant béton (PCB 20)','Autre :']},
-  {id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},
-  {id:'q_contrevent', label:'Type de contreventement', type:'checkbox', multi:true, options:['Jambe de force','Croix de St André','Autre :']},
-  {id:'q_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons (à dimensionner)','Autre :']},
-  {id:'q_escalier', label:"Type d'escalier", type:'checkbox', multi:true, options:['34°, largeur 1000 mm (Principal)','45°, largeur 800 mm (Secondaire)','Escalier hélicoïdal largeur utile 800 mm','Escalier hélicoïdal largeur utile 600 mm','Aucun','Autre :']},
-  {id:'q_gardecorps', label:'Garde-corps', type:'checkbox', multi:true, options:['Industriel (NF E85-015, plateforme de stockage)','Industriel (NF 14-122, plateforme de travail)','Aucun','Autre :']},
-  {id:'q_ouverture', label:"Type d'ouverture", type:'checkbox', multi:true, options:['Barrière écluse basculante (Ouverture permanente)','Barrière écluse pliante (Pour hauteur utile < 1800 mm)','Portillon coulissant (Ouverture occasionnelle)','Portillon battant (Ouverture occasionnelle)','Monte colis (Charge maxi: 100 ou 300 kg)','Monte charge (Charge maxi 1000 kg, hors PTT)','Toboggan (Charge maxi: 20 kg)','Convoyeur','Aucune','Autre :']},
-  {id:'q_barre_basc', label:'Barrière écluse Basculante — Dimensions', type:'checkbox', multi:true, options:['T1 (Ht charge: 1650) - L 1700','T1 (Ht charge: 1650) - L 2100','T1 (Ht charge: 1650) - L 2500','T1 (Ht charge: 1650) - L 3100','T2 (Ht charge: 2000) - L 1700','T2 (Ht charge: 2000) - L 2100','T2 (Ht charge: 2000) - L 2500','T2 (Ht charge: 2000) - L 3100','T3 (Ht charge: 2350) - L 1700','T3 (Ht charge: 2350) - L 2100','T3 (Ht charge: 2350) - L 2500','T3 (Ht charge: 2350) - L 3100']},
-  {id:'q_barre_pli', label:'Barrière écluse Pliante — Dimensions', type:'checkbox', multi:true, options:['T1 (Ht charge: 1800) - L 1700','T1 (Ht charge: 1800) - L 2100','T1 (Ht charge: 1800) - L 2500','T1 (Ht charge: 1800) - L 3100','T2 (Ht charge: 2000) - L 1700','T2 (Ht charge: 2000) - L 2100','T2 (Ht charge: 2000) - L 2500','T2 (Ht charge: 2000) - L 3100','T3 (Ht charge: 2350) - L 1700','T3 (Ht charge: 2350) - L 2100','T3 (Ht charge: 2350) - L 2500','T3 (Ht charge: 2350) - L 3100']},
-  {id:'q_tole', label:'Tôle de dépose', type:'radio', options:['Oui','Non']},
-  {id:'q_protec_poteau', label:'Protections poteau', type:'checkbox', multi:true, options:['Non','HT 400','HT 600','HT 1000','Autre :']},
-  {id:'q_accessoires', label:'Accessoires complémentaires', type:'checkbox', multi:true, options:['Cornières de chant','Tôle de liaison / franchissement','Autre :']},
-  {id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},
-  {id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}
-];
-
-var QUESTIONS_INSTALL_EXT = [
-  {id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},
-  {id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_toiture_lg', label:'Si toiture — longueur de débord', type:'text', placeholder:'En standard : longueur de débord 500 mm'},
-  {id:'qe_toiture_fin', label:'Si toiture — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Bacs anti condensation','Panneaux polycarbonate','Autre :']},
-  {id:'qe_pente', label:'Si toiture — indiquer la pente', type:'radio', options:['Penté haut','Penté bas']},
-  {id:'qe_bardage', label:'Bardage à prévoir', type:'checkbox', multi:true, options:['Pas de bardage à prévoir','Bardage arrière','Bardage latéral (2 côtés)','Bardage latéral (1 côté)','Autre :']},
-  {id:'qe_bardage_fin', label:'Si bardage — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Autre :']},
-  {id:'qe_finition_el', label:'Éléments de finition', type:'checkbox', multi:true, options:['Angle droit / Tôle finition angle','Bande de rive / Cornière de rive','U de finition de bardage','U de finition de toiture','Bandeau de finition','Faitière','Faitière contre mur','Bande de faitage','Profil bas de bardage','Tôle de finition de toiture',"Bavette de rejet d'eau",'Autre :']},
-  {id:'qe_eaux', label:"Descentes d'eaux pluviales", type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons (à dimensionner)','Autre :']},
-  {id:'qe_ancrage', label:"Type d'ancrages", type:'checkbox', multi:true, options:['Vis béton','Ancrages Inox','Ancrages chimiques','Autre :']},
-  {id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}
-];
-
-// ── État global ──────────────────────────────────────────
-var state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
-
-// ── Init ─────────────────────────────────────────────────
 function initFormulaire() {
-  var grid = document.getElementById('produits-grid');
-  if(!grid) return;
-  grid.innerHTML = '';
+  var grid = document.getElementById('produits-grid'); grid.innerHTML = '';
   PRODUITS.forEach(function(p) {
-    var el = document.createElement('label');
-    el.className = 'produit-cb';
-    el.dataset.id = p.id;
-    el.innerHTML = '<input type="checkbox" value="'+p.id+'" onchange="toggleProduit(\''+p.id+'\')">' +
-      '<div class="cb-box"><span class="cb-check">✓</span></div>' +
-      '<span>'+p.label+'</span>';
+    var el = document.createElement('label'); el.className = 'produit-cb'; el.dataset.id = p.id;
+    el.innerHTML = `<input type="checkbox" onchange="toggleProduit('${p.id}')"><div class="cb-box"><span class="cb-check">✓</span></div><span>${p.label}</span>`;
     grid.appendChild(el);
   });
-  buildOptions('q-contraintes', FORM_INFOS.contraintes, 'contraintes');
-  buildOptions('q-acces', FORM_INFOS.acces, 'acces');
-  buildOptions('q-zone', FORM_INFOS.zone, 'zone');
-  buildOptions('q-elements', FORM_INFOS.elements, 'elements');
-  buildOptions('q-plan', FORM_INFOS.plan, 'plan');
-  buildOptions('q-photos', FORM_INFOS.photos, 'photos');
-  buildOptions('q-video', FORM_INFOS.video, 'video');
-
-  document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('q-text-input') || e.target.classList.contains('finput')) {
-      e.target.classList.toggle('filled', e.target.value.trim() !== '');
-    }
-  });
+  Object.keys(FORM_INFOS).forEach(function(k){ buildOptions('q-'+k, FORM_INFOS[k], k); });
 }
-
-function buildOptions(containerId, conf, fieldId) {
-  var el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = '';
+function buildOptions(cId, conf, fId) {
+  var el = document.getElementById(cId); if (!el) return; el.innerHTML = '';
   conf.options.forEach(function(opt) {
-    var isMulti = conf.multi || conf.type === 'checkbox';
-    var sq = isMulti ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
-    var div = document.createElement('div');
-    div.className = 'q-option';
-    div.dataset.field = fieldId;
-    div.dataset.val = opt;
-    div.dataset.multi = isMulti ? '1' : '0';
-    div.innerHTML = sq + '<span>'+opt+'</span>';
-    div.onclick = function() { toggleOption(this); };
-    el.appendChild(div);
+    var div = document.createElement('div'); div.className = 'q-option'; div.dataset.field = fId; div.dataset.val = opt;
+    div.innerHTML = `<div class="${conf.type==='checkbox'?'opt-sq':'opt-dot'}">✓</div><span>${opt}</span>`;
+    div.onclick = function() { toggleOption(this); }; el.appendChild(div);
   });
 }
-
 function toggleOption(el) {
-  var multi = el.dataset.multi === '1';
-  var field = el.dataset.field;
-  if (!multi) {
-    document.querySelectorAll('.q-option[data-field="'+field+'"]').forEach(function(o) { o.classList.remove('selected'); });
-    el.classList.toggle('selected');
-  } else {
-    el.classList.toggle('selected');
-  }
+  var field = el.dataset.field; if (FORM_INFOS[field].type === 'radio') document.querySelectorAll(`.q-option[data-field="${field}"]`).forEach(function(o){o.classList.remove('selected')});
+  el.classList.toggle('selected');
 }
+function getOptionValues(fId) { var res=[]; document.querySelectorAll(`.q-option[data-field="${fId}"].selected`).forEach(function(o){res.push(o.dataset.val)}); return res; }
+function toggleProduit(id) { document.querySelector(`.produit-cb[data-id="${id}"]`).classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); }
 
-// ── Navigation ────────────────────────────────────────────
-function showTab(tab) {
-  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('section-'+tab).classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  if (tab === 'suivi') chargerSuivi();
-}
-
-// ── Gestion des étapes du formulaire ──────────────────────
 function goStep(n) {
-  document.querySelectorAll('.fstep').forEach(function(s) { s.classList.remove('active'); });
-  document.getElementById('step'+n).classList.add('active');
-  ['wz1','wz2','wz3','wz4'].forEach(function(id, i) {
-    var el = document.getElementById(id);
-    if(el) {
-      el.classList.remove('active','done');
-      if (i+1 < n) el.classList.add('done');
-      else if (i+1 === n) el.classList.add('active');
-    }
-  });
-  if (n === 4) buildRecap();
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active');
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); });
+  if(n===4) buildRecap();
 }
-
 function goStep2() {
-  var edeal = document.getElementById('f-edeal').value.trim();
-  var commercial = document.getElementById('f-commercial').value.trim();
-  var client = document.getElementById('f-client').value.trim();
-  var ville = document.getElementById('f-ville').value.trim();
-  if (!edeal || !commercial || !client || !ville) { toast('Renseignez tous les champs obligatoires.', 'err'); return; }
-  if (state.selectedProduits.length === 0) { toast('Sélectionnez au moins un produit.', 'err'); return; }
-  buildDiagnostic();
-  goStep(2);
+  if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
+  if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
+  buildDiagnostic(); goStep(2);
 }
-
-function getOptionValues(fieldId) {
-  var selected = [];
-  document.querySelectorAll('.q-option[data-field="'+fieldId+'"].selected').forEach(function(o) { selected.push(o.dataset.val); });
-  return selected;
-}
-
-function toggleProduit(id) {
-  var el = document.querySelector('.produit-cb[data-id="'+id+'"]');
-  if(el) el.classList.toggle('checked');
-  state.selectedProduits = [];
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e) { state.selectedProduits.push(e.dataset.id); });
-}
-
 function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container');
-  if(!container) return;
-  container.innerHTML = '';
-  
-  var sourceQuestions = RawConfig || {
-    proplus_lp3: QUESTIONS_PROPLUS,
-    proplus_lp3_2n: QUESTIONS_LP3_2N || QUESTIONS_PROPLUS,
-    install_ext: QUESTIONS_INSTALL_EXT
-  };
-
+  var container = document.getElementById('diagnostic-container'); container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
-    var produit = PRODUITS.find(function(p) { return p.id === pid; });
-    var questions = sourceQuestions[pid] || [];
-    
-    var block = document.createElement('div');
-    block.className = 'card';
-    block.innerHTML = '<div class="q-produit-header">'+(produit ? produit.label : pid)+'</div>';
-    
+    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = (RawConfig && RawConfig[pid]) || [];
+    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = `<div class="q-produit-header">${prod?prod.label:pid}</div>`;
     questions.forEach(function(q) {
-      var qDiv = document.createElement('div');
-      qDiv.style.marginBottom = '14px';
-      var titleDiv = document.createElement('div');
-      titleDiv.className = 'q-title';
-      titleDiv.textContent = q.label;
-      qDiv.appendChild(titleDiv);
-      
-      // 🖼️ APPARITION DE L'ILLUSTRATION DYNAMIQUE (SI DISPONIBLE)
-      if (q.image) {
-        var img = document.createElement('img');
-        img.src = q.image;
-        img.style.maxWidth = '100%';
-        img.style.height = 'auto';
-        img.style.borderRadius = '6px';
-        img.style.marginTop = '4px';
-        img.style.marginBottom = '10px';
-        img.style.display = 'block';
-        qDiv.appendChild(img);
-      }
-      
-      if (q.type === 'text') {
-        var inp = document.createElement('input');
-        inp.type = 'text';
-        inp.className = 'q-text-input';
-        inp.id = pid+'_'+q.id;
-        inp.placeholder = q.placeholder || '';
-        qDiv.appendChild(inp);
-      } else if (q.type === 'textarea') {
-        var ta = document.createElement('textarea');
-        ta.className = 'q-text-input';
-        ta.style.minHeight = '70px';
-        ta.id = pid+'_'+q.id;
-        ta.placeholder = q.placeholder || '';
-        qDiv.appendChild(ta);
+      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML=`<div class="q-title">${q.label}</div>`;
+      if(q.image) qDiv.innerHTML += `<img src="${q.image}" style="max-width:100%;display:block;margin:6px 0;border-radius:6px;">`;
+      if(q.type==='text' || q.type==='textarea') {
+        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=pid+'_'+q.id; qDiv.appendChild(inp);
       } else {
-        var optsDiv = document.createElement('div');
-        optsDiv.className = 'q-options';
-        var isMulti = q.multi || q.type === 'checkbox';
-        (q.options || []).forEach(function(opt) {
-          var o = document.createElement('div');
-          o.className = 'q-option';
-          o.dataset.field = pid+'_'+q.id;
-          o.dataset.val = opt;
-          o.dataset.multi = isMulti ? '1' : '0';
-          o.innerHTML = (isMulti ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>') + '<span>'+opt+'</span>';
-          o.onclick = function() { toggleOption(this); };
-          optsDiv.appendChild(o);
+        var optsDiv = document.createElement('div'); optsDiv.className='q-options';
+        (q.options||[]).forEach(function(o){
+          var div=document.createElement('div'); div.className='q-option'; div.dataset.field=pid+'_'+q.id; div.dataset.val=o;
+          div.innerHTML=`<div class="${q.type==='checkbox'?'opt-sq':'opt-dot'}">✓</div><span>${o}</span>`;
+          div.onclick=function(){ if(q.type==='radio')document.querySelectorAll(`.q-option[data-field="${pid+'_'+q.id}"]`).forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
+          optsDiv.appendChild(div);
         });
         qDiv.appendChild(optsDiv);
       }
@@ -745,277 +335,133 @@ function buildDiagnostic() {
   });
 }
 
-// ── Gestion des fichiers attachés ─────────────────────────
-function addFiles(files) {
-  for (var i=0; i<files.length; i++) {
-    var f = files[i];
-    if (!state.selectedFiles.find(function(x){ return x.name===f.name && x.size===f.size; })) state.selectedFiles.push(f);
-  }
-  renderFiles();
-}
-function renderFiles() {
-  var list = document.getElementById('file-list');
-  if(!list) return;
-  list.innerHTML = '';
-  state.selectedFiles.forEach(function(f, i) {
-    var item = document.createElement('div');
-    item.className = 'file-item';
-    item.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>' +
-      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+f.name+'</span>' +
-      '<span style="color:var(--text-light);font-size:10px;flex-shrink:0">'+fmtSize(f.size)+'</span>' +
-      '<button class="file-rm" onclick="rmFile('+i+')">×</button>';
-    list.appendChild(item);
-  });
-}
-function rmFile(i) { state.selectedFiles.splice(i,1); renderFiles(); }
-function fmtSize(b) { return b>1048576 ? (b/1048576).toFixed(1)+' Mo' : (b/1024).toFixed(0)+' Ko'; }
-function dzOver(e)  { e.preventDefault(); document.getElementById('dropzone').classList.add('over'); }
-function dzLeave(e) { document.getElementById('dropzone').classList.remove('over'); }
-function dzDrop(e)  { e.preventDefault(); document.getElementById('dropzone').classList.remove('over'); addFiles(e.dataTransfer.files); }
-
-// ── Récapitulatif ─────────────────────────────────────────
-function buildRecap() {
-  var edeal = document.getElementById('f-edeal').value.trim();
-  document.getElementById('recap-obj').textContent = edeal;
-
-  var produitLabels = state.selectedProduits.map(function(pid) {
-    return PRODUITS.find(function(p){ return p.id===pid; }).label;
-  }).join(', ');
-
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div>' +
-    '<div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div>' +
-    '<div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div>' +
-    '<div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div>' +
-    '<div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div>' +
-    '</div>' +
-    '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Pièces jointes ('+state.selectedFiles.length+')</div>' +
-    state.selectedFiles.map(function(f){ return '<span class="tag">'+f.name+'</span>'; }).join('') +
-    (state.selectedFiles.length === 0 ? '<span style="color:var(--text-light);font-size:11px;font-style:italic">Aucune PJ ajoutée</span>' : '') +
-    '</div>';
-
-  document.getElementById('recap-content').innerHTML = html;
-}
-
 function collectFormData() {
   var data = {
-    edeal: document.getElementById('f-edeal').value.trim(),
-    commercial: document.getElementById('f-commercial').value.trim(),
-    client: document.getElementById('f-client').value.trim(),
-    ville: document.getElementById('f-ville').value.trim(),
-    dateChantier: document.getElementById('f-date').value.trim(),
-    commentaire: document.getElementById('f-commentaire').value.trim(),
+    edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
+    client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(),
+    dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(),
     produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
-    infos: {
-      contraintes: getOptionValues('contraintes'),
-      acces: getOptionValues('acces'),
-      zone: getOptionValues('zone'),
-      elements: getOptionValues('elements'),
-      plan: getOptionValues('plan'),
-      photos: getOptionValues('photos'),
-      video: getOptionValues('video')
-    },
-    diagnostic: {}
+    infos: {}, diagnostic: {}
   };
+  Object.keys(FORM_INFOS).forEach(function(k){ data.infos[k] = getOptionValues(k); });
   state.selectedProduits.forEach(function(pid) {
-    var prodData = {};
-    var questions = pid === 'install_ext' ? QUESTIONS_INSTALL_EXT :
-                 (pid === 'proplus_lp3_2n' ? (QUESTIONS_LP3_2N || QUESTIONS_PROPLUS) : QUESTIONS_PROPLUS);
+    var prodData = {}; var questions = (RawConfig && RawConfig[pid]) || [];
     questions.forEach(function(q) {
       var fid = pid+'_'+q.id;
-      if (q.type === 'text' || q.type === 'textarea') {
-        var el = document.getElementById(fid);
-        if (el) prodData[q.label] = el.value.trim();
-      } else {
-        prodData[q.label] = getOptionValues(fid);
-      }
+      if (q.type==='text' || q.type==='textarea') { var el=document.getElementById(fid); if(el) prodData[q.label]=el.value.trim(); }
+      else prodData[q.label] = getOptionValues(fid);
     });
     data.diagnostic[pid] = prodData;
   });
   return data;
 }
 
-// ── Génération PDF Sécurisée ─────────────────────────────
+function sauvegarderBrouillon() {
+  var edeal = document.getElementById('f-edeal').value.trim();
+  if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
+  var fData = collectFormData(); fData.isBrouillon = true;
+  toast("⏳ Sauvegarde de la pré-demande...", "ok");
+  var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
+  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
+    if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
+  });
+}
+
+function reprendreBrouillon(edeal) {
+  toast("⏳ Chargement de la pré-demande...", "ok");
+  fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
+  .then(function(r){return r.json();}).then(function(res){
+    if(!res.success || !res.formData) return; var fd = res.formData;
+    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || '';
+    document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || '';
+    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    if(fd.infos) Object.keys(fd.infos).forEach(function(k){ (fd.infos[k]||[]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${k}"][data-val="${v}"]`); if(o) o.classList.add('selected'); })});
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked')});
+    state.selectedProduits = Object.keys(fd.diagnostic || {});
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector(`.produit-cb[data-id="${pid}"]`); if(c) c.classList.add('checked'); });
+    buildDiagnostic();
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = (RawConfig && RawConfig[pid]) || [];
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} }
+        else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${fid}"][data-val="${v}"]`); if(o) o.classList.add('selected'); }); }
+      });
+    });
+    showTab('demande'); goStep(1); toast("📋 Pré-demande chargée. N'oubliez pas de reglisser vos pièces jointes à l'étape 3.", "ok");
+  });
+}
+
+function envoyerDemande() {
+  var fData = collectFormData(); fData.isBrouillon = false;
+  var btn = document.getElementById('btn-send'); btn.disabled = true;
+  toast("⏳ Envoi définitif au BE...", "ok");
+  genererPDFBase64(fData).then(function(pdfBase64) {
+    var promises = state.selectedFiles.map(function(file) {
+      return new Promise(function(resolve) {
+        var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file);
+      });
+    });
+    Promise.all(promises).then(function(files) {
+      var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
+      files.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
+      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
+        btn.disabled = false; if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); }
+      });
+    });
+  });
+}
+
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
-    var dateStr = new Date().toLocaleDateString('fr-FR');
-    var produits = (fData.produits||[]).join(', ');
-    var infos = fData.infos || {};
-    var diag  = fData.diagnostic || {};
-
-    function row(label, val) {
-      if (!val || val === '') return '';
-      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
-        '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
-        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
-    }
-    function rowList(label, vals) {
-      if (!vals || !vals.length) return '';
-      return row(label, vals.join(', '));
-    }
-    function section(title, rows) {
-      if (!rows) return '';
-      return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
-        '<div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div>' +
-        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
-    }
-
-    var sections = '';
-    sections += section('Informations générales',
-      row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
-      row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) +
-      row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) +
-      rowList('Contraintes normatives', infos.contraintes) +
-      rowList('Accès pour montage', infos.acces) +
-      rowList('Zone', infos.zone) +
-      rowList('Éléments souhaités', infos.elements) +
-      row('Plan joint', infos.plan && infos.plan.length ? 'OK' : '') +
-      row('Commentaire', fData.commentaire)
-    );
-    Object.keys(diag).forEach(function(pid) {
-      var pd = diag[pid]; var rows = '';
-      var produit = PRODUITS.find(function(p) { return p.id === pid; });
-      var labelProduit = produit ? produit.label : pid;
-      
-      Object.keys(pd).forEach(function(label) {
-        var v = pd[label];
-        rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
-      });
-      if (rows) sections += section(labelProduit, rows);
-    });
-
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-      '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
-      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
-      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}' +
-      '.sec{margin-bottom:12px;page-break-inside:avoid}' +
-      '.st{font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px}' +
-      '.row{display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px}' +
-      '.rl{width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0}' +
-      '.rv{flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px}' +
-      '@media print{body{padding:0}}</style>' +
-      '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
-      '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
-      sections + '</body></html>';
-
+    var html = `<html><body><h2>Demande BE : ${fData.edeal}</h2><p>Client: ${fData.client}</p><p>Commercial: ${fData.commercial}</p></body></html>`;
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
-
-// ── Dépôt de la demande ──────────────────────────────────
-function envoyerDemande() {
-  var fData = collectFormData();
-  var btn   = document.getElementById('btn-send');
-  var spin  = document.getElementById('spin-send');
-  if(btn) btn.disabled = true;
-  if(spin) spin.style.display = 'block';
-
-  genererPDFBase64(fData).then(function(pdfBase64) {
-    var filePromises = state.selectedFiles.map(function(file) {
-      return new Promise(function(resolve) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]});
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-    return Promise.all(filePromises).then(function(files) {
-      var fd = new FormData();
-      fd.append('action', 'deposerDemande');
-      fd.append('data', JSON.stringify(fData));
-      fd.append('pdfBase64', pdfBase64);
-      files.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
-      return fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd});
-    });
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if(spin) spin.style.display = 'none'; 
-    if(btn) btn.disabled = false;
-    if (res.success) {
-      toast('Demande déposée avec succès ! ✓', 'ok');
-      resetForm();
-      setTimeout(function(){ showTab('suivi'); }, 1500);
-    } else {
-      toast('Erreur : ' + (res.error||'inconnue'), 'err');
-    }
-  })
-  .catch(function(err) {
-    if(spin) spin.style.display = 'none'; 
-    if(btn) btn.disabled = false;
-    toast('Erreur : ' + (err.message||''), 'err');
-  });
-}
-
 function resetForm() {
-  ['f-edeal','f-commercial','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
   document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
-  state.selectedFiles = [];
-  state.selectedProduits = [];
-  renderFiles();
-  goStep(1);
+  state.selectedFiles = []; state.selectedProduits = []; renderFiles(); goStep(1);
 }
-
-// ── Gestion du Tableau de Suivi ───────────────────────────
-function chargerSuivi() {
-  var sbody = document.getElementById('suivi-body');
-  if(sbody) sbody.innerHTML = '<tr class="empty-td"><td colspan="8">Chargement...</td></tr>';
-  fetch(APPS_SCRIPT_URL+'?action=getSuivi')
-  .then(function(r){ return r.json(); })
-  .then(function(res) {
-    state.allDemandes = res.demandes || [];
-    renderSuivi(state.allDemandes);
-  })
-  .catch(function() {
-    if(sbody) sbody.innerHTML = '<tr class="empty-td"><td colspan="8">Erreur de chargement.</td></tr>';
+function addFiles(files) { for(var i=0;i<files.length;i++){ var f=files[i]; if(!state.selectedFiles.find(function(x){return x.name===f.name})) state.selectedFiles.push(f); } renderFiles(); }
+function renderFiles() {
+  var list = document.getElementById('file-list'); list.innerHTML = '';
+  state.selectedFiles.forEach(function(f, i) {
+    var item = document.createElement('div'); item.className = 'file-item';
+    item.innerHTML = `<span style="flex:1;">${f.name}</span><button class="file-rm" onclick="state.selectedFiles.splice(${i},1);renderFiles();">×</button>`;
+    list.appendChild(item);
   });
 }
+function dzOver(e){e.preventDefault();} function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
+function buildRecap() { document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; }
 
-function filtrer(statut) {
-  var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; });
-  renderSuivi(list);
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('section-'+tab).classList.add('active'); document.getElementById('tab-'+tab).classList.add('active');
+  if (tab === 'suivi') chargerSuivi();
 }
-
+function chargerSuivi() {
+  var sbody = document.getElementById('suivi-body'); sbody.innerHTML = '<tr><td colspan="9">Chargement...</td></tr>';
+  fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){ return r.json(); }).then(function(res) {
+    var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
+    // 🔒 SÉCURITÉ USER : Un commercial ne voit STRICTEMENT que ses demandes (brouillons compris)
+    state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
+    renderSuivi(state.allDemandes);
+  });
+}
+function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
 function renderSuivi(demandes) {
-  var body = document.getElementById('suivi-body');
-  if (!body) return;
-  if (!demandes || demandes.length === 0) {
-    body.innerHTML = '<tr class="empty-td"><td colspan="8">Aucune demande.</td></tr>';
-    return;
-  }
+  var body = document.getElementById('suivi-body'); if (!body) return;
+  if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande</td></tr>'; return; }
   body.innerHTML = demandes.map(function(d) {
-    return '<tr>' +
-      '<td class="td-edeal">'+(d.edeal||'—')+'</td>' +
-      '<td style="font-weight:600;color:var(--dark)">'+(d.client||'—')+'</td>' +
-      '<td>'+(d.commercial||'—')+'</td>' +
-      '<td style="color:var(--text-light);font-size:11px">'+(d.date||'—')+'</td>' +
-      '<td style="font-size:11px">'+(d.produits||'—')+'</td>' +
-      '<td>'+badgeSt(d.statut)+'</td>' +
-      '<td style="font-weight:500">'+(d.attribueA||'<span style="color:var(--text-light);font-style:italic">Non attribuée</span>')+'</td>' +
-      '<td style="font-size:11px;color:var(--text-light)">'+(d.commentaireBE||'—')+'</td>' +
-    '</tr>';
+    var actionBtn = d.statut === 'Brouillon' ? `<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon('${d.edeal}')">✏️ Reprendre</button>` : '—';
+    return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
-
-// Badge de couleur
-function badgeSt(s) {
-  var m={'En attente':'b-wait','Attribuée':'b-attr','En cours':'b-prog','Terminée':'b-done','Urgent':'b-urg'};
-  return '<span class="badge '+(m[s]||'b-wait')+'">'+(s||'En attente')+'</span>';
-}
-
-function toast(msg, type) {
-  var el = document.getElementById('toast');
-  if(!el) return;
-  document.getElementById('toast-msg').textContent = msg;
-  el.className = 'toast '+(type||'');
-  el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 3500);
-}
+function toast(msg, type) { var el = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
 </html>
