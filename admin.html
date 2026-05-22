@@ -125,10 +125,9 @@ tr:last-child td{border-bottom:none}
 <section class="section active" id="section-questions">
   <div class="card">
     <div class="card-title">Formulaire à modifier</div>
-    <div class="produit-tab">
-      <button class="produit-btn active" onclick="switchProduit('proplus_lp3', event)">Proplus LP3</button>
-      <button class="produit-btn" onclick="switchProduit('proplus_lp3_2n', event)">Proplus LP3 - 2 Niveaux</button>
-      <button class="produit-btn" onclick="switchProduit('install_ext', event)">Installation extérieure</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+      <div class="produit-tab" id="produit-tabs-container"></div>
+      <button class="btn btn-outline btn-sm" style="border-color:var(--blue); color:var(--blue)" onclick="ajouterNouveauProduit()">+ Nouvelle section / produit</button>
     </div>
     <div class="q-list" id="q-list-container"></div>
     <div class="btn-row" style="margin-top:16px">
@@ -280,12 +279,64 @@ function testerGitHub() {
   .catch(function(){ toast('Connexion GitHub échouée', 'err'); });
 }
 
-// ── Charger config.json depuis GitHub ─────────────
+// ── Gestion des onglets / produits dynamiques ──────
 var formData = {};
 var currentProduit = 'proplus_lp3';
 var editingIndex = -1;
 var allDemandes = [];
 
+function renderProduitTabs() {
+  var container = document.getElementById('produit-tabs-container');
+  if (!container) return;
+  container.innerHTML = '';
+  (formData.liste_produits || []).forEach(function(p) {
+    var btn = document.createElement('button');
+    btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : '');
+    btn.textContent = p.label;
+    btn.onclick = function(e) { switchProduit(p.id, e); };
+    container.appendChild(btn);
+  });
+}
+
+function ajouterNouveauProduit() {
+  var nom = prompt("Nom de la nouvelle section ou du nouveau produit :");
+  if (!nom || !nom.trim()) return;
+  nom = nom.trim();
+  var id = "prod_" + Date.now();
+  if (!formData.liste_produits) formData.liste_produits = [];
+  formData.liste_produits.push({ id: id, label: nom });
+  formData[id] = []; 
+  currentProduit = id;
+  renderProduitTabs();
+  renderQuestions();
+  toast("✓ Nouvelle section créée. N'oubliez pas de Publier !", "ok");
+}
+
+function initChampsProduits() {
+  if (!formData.liste_produits) {
+    formData.liste_produits = [
+      {id:'proplus_lp3', label:'Proplus LP3'},
+      {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
+      {id:'install_ext', label:'Installation extérieure'}
+    ];
+  }
+  if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
+    formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || []));
+  }
+}
+
+function switchProduit(pid, e) {
+  currentProduit = pid;
+  document.querySelectorAll('.produit-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (e && e.target) {
+    e.target.classList.add('active');
+  } else {
+    renderProduitTabs();
+  }
+  renderQuestions();
+}
+
+// ── Charger config.json depuis GitHub ─────────────
 function chargerDepuisGitHub() {
   var gh = getGHConfig();
   majStatusGH();
@@ -296,6 +347,8 @@ function chargerDepuisGitHub() {
   }
   if (!gh.user || !gh.repo) {
     formData = getQuestionsDefaut();
+    initChampsProduits();
+    renderProduitTabs();
     renderQuestions();
     return;
   }
@@ -304,14 +357,15 @@ function chargerDepuisGitHub() {
   .then(function(r){ return r.json(); })
   .then(function(cfg) {
     formData = cfg;
-    if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
-      formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3));
-    }
+    initChampsProduits();
+    renderProduitTabs();
     renderQuestions();
     toast('✓ Questions chargées depuis GitHub', 'ok');
   })
   .catch(function(){ 
     formData = getQuestionsDefaut();
+    initChampsProduits();
+    renderProduitTabs();
     renderQuestions();
     toast('GitHub non accessible — questions par défaut chargées', 'err');
   });
@@ -365,13 +419,6 @@ function exporter() {
 // ── Éditeur questions ─────────────────────────────
 function getQuestionsDefaut() {
   return {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]};
-}
-
-function switchProduit(pid, e) {
-  currentProduit = pid;
-  document.querySelectorAll('.produit-btn').forEach(function(b){ b.classList.remove('active'); });
-  if (e && e.target) e.target.classList.add('active');
-  renderQuestions();
 }
 
 function renderQuestions() {
