@@ -105,8 +105,6 @@ tbody tr:hover{background:var(--bg)}
 .td-edeal{font-weight:700;color:var(--blue);font-family:monospace;font-size:12px}
 .empty-td td{text-align:center;padding:28px;color:var(--text-light);font-style:italic}
 .info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;display:flex;gap:9px}
-.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;display:none}
-@keyframes spin{to{transform:rotate(360deg)}}
 .divider{border:none;border-top:1.5px solid var(--border);margin:16px 0}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -238,7 +236,7 @@ tbody tr:hover{background:var(--bg)}
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
-var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
+var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null };
 
 function jwtDecode(token) {
   try {
@@ -341,7 +339,6 @@ function goStep2() {
   buildDiagnostic(); goStep(2);
 }
 
-// 🛠️ FIX FALLBACK QUESTIONS : Résout le problème de sauvegarde de la page 2
 function getQuestionsListForProduct(pid) {
   if (RawConfig && RawConfig[pid]) return RawConfig[pid];
   if (pid === 'proplus_lp3') return (typeof QUESTIONS_PROPLUS !== 'undefined') ? QUESTIONS_PROPLUS : [];
@@ -353,8 +350,7 @@ function getQuestionsListForProduct(pid) {
 function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
-    var prod = PRODUITS.find(function(p){return p.id===pid}); 
-    var questions = getQuestionsListForProduct(pid);
+    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = `<div class="q-produit-header">${prod?prod.label:pid}</div>`;
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML=`<div class="q-title">${q.label}</div>`;
@@ -378,6 +374,7 @@ function buildDiagnostic() {
   });
 }
 
+// 🛠️ FIX D'ÉCRASEMENT DE LA PAGE 2 : Un bouclier empêche d'effacer le diagnostic si on clique sur sauver depuis l'étape 1
 function collectFormData() {
   var data = {
     edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
@@ -388,27 +385,65 @@ function collectFormData() {
     infos: {}, diagnostic: {}
   };
   Object.keys(FORM_INFOS).forEach(function(k){ data.infos[k] = getOptionValues(k); });
+  
   state.selectedProduits.forEach(function(pid) {
     var prodData = {}; var questions = getQuestionsListForProduct(pid);
     questions.forEach(function(q) {
       var fid = pid+'_'+q.id;
-      if (q.type==='text' || q.type==='textarea') { var el=document.getElementById(fid); if(el) prodData[q.label]=el.value.trim(); }
-      else prodData[q.label] = getOptionValues(fid);
+      var el = document.getElementById(fid);
+      if (el) {
+        prodData[q.label] = el.value.trim();
+      } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector(`.q-option[data-field="${fid}"]`)) {
+        prodData[q.label] = getOptionValues(fid);
+      } else {
+        if (state.loadedDraft && state.loadedDraft.diagnostic && state.loadedDraft.diagnostic[pid] && state.loadedDraft.diagnostic[pid][q.label] !== undefined) {
+          prodData[q.label] = state.loadedDraft.diagnostic[pid][q.label];
+        } else {
+          prodData[q.label] = (q.type === 'text' || q.type === 'textarea') ? "" : [];
+        }
+      }
     });
     data.diagnostic[pid] = prodData;
   });
   return data;
 }
 
+// 🛠️ FIX DES PIÈCES JOINTES BROUILLONS : Uploade et maintient synchronisées les PJ existantes et nouvelles sur le serveur Google
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
   if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
   var fData = collectFormData(); fData.isBrouillon = true;
+  
+  var btn = document.querySelector('button[onclick="sauvegarderBrouillon()"]');
+  if(btn) btn.disabled = true;
   toast("⏳ Sauvegarde de la pré-demande...", "ok");
-  var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
-  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
-    if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
+  
+  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  
+  var promises = localFiles.map(function(file) {
+    return new Promise(function(resolve) {
+      var r = new FileReader();
+      r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); };
+      r.readAsDataURL(file);
+    });
   });
+  
+  Promise.all(promises).then(function(newFiles) {
+    var fd = new FormData();
+    fd.append('action', 'deposerDemande');
+    fd.append('data', JSON.stringify(fData));
+    
+    serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
+    newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
+    return fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd});
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){
+    if(btn) btn.disabled = false;
+    if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
+  })
+  .catch(function(){ if(btn) btn.disabled = false; toast("Erreur réseau","err"); });
 }
 
 function reprendreBrouillon(edeal) {
@@ -416,6 +451,8 @@ function reprendreBrouillon(edeal) {
   fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
   .then(function(r){return r.json();}).then(function(res){
     if(!res.success || !res.formData) return; var fd = res.formData;
+    state.loadedDraft = fd;
+    
     document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || '';
     document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || '';
     document.getElementById('f-commentaire').value = fd.commentaire || '';
@@ -438,6 +475,14 @@ function reprendreBrouillon(edeal) {
         else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${fid}"][data-val="${v}"]`); if(o) o.classList.add('selected'); }); }
       });
     });
+
+    state.selectedFiles = [];
+    if (res.fichiers && res.fichiers.length > 0) {
+      res.fichiers.forEach(function(f) {
+        state.selectedFiles.push({ name: f.nom, size: Math.round(f.b64.length * 0.75), type: f.type, isFromServer: true, b64: f.b64 });
+      });
+    }
+    renderFiles();
     showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
   });
 }
@@ -446,15 +491,22 @@ function envoyerDemande() {
   var fData = collectFormData(); fData.isBrouillon = false;
   var btn = document.getElementById('btn-send'); btn.disabled = true;
   toast("⏳ Envoi définitif au BE...", "ok");
+  
+  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  
   genererPDFBase64(fData).then(function(pdfBase64) {
-    var promises = state.selectedFiles.map(function(file) {
+    var promises = localFiles.map(function(file) {
       return new Promise(function(resolve) {
         var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file);
       });
     });
-    Promise.all(promises).then(function(files) {
+    Promise.all(promises).then(function(newFiles) {
       var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
-      files.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
+      
+      serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
+      newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
+      
       fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
         btn.disabled = false; if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); }
       });
@@ -462,7 +514,7 @@ function envoyerDemande() {
   });
 }
 
-// 🛠️ RESTAURATION DUMOTEUR DE RENDU DU PDF COMPLET : Génère un récapitulatif parfait pour le BE
+// 🛠️ FIX DU PDF RÉCAPITULATIF : Restauration complète du compilateur de design HTML pour le BE
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
@@ -474,7 +526,7 @@ function genererPDFBase64(fData) {
       if (!val || val === '') return '';
       return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
         '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
-        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
+        '<div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
     }
     function rowList(label, vals) {
       if (!vals || !vals.length) return '';
@@ -499,10 +551,11 @@ function genererPDFBase64(fData) {
       row('Plan joint', infos.plan && infos.plan.length ? 'OK' : '') +
       row('Commentaire', fData.commentaire)
     );
+    
     Object.keys(diag).forEach(function(pid) {
       var pd = diag[pid]; var rows = '';
-      var produit = PRODUITS.find(function(p) { return p.id === pid; });
-      var labelProduit = produit ? produit.label : pid;
+      var pFound = PRODUITS.find(function(p) { return p.id === pid; });
+      var labelProduit = pFound ? pFound.label : pid;
       
       Object.keys(pd).forEach(function(label) {
         var v = pd[label];
@@ -515,11 +568,7 @@ function genererPDFBase64(fData) {
       '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
       '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
       '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}' +
-      '.sec{margin-bottom:12px;page-break-inside:avoid}' +
-      '.row{display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px}' +
-      '.rl{width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0}' +
-      '.rv{flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px}' +
-      '@media print{body{padding:0}}</style>' +
+      '</style>' +
       '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
       '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
       sections + '</body></html>';
@@ -532,10 +581,13 @@ function resetForm() {
   ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
   document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
-  state.selectedFiles = []; state.selectedProduits = []; renderFiles(); goStep(1);
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1);
 }
 
-function addFiles(files) { for(var i=0;i<files.length;i++){ var f=files[i]; if(!state.selectedFiles.find(function(x){return x.name===f.name})) state.selectedFiles.push(f); } renderFiles(); }
+function addFiles(files) { 
+  for(var i=0;i<files.length;i++){ var f=files[i]; if(!state.selectedFiles.find(function(x){return x.name===f.name})) state.selectedFiles.push(f); } renderFiles(); 
+}
+
 function renderFiles() {
   var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = '';
   state.selectedFiles.forEach(function(f, i) {
@@ -548,32 +600,9 @@ function renderFiles() {
 function dzOver(e){e.preventDefault();}
 function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
 
-// ── Restauration de l'écran d'aperçu de l'étape 4 ─────────
-function buildRecap() {
-  var edeal = document.getElementById('f-edeal').value.trim();
-  document.getElementById('recap-obj').textContent = edeal;
-
-  var produitLabels = state.selectedProduits.map(function(pid) {
-    var pFound = PRODUITS.find(function(p){ return p.id===pid; });
-    return pFound ? pFound.label : pid;
-  }).join(', ');
-
-  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div>' +
-    '<div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div>' +
-    '<div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div>' +
-    '<div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div>' +
-    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div>' +
-    '<div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div>' +
-    '</div>' +
-    '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Pièces jointes ('+state.selectedFiles.length+')</div>' +
-    state.selectedFiles.map(function(f){ return '<span class="tag">'+f.name+'</span>'; }).join('') +
-    (state.selectedFiles.length === 0 ? '<span style="color:var(--text-light);font-size:11px;font-style:italic">Aucune PJ ajoutée</span>' : '') +
-    '</div>';
-
-  document.getElementById('recap-content').innerHTML = html;
+function buildRecap() { 
+  document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; 
+  document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; 
 }
 
 function showTab(tab) {
@@ -591,6 +620,7 @@ function chargerSuivi() {
     renderSuivi(state.allDemandes);
   });
 }
+
 function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
 
 function renderSuivi(demandes) {
