@@ -79,7 +79,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
     <div class="login-sub">Portail Administration — Provost</div>
-    <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="true" data-itp_support="true"></div>
+    <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
   </div>
@@ -157,6 +157,21 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var formData = {}, currentProduit = 'proplus_lp3', editingIndex = -1, allDemandes = [], tempImageUrl = "";
+
+// 🔒 CORRECTIF : Décodeur robuste avec gestion automatique du Rembourrage Base64 (=)
+function jwtDecode(token) {
+  try {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) { base64 += '='; }
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Erreur décodage jeton Google:", e); return {};
+  }
+}
 
 function handleCredentialResponse(response) {
   var payload = jwtDecode(response.credential);
@@ -277,7 +292,6 @@ function filtrer(q) { q=q.toLowerCase(); renderSuivi(allDemandes.filter(function
 
 function renderSuivi(demandes) {
   var body=document.getElementById('admin-suivi-body');
-  // 🔒 SÉCURITÉ ADMIN : On filtre complètement les lignes "Brouillon" du tableau de bord BE
   var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
   if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande définitive</td></tr>'; return; }
   body.innerHTML=filtrées.map(function(d,i){
@@ -293,7 +307,7 @@ function renderSuivi(demandes) {
 }
 function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
-  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
+  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-${i}').value,commentaireBE:document.getElementById('com-'+i).value}));
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
 }
 function ouvrirDemande(edeal) {
