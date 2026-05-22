@@ -134,7 +134,16 @@ tbody tr:hover{background:var(--bg)}
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
       <div class="login-sub">Bureau d'Études — Portail Commercial</div>
-      <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="true" data-itp_support="true"></div>
+      
+      <div id="g_id_onload" 
+           data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" 
+           data-context="signin" 
+           data-ux_mode="popup" 
+           data-callback="handleCredentialResponse" 
+           data-auto_select="false" 
+           data-itp_support="true">
+      </div>
+      
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
     </div>
@@ -240,23 +249,46 @@ var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
 
+// 🔒 CORRECTIF : Décodeur robuste avec gestion automatique du Rembourrage Base64 (=)
+function jwtDecode(token) {
+  try {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) { base64 += '='; }
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Erreur décodage jeton Google:", e); return {};
+  }
+}
+
 function handleCredentialResponse(response) {
   var payload = jwtDecode(response.credential);
   if (payload.email && payload.email.endsWith('@provost.fr')) {
-    sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name);
-    setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire();
+    sessionStorage.setItem('portail_auth', '1'); 
+    sessionStorage.setItem('user_name', payload.name);
+    setupCommercialField(payload.name); 
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').classList.add('visible'); 
+    chargerConfigFormulaire();
   }
 }
+
 function setupCommercialField(name) {
-  var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; }
+  var comm = document.getElementById('f-commercial'); 
+  if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; }
 }
+
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('[data-tab]').forEach(function(el) { el.addEventListener('click', function() { showTab(this.dataset.tab); }); });
   document.querySelectorAll('[data-filter]').forEach(function(el) { el.addEventListener('click', function() { filtrer(this.dataset.filter); }); });
 });
+
 if (sessionStorage.getItem('portail_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible');
+  document.getElementById('login-screen').style.display = 'none'; 
+  document.getElementById('app-content').classList.add('visible');
   window.addEventListener('DOMContentLoaded', function() { setupCommercialField(sessionStorage.getItem('user_name')); chargerConfigFormulaire(); });
 }
 
@@ -271,12 +303,14 @@ var FORM_INFOS = {
   acces: { type:'radio', options:['Sans contraintes particulières','Contraint (photo)'] },
   zone: { type:'radio', options:['Zone dégagée','Zone encombrée (photo)'] },
   elements: { type:'radio', options:['Dossier complet','Dossier allégé'] },
-  plan: { type:'checkbox', options:['OK'] }, photos: { type:'checkbox', options:['OK'] }, video: { type:'checkbox', options:['OK'] }
+  plan: { type:'checkbox', options:['OK'] }, 
+  photos: { type:'checkbox', options:['OK'] }, 
+  video: { type:'checkbox', options:['OK'] }
 };
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
 
 function initFormulaire() {
-  var grid = document.getElementById('produits-grid'); grid.innerHTML = '';
+  var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
   PRODUITS.forEach(function(p) {
     var el = document.createElement('label'); el.className = 'produit-cb'; el.dataset.id = p.id;
     el.innerHTML = `<input type="checkbox" onchange="toggleProduit('${p.id}')"><div class="cb-box"><span class="cb-check">✓</span></div><span>${p.label}</span>`;
@@ -284,6 +318,7 @@ function initFormulaire() {
   });
   Object.keys(FORM_INFOS).forEach(function(k){ buildOptions('q-'+k, FORM_INFOS[k], k); });
 }
+
 function buildOptions(cId, conf, fId) {
   var el = document.getElementById(cId); if (!el) return; el.innerHTML = '';
   conf.options.forEach(function(opt) {
@@ -292,25 +327,45 @@ function buildOptions(cId, conf, fId) {
     div.onclick = function() { toggleOption(this); }; el.appendChild(div);
   });
 }
+
 function toggleOption(el) {
-  var field = el.dataset.field; if (FORM_INFOS[field].type === 'radio') document.querySelectorAll(`.q-option[data-field="${field}"]`).forEach(function(o){o.classList.remove('selected')});
+  var field = el.dataset.field; 
+  if (FORM_INFOS[field].type === 'radio') {
+    document.querySelectorAll(`.q-option[data-field="${field}"]`).forEach(function(o){o.classList.remove('selected')});
+  }
   el.classList.toggle('selected');
 }
-function getOptionValues(fId) { var res=[]; document.querySelectorAll(`.q-option[data-field="${fId}"].selected`).forEach(function(o){res.push(o.dataset.val)}); return res; }
-function toggleProduit(id) { document.querySelector(`.produit-cb[data-id="${id}"]`).classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); }
+
+function getOptionValues(fId) { 
+  var res=[]; 
+  document.querySelectorAll(`.q-option[data-field="${fId}"].selected`).forEach(function(o){res.push(o.dataset.val)}); 
+  return res; 
+}
+
+function toggleProduit(id) { 
+  document.querySelector(`.produit-cb[data-id="${id}"]`).classList.toggle('checked'); 
+  state.selectedProduits=[]; 
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); 
+}
 
 function goStep(n) {
-  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active');
-  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); });
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); 
+  document.getElementById('step'+n).classList.add('active');
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ 
+    var el=document.getElementById(id); 
+    if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); 
+  });
   if(n===4) buildRecap();
 }
+
 function goStep2() {
   if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
   if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
   buildDiagnostic(); goStep(2);
 }
+
 function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container'); container.innerHTML = '';
+  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
     var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = (RawConfig && RawConfig[pid]) || [];
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = `<div class="q-produit-header">${prod?prod.label:pid}</div>`;
@@ -337,11 +392,15 @@ function buildDiagnostic() {
 
 function collectFormData() {
   var data = {
-    edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
-    client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(),
-    dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(),
+    edeal: document.getElementById('f-edeal').value.trim(), 
+    commercial: document.getElementById('f-commercial').value.trim(),
+    client: document.getElementById('f-client').value.trim(), 
+    ville: document.getElementById('f-ville').value.trim(),
+    dateChantier: document.getElementById('f-date').value.trim(), 
+    commentaire: document.getElementById('f-commentaire').value.trim(),
     produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
-    infos: {}, diagnostic: {}
+    infos: {}, 
+    diagnostic: {}
   };
   Object.keys(FORM_INFOS).forEach(function(k){ data.infos[k] = getOptionValues(k); });
   state.selectedProduits.forEach(function(pid) {
@@ -419,23 +478,33 @@ function genererPDFBase64(fData) {
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
+
 function resetForm() {
   ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
   document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
   state.selectedFiles = []; state.selectedProduits = []; renderFiles(); goStep(1);
 }
+
 function addFiles(files) { for(var i=0;i<files.length;i++){ var f=files[i]; if(!state.selectedFiles.find(function(x){return x.name===f.name})) state.selectedFiles.push(f); } renderFiles(); }
+
 function renderFiles() {
-  var list = document.getElementById('file-list'); list.innerHTML = '';
+  var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = '';
   state.selectedFiles.forEach(function(f, i) {
     var item = document.createElement('div'); item.className = 'file-item';
     item.innerHTML = `<span style="flex:1;">${f.name}</span><button class="file-rm" onclick="state.selectedFiles.splice(${i},1);renderFiles();">×</button>`;
     list.appendChild(item);
   });
 }
-function dzOver(e){e.preventDefault();} function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
-function buildRecap() { document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; }
+
+// DnD
+function dzOver(e){e.preventDefault();}
+function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
+
+function buildRecap() { 
+  document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; 
+  document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; 
+}
 
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
@@ -443,16 +512,18 @@ function showTab(tab) {
   document.getElementById('section-'+tab).classList.add('active'); document.getElementById('tab-'+tab).classList.add('active');
   if (tab === 'suivi') chargerSuivi();
 }
+
 function chargerSuivi() {
-  var sbody = document.getElementById('suivi-body'); sbody.innerHTML = '<tr><td colspan="9">Chargement...</td></tr>';
+  var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9">Chargement...</td></tr>';
   fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){ return r.json(); }).then(function(res) {
     var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
-    // 🔒 SÉCURITÉ USER : Un commercial ne voit STRICTEMENT que ses demandes (brouillons compris)
     state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
     renderSuivi(state.allDemandes);
   });
 }
+
 function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
+
 function renderSuivi(demandes) {
   var body = document.getElementById('suivi-body'); if (!body) return;
   if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande</td></tr>'; return; }
@@ -461,7 +532,8 @@ function renderSuivi(demandes) {
     return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
-function toast(msg, type) { var el = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
+
+function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
 </html>
