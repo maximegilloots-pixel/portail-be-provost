@@ -388,7 +388,6 @@ function saveDetail(edeal){
 }
 
 function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
-function exporter() { var blob = new Blob([JSON.stringify(formData, null, 2)], {type:'application/json'}); var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click(); }
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerDepuisGitHub);
 </script>
 </body>
