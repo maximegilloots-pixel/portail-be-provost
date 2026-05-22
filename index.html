@@ -426,19 +426,60 @@ tbody tr:hover{background:var(--bg)}
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
-// ══════════════════════════════════════════
-// ⚙️  CONFIG — RENSEIGNEZ VOS VALEURS ICI
-// ══════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// ⚙️  CONFIG — À ADAPTER
+// ══════════════════════════════════════════════════
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUdS700NnWQilLf6H_Is6qe5AvVn3vSDBuu4ZEr8lsLtiTXZHBX0NvNA_9EdMKVlZP/exec';
 
+// Mot de passe portail commercial
+var PWD_PORTAIL = '0000';
 
-// → Extensions > Apps Script > Déployer > Nouvelle déploiement
-// → Type : Application Web, Exécuter en tant que : Moi, Accès : Tout le monde
-// ══════════════════════════════════════════
+// URL raw du config.json sur GitHub (Remplacez par votre vrai lien)
+var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
+// ══════════════════════════════════════════════════
 
-// ── Chargement dynamique config depuis Apps Script ──────────
+// ── Login ─────────────────────────────────────────
+function checkLogin() {
+  var pwd = document.getElementById('login-pwd').value;
+  if (pwd === PWD_PORTAIL) {
+    sessionStorage.setItem('portail_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').classList.add('visible');
+    chargerConfigFormulaire();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-pwd').value = '';
+    document.getElementById('login-pwd').focus();
+  }
+}
+
+// Configuration des Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Navigation par onglets
+  document.querySelectorAll('[data-tab]').forEach(function(el) {
+    el.addEventListener('click', function() { showTab(this.dataset.tab); });
+  });
+  // Filtres de suivi
+  document.querySelectorAll('[data-filter]').forEach(function(el) {
+    el.addEventListener('click', function() { filtrer(this.dataset.filter); });
+  });
+  // Touche Entrée pour la connexion
+  var lpwd = document.getElementById('login-pwd');
+  if (lpwd) {
+    lpwd.addEventListener('keydown', function(e) { if(e.key === 'Enter') checkLogin(); });
+  }
+});
+
+// Vérification de session existante
+if (sessionStorage.getItem('portail_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-content').classList.add('visible');
+}
+
+// ── Chargement de la configuration dynamique ───────
+var QUESTIONS_LP3_2N = null;
+
 function chargerConfigFormulaire() {
-  // Si CONFIG_URL pas encore configurée → lancer directement avec questions par défaut
   if (!CONFIG_URL || CONFIG_URL.indexOf('VOTRE_USER') !== -1) {
     initFormulaire();
     return;
@@ -455,42 +496,22 @@ function chargerConfigFormulaire() {
     initFormulaire();
   })
   .catch(function() {
-    // Fallback silencieux : questions par défaut
     initFormulaire();
   });
 }
-var QUESTIONS_LP3_2N = null;
 
-// ── Définition des formulaires (extraite du fichier Excel) ──────────────────
+// ── Formulaires par défaut (Fallback) ──────────────────
 var FORM_INFOS = {
   contraintes: {
     type:'checkbox', multi:true,
     options:['Intervention cabinet de contrôle','Garde corps provisoire + Filet (pendant le montage)','Puits de désenfumage (uniquement si système de désenfumage)','Sprinklage','Autre :']
   },
-  acces: {
-    type:'radio',
-    options:['Sans contraintes particulières','Contraint (photo)']
-  },
-  zone: {
-    type:'radio',
-    options:['Zone dégagée','Zone encombrée (photo)','Zone en chambre froide','Autre :']
-  },
-  elements: {
-    type:'radio',
-    options:['Dossier complet (Plan + MR + Synthèse)','Dossier allégé (Plan + MR)',"Plan uniquement (complément d'un devis existant)",'Budget uniquement']
-  },
-  plan: {
-    type:'checkbox', multi:false,
-    options:['OK']
-  },
-  photos: {
-    type:'checkbox', multi:false,
-    options:['OK']
-  },
-  video: {
-    type:'checkbox', multi:false,
-    options:['OK']
-  }
+  acces: { type:'radio', options:['Sans contraintes particulières','Contraint (photo)'] },
+  zone: { type:'radio', options:['Zone dégagée','Zone encombrée (photo)','Zone en chambre froide','Autre :'] },
+  elements: { type:'radio', options:['Dossier complet (Plan + MR + Synthèse)','Dossier allégé (Plan + MR)',"Plan uniquement (complément d'un devis existant)",'Budget uniquement'] },
+  plan: { type:'checkbox', multi:false, options:['OK'] },
+  photos: { type:'checkbox', multi:false, options:['OK'] },
+  video: { type:'checkbox', multi:false, options:['OK'] }
 };
 
 var PRODUITS = [
@@ -539,52 +560,30 @@ var QUESTIONS_INSTALL_EXT = [
 ];
 
 // ── État global ──────────────────────────────────────────
-var state = {
-  selectedFiles: [],
-  selectedProduits: [],
-  formData: {},
-  allDemandes: []
-};
+var state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
 
-// ── Init ─────────────────────────────────────────────────
+// ── Initialisation du Formulaire ─────────────────────────
 function initFormulaire() {
-  // Produits — via DOM pour éviter les apostrophes dans onchange
   var grid = document.getElementById('produits-grid');
+  if (!grid) return;
   grid.innerHTML = '';
   PRODUITS.forEach(function(p) {
-    var label = document.createElement('label');
-    label.className = 'produit-cb';
-    label.dataset.id = p.id;
-
-    var cbBox  = document.createElement('div');
-    cbBox.className = 'cb-box';
-    var check  = document.createElement('span');
-    check.className = 'cb-check';
-    check.textContent = '✓';
-    cbBox.appendChild(check);
-
-    var span = document.createElement('span');
-    span.textContent = p.label;
-
-    var inp = document.createElement('input');
-    inp.type = 'checkbox';
-    inp.value = p.id;
-    inp.addEventListener('change', function() { toggleProduit(p.id); });
-
-    label.appendChild(inp);
-    label.appendChild(cbBox);
-    label.appendChild(span);
-    grid.appendChild(label);
+    var el = document.createElement('label');
+    el.className = 'produit-cb';
+    el.dataset.id = p.id;
+    el.innerHTML = '<input type="checkbox" value="'+p.id+'" onchange="toggleProduit(\''+p.id+'\')">' +
+      '<div class="cb-box"><span class="cb-check">✓</span></div>' +
+      '<span>'+p.label+'</span>';
+    grid.appendChild(el);
   });
-
-  // Questions infos générales
+  
   buildOptions('q-contraintes', FORM_INFOS.contraintes, 'contraintes');
-  buildOptions('q-acces',       FORM_INFOS.acces,       'acces');
-  buildOptions('q-zone',        FORM_INFOS.zone,        'zone');
-  buildOptions('q-elements',    FORM_INFOS.elements,    'elements');
-  buildOptions('q-plan',        FORM_INFOS.plan,        'plan');
-  buildOptions('q-photos',      FORM_INFOS.photos,      'photos');
-  buildOptions('q-video',       FORM_INFOS.video,       'video');
+  buildOptions('q-acces', FORM_INFOS.acces, 'acces');
+  buildOptions('q-zone', FORM_INFOS.zone, 'zone');
+  buildOptions('q-elements', FORM_INFOS.elements, 'elements');
+  buildOptions('q-plan', FORM_INFOS.plan, 'plan');
+  buildOptions('q-photos', FORM_INFOS.photos, 'photos');
+  buildOptions('q-video', FORM_INFOS.video, 'video');
 
   document.addEventListener('input', function(e) {
     if (e.target.classList.contains('q-text-input') || e.target.classList.contains('finput')) {
@@ -593,91 +592,51 @@ function initFormulaire() {
   });
 }
 
-var FORM_INFOS = {
-  contraintes: {
-    type:'checkbox', multi:true,
-    options:['Intervention cabinet de contrôle','Garde corps provisoire + Filet (pendant le montage)','Puits de désenfumage (uniquement si système de désenfumage)','Sprinklage','Autre :']
-  },
-  acces: {
-    type:'radio',
-    options:['Sans contraintes particulières','Contraint (photo)']
-  },
-  zone: {
-    type:'radio',
-    options:['Zone dégagée','Zone encombrée (photo)','Zone en chambre froide','Autre :']
-  },
-  elements: {
-    type:'radio',
-    options:['Dossier complet (Plan + MR + Synthèse)','Dossier allégé (Plan + MR)',"Plan uniquement (complément d'un devis existant)",'Budget uniquement']
-  },
-  plan: {
-    type:'checkbox', multi:false,
-    options:['OK']
-  },
-  photos: {
-    type:'checkbox', multi:false,
-    options:['OK']
-  },
-  video: {
-    type:'checkbox', multi:false,
-    options:['OK']
+if (sessionStorage.getItem('portail_auth') === '1') {
+  chargerConfigFormulaire();
+}
+
+function buildOptions(containerId, conf, fieldId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  conf.options.forEach(function(opt) {
+    var isMulti = conf.multi || conf.type === 'checkbox';
+    var sq = isMulti ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
+    var div = document.createElement('div');
+    div.className = 'q-option';
+    div.dataset.field = fieldId;
+    div.dataset.val = opt;
+    div.dataset.multi = isMulti ? '1' : '0';
+    div.innerHTML = sq + '<span>'+opt+'</span>';
+    div.onclick = function() { toggleOption(this); };
+    el.appendChild(div);
+  });
+}
+
+function toggleOption(el) {
+  var multi = el.dataset.multi === '1';
+  var field = el.dataset.field;
+  if (!multi) {
+    document.querySelectorAll('.q-option[data-field="'+field+'"]').forEach(function(o) { o.classList.remove('selected'); });
+    el.classList.toggle('selected');
+  } else {
+    el.classList.toggle('selected');
   }
-};
+}
 
-var PRODUITS = [
-  {id:'proplus_lp3', label:'Proplus LP3'},
-  {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
-  {id:'install_ext', label:'Installation extérieure'}
-];
+function getOptionValues(fieldId) {
+  var selected = [];
+  document.querySelectorAll('.q-option[data-field="'+fieldId+'"].selected').forEach(function(o) { selected.push(o.dataset.val); });
+  return selected;
+}
 
-var QUESTIONS_PROPLUS = [
-  {id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},
-  {id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},
-  {id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},
-  {id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux, rayonnages...'},
-  {id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},
-  {id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},
-  {id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Agglo P5 BRUT (milieu humide)','Agglo P6 EUB (M1, ignifugé)','Agglo P6 Antidérapant et Sous Face Blanche','Caillebotis','Plancher tôlé','Plancher collaborant béton (PCB 20)','Autre :']},
-  {id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},
-  {id:'q_contrevent', label:'Type de contreventement', type:'checkbox', multi:true, options:['Jambe de force','Croix de St André','Autre :']},
-  {id:'q_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons (à dimensionner)','Autre :']},
-  {id:'q_escalier', label:"Type d'escalier", type:'checkbox', multi:true, options:['34°, largeur 1000 mm (Principal)','45°, largeur 800 mm (Secondaire)','Escalier hélicoïdal largeur utile 800 mm','Escalier hélicoïdal largeur utile 600 mm','Aucun','Autre :']},
-  {id:'q_gardecorps', label:'Garde-corps', type:'checkbox', multi:true, options:['Industriel (NF E85-015, plateforme de stockage)','Industriel (NF 14-122, plateforme de travail)','Aucun','Autre :']},
-  {id:'q_ouverture', label:"Type d'ouverture", type:'checkbox', multi:true, options:['Barrière écluse basculante (Ouverture permanente)','Barrière écluse pliante (Pour hauteur utile < 1800 mm)','Portillon coulissant (Ouverture occasionnelle)','Portillon battant (Ouverture occasionnelle)','Monte colis (Charge maxi: 100 ou 300 kg)','Monte charge (Charge maxi 1000 kg, hors PTT)','Toboggan (Charge maxi: 20 kg)','Convoyeur','Aucune','Autre :']},
-  {id:'q_barre_basc', label:'Barrière écluse Basculante — Dimensions', type:'checkbox', multi:true, options:['T1 (Ht charge: 1650) - L 1700','T1 (Ht charge: 1650) - L 2100','T1 (Ht charge: 1650) - L 2500','T1 (Ht charge: 1650) - L 3100','T2 (Ht charge: 2000) - L 1700','T2 (Ht charge: 2000) - L 2100','T2 (Ht charge: 2000) - L 2500','T2 (Ht charge: 2000) - L 3100','T3 (Ht charge: 2350) - L 1700','T3 (Ht charge: 2350) - L 2100','T3 (Ht charge: 2350) - L 2500','T3 (Ht charge: 2350) - L 3100']},
-  {id:'q_barre_pli', label:'Barrière écluse Pliante — Dimensions', type:'checkbox', multi:true, options:['T1 (Ht charge: 1800) - L 1700','T1 (Ht charge: 1800) - L 2100','T1 (Ht charge: 1800) - L 2500','T1 (Ht charge: 1800) - L 3100','T2 (Ht charge: 2000) - L 1700','T2 (Ht charge: 2000) - L 2100','T2 (Ht charge: 2000) - L 2500','T2 (Ht charge: 2000) - L 3100','T3 (Ht charge: 2350) - L 1700','T3 (Ht charge: 2350) - L 2100','T3 (Ht charge: 2350) - L 2500','T3 (Ht charge: 2350) - L 3100']},
-  {id:'q_tole', label:'Tôle de dépose', type:'radio', options:['Oui','Non']},
-  {id:'q_protec_poteau', label:'Protections poteau', type:'checkbox', multi:true, options:['Non','HT 400','HT 600','HT 1000','Autre :']},
-  {id:'q_accessoires', label:'Accessoires complémentaires', type:'checkbox', multi:true, options:['Cornières de chant','Tôle de liaison / franchissement','Autre :']},
-  {id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},
-  {id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}
-];
-
-var QUESTIONS_INSTALL_EXT = [
-  {id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},
-  {id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_toiture_lg', label:'Si toiture — longueur de débord', type:'text', placeholder:'En standard : longueur de débord 500 mm'},
-  {id:'qe_toiture_fin', label:'Si toiture — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Bacs anti condensation','Panneaux polycarbonate','Autre :']},
-  {id:'qe_pente', label:'Si toiture — indiquer la pente', type:'radio', options:['Penté haut','Penté bas']},
-  {id:'qe_bardage', label:'Bardage à prévoir', type:'checkbox', multi:true, options:['Pas de bardage à prévoir','Bardage arrière','Bardage latéral (2 côtés)','Bardage latéral (1 côté)','Autre :']},
-  {id:'qe_bardage_fin', label:'Si bardage — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Autre :']},
-  {id:'qe_finition_el', label:'Éléments de finition', type:'checkbox', multi:true, options:['Angle droit / Tôle finition angle','Bande de rive / Cornière de rive','U de finition de bardage','U de finition de toiture','Bandeau de finition','Faitière','Faitière contre mur','Bande de faitage','Profil bas de bardage','Tôle de finition de toiture',"Bavette de rejet d'eau",'Autre :']},
-  {id:'qe_eaux', label:"Descentes d'eaux pluviales", type:'radio', options:['Oui','Non','Autre :']},
-  {id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons (à dimensionner)','Autre :']},
-  {id:'qe_ancrage', label:"Type d'ancrages", type:'checkbox', multi:true, options:['Vis béton','Ancrages Inox','Ancrages chimiques','Autre :']},
-  {id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}
-];
-
-// ── État global ──────────────────────────────────────────
-var state = {
-  selectedFiles: [],
-  selectedProduits: [],
-  formData: {},
-  allDemandes: []
-};
-
-// ── Init ─────────────────────────────────────────────────
+function toggleProduit(id) {
+  var el = document.querySelector('.produit-cb[data-id="'+id+'"]');
+  if(el) el.classList.toggle('checked');
+  state.selectedProduits = [];
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e) { state.selectedProduits.push(e.dataset.id); });
+}
 
 // ── Navigation ────────────────────────────────────────────
 function showTab(tab) {
@@ -694,9 +653,11 @@ function goStep(n) {
   document.getElementById('step'+n).classList.add('active');
   ['wz1','wz2','wz3','wz4'].forEach(function(id, i) {
     var el = document.getElementById(id);
-    el.classList.remove('active','done');
-    if (i+1 < n) el.classList.add('done');
-    else if (i+1 === n) el.classList.add('active');
+    if(el) {
+      el.classList.remove('active','done');
+      if (i+1 < n) el.classList.add('done');
+      else if (i+1 === n) el.classList.add('active');
+    }
   });
   if (n === 4) buildRecap();
 }
@@ -714,6 +675,7 @@ function goStep2() {
 
 function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container');
+  if(!container) return;
   container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
     var produit = PRODUITS.find(function(p) { return p.id === pid; });
@@ -775,6 +737,7 @@ function addFiles(files) {
 }
 function renderFiles() {
   var list = document.getElementById('file-list');
+  if(!list) return;
   list.innerHTML = '';
   state.selectedFiles.forEach(function(f, i) {
     var item = document.createElement('div');
@@ -819,7 +782,6 @@ function buildRecap() {
   document.getElementById('recap-content').innerHTML = html;
 }
 
-// ── Collecte données formulaire ───────────────────────────
 function collectFormData() {
   var data = {
     edeal: document.getElementById('f-edeal').value.trim(),
@@ -858,20 +820,19 @@ function collectFormData() {
   return data;
 }
 
-// ── Génération PDF dans le navigateur ───────────────────
+// ── Génération PDF Sécurisée ─────────────────────────────
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
-    var dateStr  = new Date().toLocaleDateString('fr-FR');
-    var produits = (fData.produits || []).join(', ');
-    var infos    = fData.infos || {};
-    var diag     = fData.diagnostic || {};
+    var dateStr = new Date().toLocaleDateString('fr-FR');
+    var produits = (fData.produits||[]).join(', ');
+    var infos = fData.infos || {};
+    var diag  = fData.diagnostic || {};
 
     function row(label, val) {
       if (!val || val === '') return '';
       return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
         '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
-        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div>' +
-        '</div>';
+        '<div style="flex:1;color:#2a7d52;font-weight:700;background:rgba(42,125,82,0.07);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
     }
     function rowList(label, vals) {
       if (!vals || !vals.length) return '';
@@ -881,69 +842,56 @@ function genererPDFBase64(fData) {
       if (!rows) return '';
       return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
         '<div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div>' +
-        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div>' +
-        '</div>';
+        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
     }
 
-    var pm = {
-      proplus_lp3:     'Proplus LP3',
-      proplus_lp3_2n:  'Proplus LP3 - 2 Niveaux',
-      install_ext:     'Installation exterieure'
-    };
+    var pm = {proplus_lp3:'Proplus LP3', proplus_lp3_2n:'Proplus LP3 - 2 Niveaux', install_ext:'Installation extérieure'};
     var sections = '';
-    sections += section('Informations generales',
-      row('N EDEAL',      fData.edeal) +
-      row('Client',       fData.client) +
-      row('Commercial',   fData.commercial) +
-      row('Departement',  fData.ville) +
-      row('Date chantier',fData.dateChantier) +
-      row('Produits',     produits) +
-      rowList('Contraintes', infos.contraintes) +
-      rowList('Acces',       infos.acces) +
-      rowList('Zone',        infos.zone) +
-      rowList('Elements',    infos.elements) +
-      row('Plan joint',    infos.plan  && infos.plan.length  ? 'OK' : '') +
-      row('Commentaire',  fData.commentaire)
+    sections += section('Informations générales',
+      row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
+      row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) +
+      row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) +
+      rowList('Contraintes normatives', infos.contraintes) +
+      rowList('Accès pour montage', infos.acces) +
+      rowList('Zone', infos.zone) +
+      rowList('Éléments souhaités', infos.elements) +
+      row('Plan joint', infos.plan && infos.plan.length ? 'OK' : '') +
+      row('Commentaire', fData.commentaire)
     );
-
     Object.keys(diag).forEach(function(pid) {
-      var pd = diag[pid];
-      var rows = '';
+      var pd = diag[pid]; var rows = '';
       Object.keys(pd).forEach(function(label) {
         var v = pd[label];
         rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
       });
-      if (rows) sections += section(pm[pid] || pid, rows);
+      if (rows) sections += section(pm[pid]||pid, rows);
     });
 
-    var css = [
-      'body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}',
-      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}',
-      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}',
-      '.ref{font-size:14px;font-weight:700;color:#fab423}',
-      '@media print{body{padding:0}}'
-    ].join('');
-
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-      '<style>' + css + '</style></head><body>' +
-      '<div class="hd">' +
-        '<div><div class="logo">PROVOST</div><div class="ref">' + fData.edeal + '</div></div>' +
-        '<div style="text-align:right;font-size:10px;color:#8a93a8">Genere le ' + dateStr + '<br>' + fData.commercial + '</div>' +
-      '</div>' +
-      sections +
-      '</body></html>';
+      '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
+      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
+      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}' +
+      '.sec{margin-bottom:12px;page-break-inside:avoid}' +
+      '.st{font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px}' +
+      '.row{display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px}' +
+      '.rl{width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0}' +
+      '.rv{flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px}' +
+      '@media print{body{padding:0}}</style>' +
+      '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
+      '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
+      sections + '</body></html>';
 
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
 
-// ── Dépôt de la demande ──────────────────────────────────
+// ── Envoi de la demande ──────────────────────────────────
 function envoyerDemande() {
   var fData = collectFormData();
   var btn   = document.getElementById('btn-send');
   var spin  = document.getElementById('spin-send');
-  btn.disabled = true;
-  spin.style.display = 'block';
+  if(btn) btn.disabled = true;
+  if(spin) spin.style.display = 'block';
 
   genererPDFBase64(fData).then(function(pdfBase64) {
     var filePromises = state.selectedFiles.map(function(file) {
@@ -966,7 +914,8 @@ function envoyerDemande() {
   })
   .then(function(r) { return r.json(); })
   .then(function(res) {
-    spin.style.display = 'none'; btn.disabled = false;
+    if(spin) spin.style.display = 'none'; 
+    if(btn) btn.disabled = false;
     if (res.success) {
       toast('Demande déposée avec succès ! ✓', 'ok');
       resetForm();
@@ -976,7 +925,8 @@ function envoyerDemande() {
     }
   })
   .catch(function(err) {
-    spin.style.display = 'none'; btn.disabled = false;
+    if(spin) spin.style.display = 'none'; 
+    if(btn) btn.disabled = false;
     toast('Erreur : ' + (err.message||''), 'err');
   });
 }
@@ -993,7 +943,8 @@ function resetForm() {
 
 // ── Gestion du Tableau de Suivi ───────────────────────────
 function chargerSuivi() {
-  document.getElementById('suivi-body').innerHTML = '<tr class="empty-td"><td colspan="8">Chargement...</td></tr>';
+  var sbody = document.getElementById('suivi-body');
+  if(sbody) sbody.innerHTML = '<tr class="empty-td"><td colspan="8">Chargement...</td></tr>';
   fetch(APPS_SCRIPT_URL+'?action=getSuivi')
   .then(function(r){ return r.json(); })
   .then(function(res) {
@@ -1001,7 +952,7 @@ function chargerSuivi() {
     renderSuivi(state.allDemandes);
   })
   .catch(function() {
-    document.getElementById('suivi-body').innerHTML = '<tr class="empty-td"><td colspan="8">Erreur de chargement.</td></tr>';
+    if(sbody) sbody.innerHTML = '<tr class="empty-td"><td colspan="8">Erreur de chargement.</td></tr>';
   });
 }
 
@@ -1012,6 +963,7 @@ function filtrer(statut) {
 
 function renderSuivi(demandes) {
   var body = document.getElementById('suivi-body');
+  if (!body) return;
   if (!demandes || demandes.length === 0) {
     body.innerHTML = '<tr class="empty-td"><td colspan="8">Aucune demande.</td></tr>';
     return;
@@ -1035,19 +987,13 @@ function badgeSt(s) {
   return '<span class="badge '+(m[s]||'b-wait')+'">'+(s||'En attente')+'</span>';
 }
 
-// ── Toast de notification ─────────────────────────────────
 function toast(msg, type) {
   var el = document.getElementById('toast');
+  if(!el) return;
   document.getElementById('toast-msg').textContent = msg;
   el.className = 'toast '+(type||'');
   el.classList.add('show');
   setTimeout(function(){ el.classList.remove('show'); }, 3500);
-}
-
-
-// Démarrage : si déjà connecté, charger la config
-if (sessionStorage.getItem('portail_auth') === '1') {
-  chargerConfigFormulaire();
 }
 </script>
 </body>
