@@ -134,16 +134,7 @@ tbody tr:hover{background:var(--bg)}
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
       <div class="login-sub">Bureau d'Études — Portail Commercial</div>
-      
-      <div id="g_id_onload" 
-           data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" 
-           data-context="signin" 
-           data-ux_mode="popup" 
-           data-callback="handleCredentialResponse" 
-           data-auto_select="false" 
-           data-itp_support="true">
-      </div>
-      
+      <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
     </div>
@@ -249,7 +240,6 @@ var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [] };
 
-// 🔒 CORRECTIF : Décodeur robuste avec gestion automatique du Rembourrage Base64 (=)
 function jwtDecode(token) {
   try {
     var base64Url = token.split('.')[1];
@@ -259,9 +249,7 @@ function jwtDecode(token) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error("Erreur décodage jeton Google:", e); return {};
-  }
+  } catch (e) { console.error(e); return {}; }
 }
 
 function handleCredentialResponse(response) {
@@ -303,9 +291,7 @@ var FORM_INFOS = {
   acces: { type:'radio', options:['Sans contraintes particulières','Contraint (photo)'] },
   zone: { type:'radio', options:['Zone dégagée','Zone encombrée (photo)'] },
   elements: { type:'radio', options:['Dossier complet','Dossier allégé'] },
-  plan: { type:'checkbox', options:['OK'] }, 
-  photos: { type:'checkbox', options:['OK'] }, 
-  video: { type:'checkbox', options:['OK'] }
+  plan: { type:'checkbox', options:['OK'] }, photos: { type:'checkbox', options:['OK'] }, video: { type:'checkbox', options:['OK'] }
 };
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
 
@@ -323,7 +309,9 @@ function buildOptions(cId, conf, fId) {
   var el = document.getElementById(cId); if (!el) return; el.innerHTML = '';
   conf.options.forEach(function(opt) {
     var div = document.createElement('div'); div.className = 'q-option'; div.dataset.field = fId; div.dataset.val = opt;
-    div.innerHTML = `<div class="${conf.type==='checkbox'?'opt-sq':'opt-dot'}">✓</div><span>${opt}</span>`;
+    // 🛠️ FIX GRAPHIQUE : La coche n'apparaît plus en tâche de fond sur les boutons radios ronds
+    var checkHtml = (conf.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
+    div.innerHTML = checkHtml + `<span>${opt}</span>`;
     div.onclick = function() { toggleOption(this); }; el.appendChild(div);
   });
 }
@@ -337,24 +325,17 @@ function toggleOption(el) {
 }
 
 function getOptionValues(fId) { 
-  var res=[]; 
-  document.querySelectorAll(`.q-option[data-field="${fId}"].selected`).forEach(function(o){res.push(o.dataset.val)}); 
-  return res; 
+  var res=[]; document.querySelectorAll(`.q-option[data-field="${fId}"].selected`).forEach(function(o){res.push(o.dataset.val)}); return res; 
 }
 
 function toggleProduit(id) { 
   document.querySelector(`.produit-cb[data-id="${id}"]`).classList.toggle('checked'); 
-  state.selectedProduits=[]; 
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); 
+  state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){state.selectedProduits.push(e.dataset.id)}); 
 }
 
 function goStep(n) {
-  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); 
-  document.getElementById('step'+n).classList.add('active');
-  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ 
-    var el=document.getElementById(id); 
-    if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); 
-  });
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active');
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); });
   if(n===4) buildRecap();
 }
 
@@ -378,7 +359,8 @@ function buildDiagnostic() {
         var optsDiv = document.createElement('div'); optsDiv.className='q-options';
         (q.options||[]).forEach(function(o){
           var div=document.createElement('div'); div.className='q-option'; div.dataset.field=pid+'_'+q.id; div.dataset.val=o;
-          div.innerHTML=`<div class="${q.type==='checkbox'?'opt-sq':'opt-dot'}">✓</div><span>${o}</span>`;
+          var checkInner = (q.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>';
+          div.innerHTML= checkInner + `<span>${o}</span>`;
           div.onclick=function(){ if(q.type==='radio')document.querySelectorAll(`.q-option[data-field="${pid+'_'+q.id}"]`).forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
           optsDiv.appendChild(div);
         });
@@ -392,15 +374,11 @@ function buildDiagnostic() {
 
 function collectFormData() {
   var data = {
-    edeal: document.getElementById('f-edeal').value.trim(), 
-    commercial: document.getElementById('f-commercial').value.trim(),
-    client: document.getElementById('f-client').value.trim(), 
-    ville: document.getElementById('f-ville').value.trim(),
-    dateChantier: document.getElementById('f-date').value.trim(), 
-    commentaire: document.getElementById('f-commentaire').value.trim(),
+    edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
+    client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(),
+    dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(),
     produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
-    infos: {}, 
-    diagnostic: {}
+    infos: {}, diagnostic: {}
   };
   Object.keys(FORM_INFOS).forEach(function(k){ data.infos[k] = getOptionValues(k); });
   state.selectedProduits.forEach(function(pid) {
@@ -448,7 +426,7 @@ function reprendreBrouillon(edeal) {
         else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector(`.q-option[data-field="${fid}"][data-val="${v}"]`); if(o) o.classList.add('selected'); }); }
       });
     });
-    showTab('demande'); goStep(1); toast("📋 Pré-demande chargée. N'oubliez pas de reglisser vos pièces jointes à l'étape 3.", "ok");
+    showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
   });
 }
 
@@ -487,7 +465,6 @@ function resetForm() {
 }
 
 function addFiles(files) { for(var i=0;i<files.length;i++){ var f=files[i]; if(!state.selectedFiles.find(function(x){return x.name===f.name})) state.selectedFiles.push(f); } renderFiles(); }
-
 function renderFiles() {
   var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = '';
   state.selectedFiles.forEach(function(f, i) {
@@ -497,14 +474,8 @@ function renderFiles() {
   });
 }
 
-// DnD
-function dzOver(e){e.preventDefault();}
-function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
-
-function buildRecap() { 
-  document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; 
-  document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; 
-}
+function dzOver(e){e.preventDefault();} function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
+function buildRecap() { document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; }
 
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
@@ -521,7 +492,6 @@ function chargerSuivi() {
     renderSuivi(state.allDemandes);
   });
 }
-
 function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
 
 function renderSuivi(demandes) {
@@ -532,7 +502,6 @@ function renderSuivi(demandes) {
     return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
-
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
