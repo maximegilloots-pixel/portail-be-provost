@@ -239,6 +239,15 @@
       ],
       "placeholder": "Fonctionne ?",
       "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/img_1779444518703_IMG_45761.jpg"
+    },
+    {
+      "id": "q_1779460931232",
+      "label": "CECI EST UN AUTRE TEST",
+      "type": "checkbox",
+      "options": [
+        "BONJOUR",
+        "AU REVOIR"
+      ]
     }
   ],
   "proplus_lp3_2n": [
