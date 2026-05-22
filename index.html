@@ -621,19 +621,6 @@ function toggleOption(el) {
   }
 }
 
-function getOptionValues(fieldId) {
-  var selected = [];
-  document.querySelectorAll('.q-option[data-field="'+fieldId+'"].selected').forEach(function(o) { selected.push(o.dataset.val); });
-  return selected;
-}
-
-function toggleProduit(id) {
-  var el = document.querySelector('.produit-cb[data-id="'+id+'"]');
-  if(el) el.classList.toggle('checked');
-  state.selectedProduits = [];
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e) { state.selectedProduits.push(e.dataset.id); });
-}
-
 // ── Navigation ────────────────────────────────────────────
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
@@ -669,6 +656,19 @@ function goStep2() {
   goStep(2);
 }
 
+function getOptionValues(fieldId) {
+  var selected = [];
+  document.querySelectorAll('.q-option[data-field="'+fieldId+'"].selected').forEach(function(o) { selected.push(o.dataset.val); });
+  return selected;
+}
+
+function toggleProduit(id) {
+  var el = document.querySelector('.produit-cb[data-id="'+id+'"]');
+  if(el) el.classList.toggle('checked');
+  state.selectedProduits = [];
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e) { state.selectedProduits.push(e.dataset.id); });
+}
+
 function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container');
   if(!container) return;
@@ -695,6 +695,20 @@ function buildDiagnostic() {
       titleDiv.className = 'q-title';
       titleDiv.textContent = q.label;
       qDiv.appendChild(titleDiv);
+      
+      // 🖼️ APPARITION DE L'ILLUSTRATION DYNAMIQUE (SI DISPONIBLE)
+      if (q.image) {
+        var img = document.createElement('img');
+        img.src = q.image;
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        img.style.borderRadius = '6px';
+        img.style.marginTop = '4px';
+        img.style.marginBottom = '10px';
+        img.style.display = 'block';
+        qDiv.appendChild(img);
+      }
+      
       if (q.type === 'text') {
         var inp = document.createElement('input');
         inp.type = 'text';
@@ -988,6 +1002,7 @@ function renderSuivi(demandes) {
   }).join('');
 }
 
+// Badge de couleur
 function badgeSt(s) {
   var m={'En attente':'b-wait','Attribuée':'b-attr','En cours':'b-prog','Terminée':'b-done','Urgent':'b-urg'};
   return '<span class="badge '+(m[s]||'b-wait')+'">'+(s||'En attente')+'</span>';
