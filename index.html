@@ -105,6 +105,8 @@ tbody tr:hover{background:var(--bg)}
 .td-edeal{font-weight:700;color:var(--blue);font-family:monospace;font-size:12px}
 .empty-td td{text-align:center;padding:28px;color:var(--text-light);font-style:italic}
 .info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;display:flex;gap:9px}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--white);border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 .divider{border:none;border-top:1.5px solid var(--border);margin:16px 0}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -244,7 +246,7 @@ function jwtDecode(token) {
     while (base64.length % 4) { base64 += '='; }
     var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
     return JSON.parse(jsonPayload);
-  } catch (e) { console.error(e); return {}; }
+  } catch (e) { console.error("Erreur décodage jeton Google:", e); return {}; }
 }
 
 function handleCredentialResponse(response) {
@@ -341,9 +343,6 @@ function goStep2() {
 
 function getQuestionsListForProduct(pid) {
   if (RawConfig && RawConfig[pid]) return RawConfig[pid];
-  if (pid === 'proplus_lp3') return (typeof QUESTIONS_PROPLUS !== 'undefined') ? QUESTIONS_PROPLUS : [];
-  if (pid === 'proplus_lp3_2n') return (typeof QUESTIONS_LP3_2N !== 'undefined') ? QUESTIONS_LP3_2N : ((typeof QUESTIONS_PROPLUS !== 'undefined') ? QUESTIONS_PROPLUS : []);
-  if (pid === 'install_ext') return (typeof QUESTIONS_INSTALL_EXT !== 'undefined') ? QUESTIONS_INSTALL_EXT : [];
   return [];
 }
 
@@ -374,7 +373,6 @@ function buildDiagnostic() {
   });
 }
 
-// 🛠️ FIX D'ÉCRASEMENT DE LA PAGE 2 : Un bouclier empêche d'effacer le diagnostic si on clique sur sauver depuis l'étape 1
 function collectFormData() {
   var data = {
     edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
@@ -408,7 +406,6 @@ function collectFormData() {
   return data;
 }
 
-// 🛠️ FIX DES PIÈCES JOINTES BROUILLONS : Uploade et maintient synchronisées les PJ existantes et nouvelles sur le serveur Google
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
   if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
@@ -439,7 +436,7 @@ function sauvegarderBrouillon() {
     return fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd});
   })
   .then(function(r){return r.json();})
-  .then(function(res){
+  .then(function(res) {
     if(btn) btn.disabled = false;
     if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
   })
@@ -514,7 +511,6 @@ function envoyerDemande() {
   });
 }
 
-// 🛠️ FIX DU PDF RÉCAPITULATIF : Restauration complète du compilateur de design HTML pour le BE
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
@@ -567,8 +563,7 @@ function genererPDFBase64(fData) {
     var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
       '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
       '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
-      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}' +
-      '</style>' +
+      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body>' +
       '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
       '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
       sections + '</body></html>';
@@ -600,9 +595,29 @@ function renderFiles() {
 function dzOver(e){e.preventDefault();}
 function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
 
-function buildRecap() { 
-  document.getElementById('recap-obj').textContent = document.getElementById('f-edeal').value; 
-  document.getElementById('recap-content').innerHTML = `<p><b>EDEAL:</b> ${document.getElementById('f-edeal').value}</p><p><b>Client:</b> ${document.getElementById('f-client').value}</p>`; 
+function buildRecap() {
+  var edeal = document.getElementById('f-edeal').value.trim();
+  document.getElementById('recap-obj').textContent = edeal;
+  var produitLabels = state.selectedProduits.map(function(pid) {
+    var pFound = PRODUITS.find(function(p){ return p.id===pid; });
+    return pFound ? pFound.label : pid;
+  }).join(', ');
+
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div>' +
+    '<div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div>' +
+    '<div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div>' +
+    '<div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div>' +
+    '<div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div>' +
+    '<div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div>' +
+    '</div>' +
+    '<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Pièces jointes ('+state.selectedFiles.length+')</div>' +
+    state.selectedFiles.map(function(f){ return '<span class="tag">'+f.name+'</span>'; }).join('') +
+    (state.selectedFiles.length === 0 ? '<span style="color:var(--text-light);font-size:11px;font-style:italic">Aucune PJ ajoutée</span>' : '') +
+    '</div>';
+  document.getElementById('recap-content').innerHTML = html;
 }
 
 function showTab(tab) {
@@ -620,7 +635,6 @@ function chargerSuivi() {
     renderSuivi(state.allDemandes);
   });
 }
-
 function filtrer(statut) { var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); renderSuivi(list); }
 
 function renderSuivi(demandes) {
@@ -631,7 +645,6 @@ function renderSuivi(demandes) {
     return `<tr><td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.date}</td><td>${d.produits}</td><td><span class="badge ${d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')}">${d.statut}</span></td><td>${d.attribueA||'—'}</td><td>${d.commentaireBE||'—'}</td><td>${actionBtn}</td></tr>`;
   }).join('');
 }
-
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
