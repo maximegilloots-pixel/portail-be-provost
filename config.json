@@ -610,5 +610,30 @@
       "type": "textarea",
       "placeholder": "Informations complémentaires..."
     }
+  ],
+  "liste_produits": [
+    {
+      "id": "proplus_lp3",
+      "label": "Proplus LP3"
+    },
+    {
+      "id": "proplus_lp3_2n",
+      "label": "Proplus LP3 - 2 Niveaux"
+    },
+    {
+      "id": "install_ext",
+      "label": "Installation extérieure"
+    },
+    {
+      "id": "prod_1779436061922",
+      "label": "PROPAL 3"
+    }
+  ],
+  "prod_1779436061922": [
+    {
+      "id": "q_1779436071288",
+      "label": "Charge ?",
+      "type": "text"
+    }
   ]
 }
