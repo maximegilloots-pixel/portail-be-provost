@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin BE — Provost</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;padding:20px}
+.admin-header{background:var(--blue);color:#fff;padding:18px 24px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.admin-header h1{font-size:18px;font-weight:900;letter-spacing:-0.5px}
+.admin-header span{font-size:10px;opacity:.7;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:40px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 16px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;background:transparent;transition:var(--tr)}
+.tab.active{background:var(--blue);color:#fff}
+.section{display:none}.section.active{display:block}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:700;color:var(--dark);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:'';width:3px;height:12px;background:var(--yellow);border-radius:2px}
+
+/* Éditeur questions */
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-item{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:grab}
+.q-item:active{cursor:grabbing}
+.drag-handle{color:var(--text-light);font-size:16px;margin-top:1px;flex-shrink:0;user-select:none}
+.q-item-body{flex:1}
+.q-item-label{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.q-item-type{font-size:10px;color:var(--text-light);background:var(--border);padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.q-item-opts{font-size:11px;color:var(--text-light);line-height:1.6}
+.q-item-actions{display:flex;gap:5px;flex-shrink:0}
+.btn-icon{width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.btn-icon:hover{border-color:var(--blue);color:var(--blue)}
+.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
+
+/* Modal édition question */
+.modal-bg{position:fixed;inset:0;background:rgba(35,45,70,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:12px;padding:24px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(35,45,70,.2)}
+.modal-title{font-size:15px;font-weight:900;color:var(--dark);margin-bottom:18px}
+.frow{margin-bottom:12px}
+.flabel{display:block;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.finput,.fselect{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none;transition:var(--tr)}
+.finput:focus,.fselect:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
+.opts-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.opt-row{display:flex;gap:6px;align-items:center}
+.opt-row input{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;outline:none}
+.opt-row input:focus{border-color:var(--blue)}
+.opt-rm{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px;padding:0 3px;line-height:1}
+.opt-rm:hover{color:var(--red)}
+.add-opt{font-size:11px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-dark)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-green{background:var(--green);color:#fff}
+.btn-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.produit-tab{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.produit-btn{padding:5px 12px;border:1.5px solid var(--border);border-radius:40px;background:var(--white);font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
+.produit-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(35,45,70,.15);z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left:4px solid var(--green)}.toast.err{border-left:4px solid var(--red)}
+
+/* Suivi admin */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg)}
+th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);border-bottom:1.5px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.td-edeal{font-weight:700;color:var(--blue);font-family:monospace}
+.st-select{padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;outline:none;cursor:pointer;transition:var(--tr)}
+.st-select:focus{border-color:var(--blue)}
+.assign-input{padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;outline:none;width:110px}
+.save-row{padding:5px 10px;border:none;background:var(--green);color:#fff;border-radius:20px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.save-row:hover{background:#1f5c3a}
+</style>
+<style>
+.login-screen{position:fixed;inset:0;background:#f5f7fb;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:36px 40px;width:360px;box-shadow:0 8px 32px rgba(35,45,70,.14);text-align:center}
+.login-logo{font-size:20px;font-weight:900;color:var(--blue);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text-light);margin-bottom:24px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--dark);outline:none;margin-bottom:14px;transition:all .2s}
+.login-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
+.login-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:40px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.login-btn:hover{background:var(--blue-dark)}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.app-content{display:none}
+.app-content.visible{display:block}
+.github-status{font-size:10px;padding:3px 10px;border-radius:20px;display:inline-block;font-weight:700}
+.gh-ok{background:#d4edda;color:#1a5c36}
+.gh-err{background:#fce8e6;color:#8b1a1a}
+.gh-pending{background:#fff3cd;color:#7a5500}
+</style>
+</head>
+<body>
+
+<!-- LOGIN ADMIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">⚙️ ADMIN BE</div>
+    <div class="login-sub">Portail Administration — Provost</div>
+    <input type="password" class="login-input" id="login-pwd" placeholder="Mot de passe admin"
+      onkeydown="if(event.key==='Enter') checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">Accéder</button>
+    <div class="login-err" id="login-err">Mot de passe incorrect.</div>
+  </div>
+</div>
+
+<!-- CONTENU ADMIN -->
+<div class="app-content" id="app-content">
+<div class="admin-header">
+  <div><h1>⚙️ Administration — Portail BE</h1></div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
+    <span style="font-size:10px;opacity:.7;font-weight:600;letter-spacing:1px;text-transform:uppercase">Provost · BE</span>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" onclick="showTab('questions', event)">Éditeur de questions</button>
+  <button class="tab" onclick="showTab('suivi', event)">Suivi & Attributions</button>
+  <button class="tab" onclick="showTab('parametres', event)">Paramètres</button>
+</nav>
+
+<!-- ÉDITEUR QUESTIONS -->
+<section class="section active" id="section-questions">
+  <div class="card">
+    <div class="card-title">Formulaire à modifier</div>
+    <div class="produit-tab">
+      <button class="produit-btn active" onclick="switchProduit('proplus_lp3', event)">Proplus LP3</button>
+      <button class="produit-btn" onclick="switchProduit('proplus_lp3_2n', event)">Proplus LP3 - 2 Niveaux</button>
+      <button class="produit-btn" onclick="switchProduit('install_ext', event)">Installation extérieure</button>
+    </div>
+    <div class="q-list" id="q-list-container"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter une question</button>
+      <button class="btn btn-green" onclick="sauvegarder()">💾 Publier sur le portail</button>
+      <button class="btn btn-outline" onclick="exporter()">⬇️ Backup JSON</button>
+    </div>
+    <p style="font-size:10px;color:var(--text-light);margin-top:10px">
+      Glissez-déposez pour réordonner. "Publier" met à jour les questions sur le portail commercial instantanément.
+    </p>
+  </div>
+</section>
+
+<!-- SUIVI -->
+<section class="section" id="section-suivi">
+  <div class="card">
+    <div class="card-title">Gestion des demandes</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-outline" style="padding:5px 12px;font-size:10px" onclick="chargerSuivi()">🔄 Actualiser</button>
+      <input id="filter-input" placeholder="Filtrer par EDEAL, client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;outline:none;flex:1;min-width:180px" oninput="filtrer(this.value)">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
+        <tbody id="admin-suivi-body"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Cliquez sur Actualiser</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PARAMÈTRES -->
+<section class="section" id="section-parametres">
+  <div class="card">
+    <div class="card-title">Configuration GitHub</div>
+    <div style="background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--blue);margin-bottom:16px;line-height:1.7">
+      GitHub permet de sauvegarder les questions et de les publier sur le portail.<br>
+      <strong>1.</strong> Créez un token sur <a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--blue)">github.com/settings/tokens/new</a> (cochez <em>repo</em>)<br>
+      <strong>2.</strong> Renseignez vos infos ci-dessous et cliquez Sauvegarder.
+    </div>
+    <div class="frow"><label class="flabel">Votre nom d'utilisateur GitHub</label><input class="finput" id="gh-user" placeholder="ex : maximegilloots"></div>
+    <div class="frow"><label class="flabel">Nom du repository GitHub</label><input class="finput" id="gh-repo" placeholder="ex : portail-be-provost"></div>
+    <div class="frow"><label class="flabel">Token GitHub (Personal Access Token)</label><input class="finput" type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder la config GitHub</button>
+      <button class="btn btn-outline" onclick="testerGitHub()">🔗 Tester la connexion</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Mots de passe</div>
+    <div class="frow"><label class="flabel">Mot de passe portail commercial</label><input class="finput" id="pwd-portail" placeholder="Provost59"></div>
+    <div class="frow"><label class="flabel">Mot de passe admin</label><input class="finput" id="pwd-admin" placeholder="AdminBE59"></div>
+    <p style="font-size:10px;color:var(--text-light);margin-top:4px">Ces mots de passe sont stockés localement. Pour les changer sur le portail, modifiez <code>PWD_PORTAIL</code> dans index.html.</p>
+  </div>
+</section>
+
+</div><!-- fin app-content -->
+
+<!-- MODALS -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Ajouter une question</div>
+    <div class="frow"><label class="flabel">Libellé</label><input class="finput" id="m-label" placeholder="ex : Type de sol"></div>
+    <div class="frow"><label class="flabel">Type</label>
+      <select class="fselect" id="m-type" onchange="toggleOptsSection()">
+        <option value="text">Champ texte libre</option>
+        <option value="textarea">Zone de texte</option>
+        <option value="radio">Choix unique</option>
+        <option value="checkbox">Choix multiple</option>
+      </select>
+    </div>
+    <div id="m-opts-section">
+      <label class="flabel">Options</label>
+      <div class="opts-list" id="m-opts-list"></div>
+      <button class="add-opt" onclick="addOpt()">+ Option</button>
+    </div>
+    <div class="frow" style="margin-top:12px"><label class="flabel">Placeholder / aide</label><input class="finput" id="m-hint" placeholder="Texte d'aide (optionnel)"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveModal()">Enregistrer</button>
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="detail-modal">
+  <div class="modal" style="width:680px;max-height:85vh">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="modal-title" style="margin-bottom:0">Demande <span id="detail-edeal" style="color:var(--blue)"></span></div>
+      <button onclick="document.getElementById('detail-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
+    </div>
+    <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// ⚙️  CONFIG
+// ══════════════════════════════════════════════════
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUdS700NnWQilLf6H_Is6qe5AvVn3vSDBuu4ZEr8lsLtiTXZHBX0NvNA_9EdMKVlZP/exec';
+var PWD_ADMIN = '0000'; // ← Changez ce mot de passe !
+// ══════════════════════════════════════════════════
+
+// ── Login ─────────────────────────────────────────
+function checkLogin() {
+  var pwd = document.getElementById('login-pwd').value;
+  if (pwd === PWD_ADMIN) {
+    sessionStorage.setItem('admin_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').classList.add('visible');
+    chargerDepuisGitHub();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-pwd').value = '';
+  }
+}
+if (sessionStorage.getItem('admin_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-content').classList.add('visible');
+}
+
+// ── Config GitHub (stockée en localStorage) ───────
+function getGHConfig() {
+  return {
+    user:  localStorage.getItem('gh_user')  || '',
+    repo:  localStorage.getItem('gh_repo')  || '',
+    token: localStorage.getItem('gh_token') || ''
+  };
+}
+function sauvegarderConfig() {
+  localStorage.setItem('gh_user',  document.getElementById('gh-user').value.trim());
+  localStorage.setItem('gh_repo',  document.getElementById('gh-repo').value.trim());
+  localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
+  toast('✓ Config GitHub sauvegardée', 'ok');
+  majStatusGH();
+}
+function majStatusGH() {
+  var gh = getGHConfig();
+  var el = document.getElementById('gh-status');
+  if (gh.user && gh.repo && gh.token) {
+    el.textContent = 'GitHub : ' + gh.user + '/' + gh.repo;
+    el.className = 'github-status gh-ok';
+  } else {
+    el.textContent = 'GitHub : non configuré';
+    el.className = 'github-status gh-err';
+  }
+}
+function testerGitHub() {
+  var gh = getGHConfig();
+  if (!gh.token) { toast('Configurez d'abord GitHub dans Paramètres', 'err'); return; }
+  fetch('https://api.github.com/user', {headers:{'Authorization':'token '+gh.token}})
+  .then(function(r){return r.json();})
+  .then(function(u){ toast('✓ Connecté en tant que : ' + u.login, 'ok'); majStatusGH(); })
+  .catch(function(){ toast('Connexion GitHub échouée', 'err'); });
+}
+
+// ── Charger config.json depuis GitHub ─────────────
+var formData = {};
+var currentProduit = 'proplus_lp3';
+var editingIndex = -1;
+var allDemandes = [];
+
+function chargerDepuisGitHub() {
+  var gh = getGHConfig();
+  majStatusGH();
+  // Remplir les champs paramètres
+  if (document.getElementById('gh-user')) {
+    document.getElementById('gh-user').value = gh.user;
+    document.getElementById('gh-repo').value = gh.repo;
+    document.getElementById('gh-token').value = gh.token;
+  }
+  if (!gh.user || !gh.repo) {
+    // Charger les questions par défaut hardcodées
+    formData = getQuestionsDefaut();
+    renderQuestions();
+    return;
+  }
+  var url = 'https://raw.githubusercontent.com/' + gh.user + '/' + gh.repo + '/main/config.json?v=' + Date.now();
+  fetch(url)
+  .then(function(r){ return r.json(); })
+  .then(function(cfg) {
+    formData = cfg;
+    if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
+      formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3));
+    }
+    renderQuestions();
+    toast('✓ Questions chargées depuis GitHub', 'ok');
+  })
+  .catch(function(){ 
+    formData = getQuestionsDefaut();
+    renderQuestions();
+    toast('GitHub non accessible — questions par défaut chargées', 'err');
+  });
+}
+
+// ── Sauvegarder config.json sur GitHub ────────────
+function sauvegarder() {
+  var gh = getGHConfig();
+  if (!gh.user || !gh.repo || !gh.token) {
+    toast('Configurez GitHub dans l'onglet Paramètres', 'err');
+    return;
+  }
+  var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
+  var contenu = JSON.stringify(formData, null, 2);
+  var b64 = btoa(unescape(encodeURIComponent(contenu)));
+
+  // Récupérer le SHA actuel du fichier (nécessaire pour le mettre à jour)
+  fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}})
+  .then(function(r){ return r.json(); })
+  .then(function(info) {
+    var sha = info.sha || '';
+    return fetch(apiUrl, {
+      method: 'PUT',
+      headers: {'Authorization':'token '+gh.token, 'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: 'Mise à jour questions portail BE',
+        content: b64,
+        sha: sha
+      })
+    });
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res.content) {
+      toast('✓ Questions publiées sur le portail !', 'ok');
+    } else {
+      toast('Erreur GitHub : ' + (res.message || 'inconnue'), 'err');
+    }
+  })
+  .catch(function(e){ toast('Erreur : ' + e.message, 'err'); });
+}
+
+function exporter() {
+  var blob = new Blob([JSON.stringify(formData, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config_be_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('JSON exporté', 'ok');
+}
+
+// ── Éditeur questions ─────────────────────────────
+function getQuestionsDefaut() {
+  // Retourner une structure minimale si GitHub non dispo
+  return {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]};
+}
+
+function switchProduit(pid, e) {
+  currentProduit = pid;
+  document.querySelectorAll('.produit-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (e && e.target) e.target.classList.add('active');
+  renderQuestions();
+}
+
+function renderQuestions() {
+  var list = document.getElementById('q-list-container');
+  list.innerHTML = '';
+  var questions = formData[currentProduit] || [];
+  if (questions.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Aucune question. Cliquez sur + Ajouter.</div>';
+    return;
+  }
+  questions.forEach(function(q, i) {
+    var el = document.createElement('div');
+    el.className = 'q-item';
+    el.draggable = true;
+    el.innerHTML =
+      '<div class="drag-handle">⠿</div>' +
+      '<div class="q-item-body">' +
+        '<div class="q-item-label">'+q.label+'</div>' +
+        '<span class="q-item-type">'+typeLbl(q.type)+'</span>' +
+        (q.options && q.options.length ? '<div class="q-item-opts">'+q.options.slice(0,4).join(' · ')+(q.options.length>4?' · ...':'')+'</div>' : '') +
+      '</div>' +
+      '<div class="q-item-actions">' +
+        '<button class="btn-icon" onclick="editQuestion('+i+')">✏️</button>' +
+        '<button class="btn-icon del" onclick="deleteQuestion('+i+')">🗑️</button>' +
+      '</div>';
+    el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; });
+    el.addEventListener('dragend', function(){ el.style.opacity='1'; });
+    el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; });
+    el.addEventListener('dragleave', function(){ el.style.background=''; });
+    el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background='';
+      var from=parseInt(e.dataTransfer.getData('text')),to=i;
+      if(from===to) return;
+      var arr=formData[currentProduit],item=arr.splice(from,1)[0];
+      arr.splice(to,0,item); renderQuestions(); });
+    list.appendChild(el);
+  });
+}
+
+function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',radio:'Choix unique',checkbox:'Choix multiple'}[t]||t; }
+
+function openAddModal() {
+  editingIndex=-1;
+  document.getElementById('modal-title').textContent='Ajouter une question';
+  document.getElementById('m-label').value='';
+  document.getElementById('m-type').value='text';
+  document.getElementById('m-hint').value='';
+  document.getElementById('m-opts-list').innerHTML='';
+  toggleOptsSection();
+  addOpt(); addOpt();
+  document.getElementById('modal-bg').classList.add('open');
+}
+function editQuestion(i) {
+  editingIndex=i;
+  var q=formData[currentProduit][i];
+  document.getElementById('modal-title').textContent='Modifier la question';
+  document.getElementById('m-label').value=q.label;
+  document.getElementById('m-type').value=q.type;
+  document.getElementById('m-hint').value=q.placeholder||q.hint||'';
+  document.getElementById('m-opts-list').innerHTML='';
+  toggleOptsSection();
+  (q.options||[]).forEach(function(o){ addOpt(o); });
+  document.getElementById('modal-bg').classList.add('open');
+}
+function deleteQuestion(i){ if(!confirm('Supprimer ?')) return; formData[currentProduit].splice(i,1); renderQuestions(); toast('Supprimée','ok'); }
+function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox')?'block':'none'; }
+function addOpt(val){ var list=document.getElementById('m-opts-list'); var row=document.createElement('div'); row.className='opt-row'; row.innerHTML='<input type="text" placeholder="Option..." value="'+(val||'')+'">'+'<button class="opt-rm" onclick="this.parentNode.remove()">×</button>'; list.appendChild(row); }
+function saveModal() {
+  var label=document.getElementById('m-label').value.trim();
+  var type=document.getElementById('m-type').value;
+  var hint=document.getElementById('m-hint').value.trim();
+  if(!label){ toast('Libellé obligatoire','err'); return; }
+  var opts=[]; document.querySelectorAll('#m-opts-list input').forEach(function(inp){ var v=inp.value.trim(); if(v) opts.push(v); });
+  var q={id:'q_'+Date.now(),label:label,type:type};
+  if(opts.length) q.options=opts;
+  if(hint) q.placeholder=hint;
+  if(type==='checkbox') q.multi=true;
+  if(editingIndex>=0){ formData[currentProduit][editingIndex]=q; } else { if(!formData[currentProduit]) formData[currentProduit]=[]; formData[currentProduit].push(q); }
+  renderQuestions(); closeModal(); toast('Question enregistrée','ok');
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+document.getElementById('modal-bg').onclick=function(e){ if(e.target===this) closeModal(); };
+
+// ── Suivi ─────────────────────────────────────────
+function showTab(tab, e) {
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('section-'+tab).classList.add('active');
+  if(e && e.target) e.target.classList.add('active');
+  if(tab==='suivi') chargerSuivi();
+  if(tab==='parametres') chargerDepuisGitHub();
+}
+function chargerSuivi() {
+  fetch(APPS_SCRIPT_URL+'?action=getSuivi')
+  .then(function(r){return r.json();})
+  .then(function(res){ allDemandes=res.demandes||[]; renderSuivi(allDemandes); })
+  .catch(function(){ toast('Erreur chargement suivi','err'); });
+}
+function filtrer(q) {
+  q=q.toLowerCase();
+  renderSuivi(allDemandes.filter(function(d){ return (d.edeal+d.client+d.commercial).toLowerCase().includes(q); }));
+}
+function renderSuivi(demandes) {
+  var body=document.getElementById('admin-suivi-body');
+  if(!demandes||demandes.length===0){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light);font-style:italic">Aucune demande</td></tr>'; return; }
+  var stStyle={'En attente':'background:#fff3cd;color:#7a5500','Attribuée':'background:#d4edda;color:#1a5c36','En cours':'background:#d6e8ff;color:#1a3a7c','Terminée':'background:#d4edda;color:#1a5c36','Urgent':'background:#fce8e6;color:#8b1a1a'};
+  body.innerHTML=demandes.map(function(d,i){
+    var st=d.statut||'En attente';
+    var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="'+s+'"'+(st===s?' selected':'')+'>'+s+'</option>'; }).join('');
+    return '<tr>'+
+      '<td class="td-edeal">'+(d.edeal||'—')+'</td>'+
+      '<td style="font-weight:600">'+(d.client||'—')+'</td>'+
+      '<td>'+(d.commercial||'—')+'</td>'+
+      '<td style="font-size:11px">'+(d.produits||'—')+'</td>'+
+      '<td style="font-size:11px;color:var(--text-light)">'+(d.date||'—')+'</td>'+
+      '<td><select class="st-select" id="st-'+i+'">'+ opts +'</select></td>'+
+      '<td><input class="assign-input" id="ass-'+i+'" value="'+(d.attribueA||'')+'" placeholder="Nom ingénieur"></td>'+
+      '<td><input class="assign-input" style="width:140px" id="com-'+i+'" value="'+(d.commentaireBE||'')+'" placeholder="Commentaire..."></td>'+
+      '<td>'+
+        '<button class="save-row" onclick="saveLine('+i+',''+d.edeal+'')">✓ Sauver</button> '+
+        '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(''+d.edeal+'')">📂 Voir</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+function saveLine(i,edeal) {
+  var fd=new FormData();
+  fd.append('action','updateSuivi');
+  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
+  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd})
+  .then(function(r){return r.json();})
+  .then(function(res){ toast(res.success?'✓ Mis à jour : '+edeal:'Erreur : '+(res.error||''),res.success?'ok':'err'); })
+  .catch(function(e){ toast('Erreur réseau','err'); });
+}
+function ouvrirDemande(edeal) {
+  document.getElementById('detail-edeal').textContent=edeal;
+  document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>';
+  document.getElementById('detail-modal').classList.add('open');
+  fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal))
+  .then(function(r){return r.json();})
+  .then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); })
+  .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
+}
+function renderDetail(res) {
+  var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
+  html+=detailSection('Informations générales',[detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Produit(s)',(fd.produits||[]).join(', ')),detailRow('Contraintes',(infos.contraintes||[]).join(', ')),detailRow('Accès',(infos.acces||[]).join(', ')),detailRow('Zone',(infos.zone||[]).join(', ')),detailRow('Éléments',(infos.elements||[]).join(', ')),detailRow('Commentaire',fd.commentaire)].join(''));
+  var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
+  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
+  html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
+  if(res.pdfBase64){html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(''+res.pdfBase64+'',''+res.pdfNom+'','application/pdf')">⬇️ '+res.pdfNom+'</button></div>';}
+  (res.fichiers||[]).forEach(function(f){html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(''+f.b64+'',''+f.nom+'',''+f.type+'')">📎 '+f.nom+'</button></div>';});
+  html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur"></div></div>';
+  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..."></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(''+res.edeal+'')">✓ Sauvegarder</button></div>';
+  document.getElementById('detail-body').innerHTML=html;
+}
+function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
+function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
+function telecharger(b64,nom,type){
+  try{
+    if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){
+      try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){}
+    }
+    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
+    var blob=new Blob([bytes],{type:type||'application/octet-stream'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
+  }catch(err){alert('Erreur : '+err.message);}
+}
+function saveDetail(edeal){
+  var fd=new FormData();
+  fd.append('action','updateSuivi');
+  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value}));
+  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur : '+(res.error||''),res.success?'ok':'err');}).catch(function(){toast('Erreur réseau','err');});
+}
+function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast '+(type||'');el.classList.add('show');setTimeout(function(){el.classList.remove('show');},3500);}
+
+// Démarrage
+if(sessionStorage.getItem('admin_auth')==='1') chargerDepuisGitHub();
+</script>
+</body>
+</html>
