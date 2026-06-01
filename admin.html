@@ -77,7 +77,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost</div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v2.9-AdminLoginFix</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -86,7 +86,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.8-AtobSafety</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.9-AdminLoginFix</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -186,7 +186,7 @@ function handleCredentialResponse(response) {
     document.getElementById('app-content').classList.add('visible');
     chargerDepuisGitHub();
   } else {
-    document.getElementById('login-err').textContent = "Accès refusé."; document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block';
   }
 }
 if (sessionStorage.getItem('admin_auth') === '1') {
@@ -266,8 +266,8 @@ function renderQuestions() {
   if(!questions.length){ list.innerHTML='<div style="padding:10px;font-style:italic;">Aucune question</div>'; return; }
   questions.forEach(function(q, i) {
     var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true;
-    el.innerHTML = `<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">${q.label} ${q.image?'[🖼️ Image]':''}</div><span class="q-item-type">${typeLbl(q.type)}</span></div>
-      <div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(${i})">✏️</button><button class="btn-icon del" onclick="deleteQuestion(${i})">🗑️</button></div>`;
+    el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + q.label + ' ' + (q.image?'[🖼️ Image]':'') + '</div><span class="q-item-type">' + typeLbl(q.type) + '</span></div>' +
+      '<div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(' + i + ')">✏️</button><button class="btn-icon del" onclick="deleteQuestion(' + i + ')">🗑️</button></div>';
     el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; });
     el.addEventListener('dragend', function(){ el.style.opacity='1'; });
     el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; });
@@ -279,6 +279,33 @@ function renderQuestions() {
   });
 }
 function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',radio:'Unique',checkbox:'Multiple'}[t]||t; }
+function openAddModal() {
+  editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter';
+  document.getElementById('m-label').value=''; document.getElementById('m-type').value='text';
+  document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML='';
+  document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open');
+}
+function editQuestion(i) {
+  editingIndex=i; var q=formData[currentProduit][i]; tempImageUrl=q.image||"";
+  document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label;
+  document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||'';
+  document.getElementById('m-image-preview').innerHTML=tempImageUrl?"✅ Image liée":"";
+  document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection();
+  (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open');
+}
+function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
+function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox')?'block':'none'; }
+function addOpt(v){ var r=document.createElement('div'); r.className='opt-row'; r.innerHTML='<input type="text" value="' + (v||'') + '">'; document.getElementById('m-opts-list').appendChild(r); }
+function saveModal() {
+  var l=document.getElementById('m-label').value.trim(); var t=document.getElementById('m-type').value;
+  var opts=[]; document.querySelectorAll('#m-opts-list input').forEach(function(inp){ if(inp.value.trim()) opts.push(inp.value.trim()); });
+  var q={id:'q_'+Date.now(), label:l, type:t}; if(opts.length) q.options=opts;
+  if(document.getElementById('m-hint').value.trim()) q.placeholder=document.getElementById('m-hint').value.trim();
+  if(tempImageUrl) q.image=tempImageUrl;
+  if(editingIndex>=0) formData[currentProduit][editingIndex]=q; else { if(!formData[currentProduit])formData[currentProduit]=[]; formData[currentProduit].push(q); }
+  renderQuestions(); closeModal();
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
 
 function showTab(tab, e) {
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
@@ -287,7 +314,7 @@ function showTab(tab, e) {
   if (e && e.target) {
     e.target.classList.add('active');
   } else {
-    var btn = document.querySelector(`.tab[onclick*="${tab}"]`); if (btn) btn.classList.add('active');
+    var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active');
   }
   if(tab==='suivi') chargerSuivi();
   if(tab==='parametres') chargerDepuisGitHub();
@@ -305,16 +332,15 @@ function renderSuivi(demandes) {
   var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
   if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande définitive</td></tr>'; return; }
   body.innerHTML=filtrées.map(function(d,i){
-    var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return `<option value="${s}" ${d.statut===s?'selected':''}>${s}</option>`; }).join('');
-    return `<tr>
-      <td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.produits}</td><td>${d.date}</td>
-      <td><select class="st-select" id="st-${i}">${opts}</select></td>
-      <td><input class="assign-input" id="ass-${i}" value="${d.attribueA}"></td>
-      <td><input class="assign-input" style="width:140px" id="com-${i}" value="${d.commentaireBE}"></td>
-      <td><button class="save-row" onclick="saveLine(${i}, '${d.edeal}')">✓ Sauver</button> <button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande('${d.edeal}')">📂 Voir</button></td>
-    </tr>`;
+    var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + d.date + '</td>' +
+      '<td><select class="st-select" id="st-' + i + '">' + opts + '</select></td>' +
+      '<td><input class="assign-input" id="ass-' + i + '" value="' + d.attribueA + '"></td>' +
+      '<td><input class="assign-input" style="width:140px" id="com-' + i + '" value="' + d.commentaireBE + '"></td>' +
+      '<td><button class="save-row" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> <button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button></td></tr>';
   }).join('');
 }
+
 function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
@@ -350,52 +376,78 @@ function ouvrirDemande(edeal) {
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
+// ── 🛠️ FIX COMPLET DU RECAPITULATIF : Extraction universelle sans backticks ES6 ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
-  html+=detailSection('Informations générales',[detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Produit(s)',(fd.produits||[]).join(', ')),detailRow('Contraintes',(infos.contraintes||[]).join(', ')),detailRow('Accès',(infos.acces||[]).join(', ')),detailRow('Zone',(infos.zone||[]).join(', ')),detailRow('Éléments',(infos.elements||[]).join(', ')),detailRow('Commentaire',fd.commentaire)].join(''));
+  var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
+  
+  html+=detailSection('Informations générales',[
+    detailRow('Client',fd.client),
+    detailRow('Commercial',fd.commercial),
+    detailRow('Département',fd.ville),
+    detailRow('Date chantier',fd.dateChantier),
+    detailRow('Produit(s)',(fd.produits||[]).join(', ')),
+    detailRow('Contraintes',(infos.contraintes||[]).join(', ')),
+    detailRow('Accès',(infos.acces||[]).join(', ')),
+    detailRow('Zone',(infos.zone||[]).join(', ')),
+    detailRow('Éléments',(infos.elements||[]).join(', ')),
+    detailRow('Commentaire',fd.commentaire)
+  ].join(''));
+  
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
-  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
+  Object.keys(fd.diagnostic||{}).forEach(function(pid){
+    var pd=fd.diagnostic[pid];
+    var rows=Object.keys(pd).map(function(label){
+      var v=pd[label]; return detailRow(label,Array.isArray(v)?v.join(', '):v);
+    }).join('');
+    if(rows) html+=detailSection(pm[pid]||pid,rows);
+  });
   
   html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
   
-  // 🛠️ MULTI-VERIFICATION NETTE DE SECURITE PDF RECAP
   if(res.pdfBase64){
     var cleanPdfB64 = String(res.pdfBase64).trim();
     if (cleanPdfB64 === "SUPPRIME_15J" || cleanPdfB64 === "") {
-      html+=`<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
-        ❌ <s style="color:var(--text-light); font-weight:600;">${res.pdfNom}</s> 
-        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
-      </div>`;
+      html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">' +
+        '❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> ' +
+        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>' +
+      '</div>';
     } else {
-      html+=`<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger('${res.pdfBase64}','${res.pdfNom}','application/pdf')">⬇️ ${res.pdfNom}</button></div>`;
+      html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>';
     }
   }
   
-  // 🛠️ MULTI-VERIFICATION NETTE DE SECURITE COMPOSANTS PJ
   (res.fichiers||[]).forEach(function(f){
     var cleanFileB64 = String(f.b64).trim();
     if (cleanFileB64 === "SUPPRIME_15J" || cleanFileB64 === "") {
-      html+=`<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
-        ❌ <s style="color:var(--text-light); font-weight:600;">${f.nom}</s> 
-        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
-      </div>`;
+      html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">' +
+        '❌ <s style="color:var(--text-light); font-weight:600;">' + f.nom + '</s> ' +
+        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>' +
+      '</div>';
     } else {
-      html+=`<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger('${f.b64}','${f.nom}','${f.type}')">📎 ${f.nom}</button></div>`;
+      html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>';
     }
   });
   
+  var optStatut = ['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){
+    return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>';
+  }).join('');
+  
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur" value="${res.attribueA||''}"></div></div>';
-  html+=`<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="${res.commentaireBE||''}"></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail('${res.edeal}')">✓ Sauvegarder</button></div>`;
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+    '<div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div>' +
+    '<div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur" value="' + (currentSuivi.attribueA || '') + '"></div>' +
+  '</div>';
+  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="' + (currentSuivi.commentaireBE || '') + '"></div>' +
+    '<div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\'' + res.edeal + '\')">✓ Sauvegarder</button></div>';
+  
   document.getElementById('detail-body').innerHTML=html;
 }
 
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
 function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
 
-// ── 🛠️ PARAFOUDRE ATOB PARE-BALLES CONTRE LES SCRIPTS CRASH ──
 function telecharger(b64,nom,type){
-  // Si la chaîne est vide, corrompue ou marquée purgée, on coupe court proprement sans planter
   if (!b64 || String(b64).trim() === "SUPPRIME_15J") {
     alert("⚠️ Fichier non disponible\n\nCe fichier a été supprimé définitivement car la demande a été déposée il y a plus de 15 jours.");
     return;
@@ -413,421 +465,7 @@ function telecharger(b64,nom,type){
 function saveDetail(edeal){
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value}));
-  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok');}).catch(function(){toast('Erreur réseau','err');});
-}
-
-function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
-if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerDepuisGitHub);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin BE — Provost</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
-body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;padding:20px}
-.admin-header{background:var(--blue);color:#fff;padding:18px 24px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
-.admin-header h1{font-size:18px;font-weight:900;letter-spacing:-0.5px}
-.tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:40px;padding:4px;margin-bottom:20px;width:fit-content}
-.tab{padding:7px 16px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;background:transparent;transition:var(--tr)}
-.tab.active{background:var(--blue);color:#fff}
-.section{display:none}.section.active{display:block}
-.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
-.card-title{font-size:11px;font-weight:700;color:var(--dark);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
-.card-title::before{content:'';width:3px;height:12px;background:var(--yellow);border-radius:2px}
-.q-list{display:flex;flex-direction:column;gap:8px}
-.q-item{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:grab}
-.q-item-body{flex:1}
-.q-item-label{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px}
-.q-item-type{font-size:10px;color:var(--text-light);background:var(--border);padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:6px}
-.q-item-actions{display:flex;gap:5px;flex-shrink:0}
-.btn-icon{width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
-.btn-icon:hover{border-color:var(--blue);color:var(--blue)}
-.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
-.modal-bg{position:fixed;inset:0;background:rgba(35,45,70,.4);z-index:1000;display:none;align-items:center;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:var(--white);border-radius:12px;padding:24px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(35,45,70,.2)}
-.modal-title{font-size:15px;font-weight:900;color:var(--dark);margin-bottom:18px}
-.frow{margin-bottom:12px}
-.flabel{display:block;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
-.finput,.fselect{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none;transition:var(--tr)}
-.opts-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
-.opt-row{display:flex;gap:6px;align-items:center}
-.opt-row input{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;outline:none}
-.opt-rm{background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px;padding:0 3px;line-height:1}
-.add-opt{font-size:11px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
-.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-dark)}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
-.btn-green{background:var(--green);color:#fff}
-.btn-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-.produit-tab{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
-.produit-btn{padding:5px 12px;border:1.5px solid var(--border);border-radius:40px;background:var(--white);font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
-.produit-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(35,45,70,.15);z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s ease}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.ok{border-left:4px solid var(--green)}.toast.err{border-left:4px solid var(--red)}
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead tr{background:var(--bg)}
-th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);border-bottom:1.5px solid var(--border);white-space:nowrap}
-td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
-.td-edeal{font-weight:700;color:var(--blue);font-family:monospace}
-.st-select{padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;outline:none}
-.assign-input{padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;width:110px}
-.save-row{padding:5px 10px;border:none;background:var(--green);color:#fff;border-radius:20px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;cursor:pointer}
-.login-screen{position:fixed;inset:0;background:#f5f7fb;display:flex;align-items:center;justify-content:center;z-index:9999}
-.login-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:36px 40px;width:360px;box-shadow:0 8px 32px rgba(35,45,70,.14);text-align:center}
-.login-logo{font-size:20px;font-weight:900;color:var(--blue);margin-bottom:4px}
-.login-sub{font-size:12px;color:var(--text-light);margin-bottom:24px}
-.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none}
-.app-content{display:none}
-.app-content.visible{display:block}
-.github-status{font-size:10px;padding:3px 10px;border-radius:20px;display:inline-block;font-weight:700}
-.gh-ok{background:#d4edda;color:#1a5c36}
-.gh-err{background:#fce8e6;color:#8b1a1a}
-</style>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-
-<div class="login-screen" id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost</div>
-    <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
-    <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
-    <div class="login-err" id="login-err"></div>
-  </div>
-</div>
-
-<div class="app-content" id="app-content">
-<div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.7-PurgeTrace</span></h1></div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
-  </div>
-</div>
-
-<nav class="tabs">
-  <button class="tab active" onclick="showTab('questions', event)">Éditeur de questions</button>
-  <button class="tab" onclick="showTab('suivi', event)">Suivi & Attributions</button>
-  <button class="tab" onclick="showTab('parametres', event)">Paramètres</button>
-</nav>
-
-<section class="section active" id="section-questions">
-  <div class="card">
-    <div class="card-title">Formulaire à modifier</div>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-      <div class="produit-tab" id="produit-tabs-container"></div>
-      <button class="btn btn-outline btn-sm" style="border-color:var(--blue); color:var(--blue)" onclick="ajouterNouveauProduit()">+ Nouvelle section / produit</button>
-    </div>
-    <div class="q-list" id="q-list-container"></div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter une question</button>
-      <button class="btn btn-green" onclick="sauvegarder()">💾 Publier sur le portail</button>
-      <button class="btn btn-outline" onclick="exporter()">⬇️ Backup JSON</button>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="section-suivi">
-  <div class="card">
-    <div class="card-title">Gestion des demandes</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap;">
-      <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
-      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
-      <input id="filter-input" placeholder="Filtrer..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)">
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
-        <tbody id="admin-suivi-body"></tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="section-parametres">
-  <div class="card">
-    <div class="card-title">Configuration GitHub</div>
-    <div class="frow"><label class="flabel">Utilisateur GitHub</label><input class="finput" id="gh-user"></div>
-    <div class="frow"><label class="flabel">Repository</label><input class="finput" id="gh-repo"></div>
-    <div class="frow"><label class="flabel">Token PAT</label><input class="finput" type="password" id="gh-token"></div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder</button></div>
-  </div>
-</section>
-</div>
-
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <div class="modal-title" id="modal-title">Éditer question</div>
-    <div class="frow"><label class="flabel">Libellé</label><input class="finput" id="m-label"></div>
-    <div class="frow"><label class="flabel">Type</label><select class="fselect" id="m-type" onchange="toggleOptsSection()"><option value="text">Texte</option><option value="textarea">Zone texte</option><option value="radio">Choix unique</option><option value="checkbox">Choix multiple</option></select></div>
-    <div id="m-opts-section"><label class="flabel">Options</label><div class="opts-list" id="m-opts-list"></div><button class="add-opt" onclick="addOpt()">+ Option</button></div>
-    <div class="frow"><label class="flabel">Illustration Image (Optionnelle)</label><input type="file" id="m-image-file" accept="image/*" class="finput" onchange="handleImageUpload(this)"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
-    <div class="frow"><label class="flabel">Aide / Placeholder</label><input class="finput" id="m-hint"></div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="saveModal()">Enregistrer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>
-  </div>
-</div>
-
-<div class="modal-bg" id="detail-modal">
-  <div class="modal" style="width:680px; max-height:85vh">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div class="modal-title" style="margin-bottom:0">Demande <span id="detail-edeal" style="color:var(--blue)"></span></div>
-      <button onclick="document.getElementById('detail-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
-    </div>
-    <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
-  </div>
-</div>
-<div class="toast" id="toast"><span id="toast-msg"></span></div>
-
-<script>
-var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
-var formData = {}, currentProduit = 'proplus_lp3', editingIndex = -1, allDemandes = [], tempImageUrl = "";
-
-function jwtDecode(token) {
-  try {
-    var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) { base64 += '='; }
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) { console.error("Erreur décodage jeton Google:", e); return {}; }
-}
-
-function handleCredentialResponse(response) {
-  var payload = jwtDecode(response.credential);
-  if (payload.email && payload.email.endsWith('@provost.fr')) {
-    sessionStorage.setItem('admin_auth', '1');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-content').classList.add('visible');
-    chargerDepuisGitHub();
-  } else {
-    document.getElementById('login-err').textContent = "Accès refusé."; document.getElementById('login-err').style.display = 'block';
-  }
-}
-if (sessionStorage.getItem('admin_auth') === '1') {
-  document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible');
-}
-function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
-function sauvegarderConfig() {
-  localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim());
-  localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
-  localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
-  toast('✓ Sauvegardé', 'ok'); majStatusGH();
-}
-function majStatusGH() {
-  var gh = getGHConfig(); var el = document.getElementById('gh-status');
-  el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err';
-}
-function handleImageUpload(input) {
-  if (!input.files || !input.files[0]) return;
-  var file = input.files[0]; var preview = document.getElementById('m-image-preview'); var gh = getGHConfig();
-  if (!gh.token) { alert("Configurez GitHub d'abord."); return; }
-  preview.innerHTML = "⏳ Envoi...";
-  var filename = 'images/img_' + Date.now() + '_' + file.name.replace(/\s+/g, '_');
-  var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + filename;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    fetch(apiUrl, { method: 'PUT', headers: {'Authorization': 'token '+gh.token}, body: JSON.stringify({ message: 'Upload img', content: e.target.result.split(',')[1] }) })
-    .then(function(r){return r.json();}).then(function(res){
-      if(res.content) { tempImageUrl = 'https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/'+filename; preview.innerHTML = "✅ En ligne"; }
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-function initChampsProduits() {
-  if (!formData.liste_produits) {
-    formData.liste_produits = [
-      {id:'proplus_lp3', label:'Proplus LP3'},
-      {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
-      {id:'install_ext', label:'Installation extérieure'}
-    ];
-  }
-  if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
-    formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || []));
-  }
-}
-
-function renderProduitTabs() {
-  var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = '';
-  (formData.liste_produits || []).forEach(function(p) {
-    var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : '');
-    btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
-    container.appendChild(btn);
-  });
-}
-function ajouterNouveauProduit() {
-  var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now();
-  if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom });
-  formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions();
-}
-function chargerDepuisGitHub() {
-  var gh = getGHConfig(); majStatusGH();
-  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;}
-  if (!gh.user) { formData = {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; }
-  fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now())
-  .then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); })
-  .catch(function(){ formData = {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); });
-}
-function sauvegarder() {
-  var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json';
-  fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){
-    fetch(apiUrl, { method: 'PUT', headers: {'Authorization':'token '+gh.token}, body: JSON.stringify({ message: 'Mise a jour', content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), sha: info.sha||'' }) })
-    .then(function(){ toast('✓ Publié !', 'ok'); });
-  });
-}
-function renderQuestions() {
-  var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
-  if(!questions.length){ list.innerHTML='<div style="padding:10px;font-style:italic;">Aucune question</div>'; return; }
-  questions.forEach(function(q, i) {
-    var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true;
-    el.innerHTML = `<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">${q.label} ${q.image?'[🖼️ Image]':''}</div><span class="q-item-type">${typeLbl(q.type)}</span></div>
-      <div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(${i})">✏️</button><button class="btn-icon del" onclick="deleteQuestion(${i})">🗑️</button></div>`;
-    el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; });
-    el.addEventListener('dragend', function(){ el.style.opacity='1'; });
-    el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; });
-    el.addEventListener('dragleave', function(){ el.style.background=''; });
-    el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background='';
-      var from=parseInt(e.dataTransfer.getData('text')),to=i; if(from===to) return;
-      var arr=formData[currentProduit],item=arr.splice(from,1)[0]; arr.splice(to,0,item); renderQuestions(); });
-    list.appendChild(el);
-  });
-}
-function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',radio:'Unique',checkbox:'Multiple'}[t]||t; }
-
-function showTab(tab, e) {
-  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  document.getElementById('section-'+tab).classList.add('active');
-  if (e && e.target) {
-    e.target.classList.add('active');
-  } else {
-    var btn = document.querySelector(`.tab[onclick*="${tab}"]`); if (btn) btn.classList.add('active');
-  }
-  if(tab==='suivi') chargerSuivi();
-  if(tab==='parametres') chargerDepuisGitHub();
-}
-
-function chargerSuivi() {
-  fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){return r.json();}).then(function(res){
-    allDemandes=res.demandes||[]; renderSuivi(allDemandes);
-  });
-}
-function filtrer(q) { q=q.toLowerCase(); renderSuivi(allDemandes.filter(function(d){ return (d.edeal+d.client+d.commercial).toLowerCase().includes(q); })); }
-
-function renderSuivi(demandes) {
-  var body=document.getElementById('admin-suivi-body');
-  var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
-  if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande définitive</td></tr>'; return; }
-  body.innerHTML=filtrées.map(function(d,i){
-    var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return `<option value="${s}" ${d.statut===s?'selected':''}>${s}</option>`; }).join('');
-    return `<tr>
-      <td class="td-edeal">${d.edeal}</td><td>${d.client}</td><td>${d.commercial}</td><td>${d.produits}</td><td>${d.date}</td>
-      <td><select class="st-select" id="st-${i}">${opts}</select></td>
-      <td><input class="assign-input" id="ass-${i}" value="${d.attribueA}"></td>
-      <td><input class="assign-input" style="width:140px" id="com-${i}" value="${d.commentaireBE}"></td>
-      <td><button class="save-row" onclick="saveLine(${i}, '${d.edeal}')">✓ Sauver</button> <button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande('${d.edeal}')">📂 Voir</button></td>
-    </tr>`;
-  }).join('');
-}
-function saveLine(i,edeal) {
-  var fd=new FormData(); fd.append('action','updateSuivi');
-  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
-  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
-}
-
-function declencherPurgeManuelle() {
-  if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return;
-  var fd = new FormData();
-  fd.append('action', 'lancerPurgeManuelle');
-  toast("⏳ Exécution de la purge...", "ok");
-  
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r){ return r.json(); })
-  .then(function(res) {
-    if (res.success) {
-      alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message);
-      chargerSuivi();
-    } else {
-      toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err");
-    }
-  })
-  .catch(function(err){ toast("Erreur réseau : " + err.message, "err"); });
-}
-
-function ouvrirDemande(edeal) {
-  document.getElementById('detail-edeal').textContent=edeal;
-  document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>';
-  document.getElementById('detail-modal').classList.add('open');
-  fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal))
-  .then(function(r){return r.json();})
-  .then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); })
-  .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
-}
-
-// ── 🛠️ INTERCEPTION ET AFFICHAGE DES TRACES POUR LES FICHIERS PURGÉS (> 15 JOURS) ──
-function renderDetail(res) {
-  var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
-  html+=detailSection('Informations générales',[detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Produit(s)',(fd.produits||[]).join(', ')),detailRow('Contraintes',(infos.contraintes||[]).join(', ')),detailRow('Accès',(infos.acces||[]).join(', ')),detailRow('Zone',(infos.zone||[]).join(', ')),detailRow('Éléments',(infos.elements||[]).join(', ')),detailRow('Commentaire',fd.commentaire)].join(''));
-  var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
-  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
-  
-  html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  
-  // Trace du Récapitulatif PDF
-  if(res.pdfBase64){
-    if (res.pdfBase64 === "SUPPRIME_15J") {
-      html+=`<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
-        ❌ <s style="color:var(--text-light); font-weight:600;">${res.pdfNom}</s> 
-        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
-      </div>`;
-    } else {
-      html+=`<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger('${res.pdfBase64}','${res.pdfNom}','application/pdf')">⬇️ ${res.pdfNom}</button></div>`;
-    }
-  }
-  
-  // Trace des Pièces Jointes du commercial
-  (res.fichiers||[]).forEach(function(f){
-    if (f.b64 === "SUPPRIME_15J") {
-      html+=`<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
-        ❌ <s style="color:var(--text-light); font-weight:600;">${f.nom}</s> 
-        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
-      </div>`;
-    } else {
-      html+=`<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger('${f.b64}','${f.nom}','${f.type}')">📎 ${f.nom}</button></div>`;
-    }
-  });
-  
-  html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur" value="${res.attribueA||''}"></div></div>';
-  html+=`<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="${res.commentaireBE||''}"></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail('${res.edeal}')">✓ Sauvegarder</button></div>`;
-  document.getElementById('detail-body').innerHTML=html;
-}
-
-function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
-function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
-
-function telecharger(b64,nom,type){
-  try{
-    if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){
-      try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){}
-    }
-    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
-    var blob=new Blob([bytes],{type:type||'application/octet-stream'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
-  }catch(err){alert('Erreur : '+err.message);}
-}
-function saveDetail(edeal){
-  var fd=new FormData(); fd.append('action','updateSuivi');
-  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value}));
-  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok');}).catch(function(){toast('Erreur réseau','err');});
+  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok'); chargerSuivi(); document.getElementById('detail-modal').classList.remove('open'); }).catch(function(){toast('Erreur réseau','err');});
 }
 
 function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
