@@ -36,7 +36,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
 .steps{display:flex;flex-direction:column;gap:12px}
 .step{display:flex;gap:14px;padding:16px;background:var(--bg);border-radius:var(--radius);border-left:4px solid var(--blue)}
-.step-n{width:26px;height:26px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
 .step strong{display:block;font-size:13px;color:var(--dark);margin-bottom:2px}
 .step span{font-size:12px;color:var(--text-light)}
 .wizard{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:22px;box-shadow:var(--shadow)}
@@ -46,10 +45,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .wz.done{background:var(--green-bg);color:var(--green)}
 .wz-n{font-size:14px;font-weight:900;display:block;margin-bottom:2px}
 .fstep{display:none}
-
-/* 🛠️ FIX GRAPHIQUE CAPITAL : Correction de la syntaxe d'affichage des étapes */
 .fstep.active{display:block}
-
 .frow{margin-bottom:16px}
 .flabel{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
 .finput,.fselect,.ftextarea{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);background:var(--white);outline:none;transition:var(--tr)}
@@ -63,13 +59,22 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .produit-cb.checked .cb-box{background:var(--blue);border-color:var(--blue)}
 .cb-check{display:none;color:white;font-size:11px;font-weight:900}
 .produit-cb.checked .cb-check{display:block}
-.produit-cb span{font-size:13px;font-weight:600;color:var(--dark)}
+.produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-produit-header{font-size:14px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;border-bottom:2px solid var(--blue-light);padding-bottom:6px}
 .q-title{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:8px}
 .q-options{display:flex;flex-direction:column;gap:6px}
 .q-option{display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text);user-select:none;transition:var(--tr)}
+.opt-dot,.opt-sq{width:15px;height:15px;border:2px solid var(--border);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:var(--tr)}
+.opt-dot{border-radius:50%} .opt-sq{border-radius:3px}
+.q-option.selected{border-color:var(--green)!important;background:rgba(42,125,82,0.06)!important;color:var(--green)!important;font-weight:700}
+.q-option.selected .opt-dot{background:var(--green)!important;border-color:var(--green)!important}
+.q-option.selected .opt-dot::after{content:'';width:5px;height:5px;background:var(--white);border-radius:50%;display:block}
+.q-option.selected .opt-sq{background:var(--green)!important;border-color:var(--green)!important}
+.q-option.selected .opt-sq::after{content:'✓';color:var(--white);font-size:11px;font-weight:900}
 .q-text-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);outline:none;transition:var(--tr)}
 .q-text-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.1)}
+.q-text-input.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
+.finput.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
 .dropzone{border:2px dashed var(--blue-mid);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;background:var(--blue-lighter);transition:var(--tr)}
 .dropzone:hover{background:var(--blue-light);border-color:var(--blue)}
 .dz-title{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:4px}
@@ -77,6 +82,18 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .file-item{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;box-shadow:var(--shadow)}
 .file-rm{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:18px;font-weight:700}
 .file-rm:hover{color:var(--red)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.btn-primary{background:var(--blue);color:var(--white)}
+.btn-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(45,75,140,.28)}
+.btn-yellow{background:var(--yellow);color:var(--dark)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer}
+.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase}
+.b-wait{background:var(--yellow-bg);color:#7a5500}
+.b-draft{background:rgba(35,45,70,0.1);color:var(--dark)}
+.b-attr{background:var(--green-bg);color:var(--green)}
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);background:var(--white)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{background:rgba(45,75,140,0.04)}
@@ -84,18 +101,26 @@ th{padding:12px 16px;text-align:left;font-size:10px;font-weight:700;letter-spaci
 td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--dark)}
 tbody tr:hover{background:var(--blue-lighter)}
 .td-edeal{font-weight:700;color:var(--blue);font-family:monospace;font-size:13px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
-.b-wait{background:var(--yellow-bg);color:#7a5500}
-.b-draft{background:rgba(35,45,70,0.08);color:var(--dark)}
-.b-attr{background:var(--green-bg);color:var(--green)}
-.b-urg{background:var(--red-bg);color:var(--red)}
+.empty-td td{text-align:center;padding:28px;color:var(--text-light);font-style:italic}
+.info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;display:flex;gap:9px}
+.divider{border:none;border-top:1.5px solid var(--border);margin:16px 0}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left:4px solid var(--green)}
+.toast.err{border-left:4px solid var(--red)}
 .login-screen{position:fixed;inset:0;background:linear-gradient(135deg, #1a2f5e 0%, #2d4b8c 100%);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
 .login-card{background:var(--white);border-radius:16px;padding:40px;width:400px;box-shadow:var(--shadow-lg);text-align:center;position:relative;overflow:hidden}
 .login-logo{font-size:26px;font-weight:900;color:var(--blue);margin-bottom:6px;letter-spacing:-0.5px}
 .login-sub{font-size:12px;color:var(--text-light);margin-bottom:30px;font-weight:500}
+.login-err{color:var(--red);font-size:12px;margin-top:10px;display:none}
 .login-bar{width:100%;height:5px;background:var(--yellow);position:absolute;top:0;left:0}
 .app-content{display:none;max-width:1200px;margin:0 auto}
 .app-content.visible{display:block}
+.loading-overlay{position:fixed;inset:0;width:100vw;height:100vh;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
+.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
+.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
+@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
+.btn-filter.active-filter { background: var(--blue) !important; color: #fff !important; font-weight: 700; border-color: var(--blue) !important; }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -322,7 +347,6 @@ function buildDiagnostic() {
   });
 }
 
-// ── 🛠️ ACCÈS ATTRIBUT UNIVERSEL : Corrige la capture de l'Étape 2 (Bannit les faux vides de BDD) ──
 function collectFormData() {
   var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
@@ -408,31 +432,22 @@ function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles
 function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
 function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
 
-// ── 🛠️ ALIGNEMENT DE LECTURE POST : Bascule le chargement du suivi en requete POST binaire native ──
 function chargerSuivi() {
   var sbody = document.getElementById('suivi-body'); if(!sbody) return;
   sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
-  
-  var fd = new FormData();
-  fd.append('action', 'getSuivi');
-  
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r){ return r.json(); })
-  .then(function(res) {
+  fetch(APPS_SCRIPT_URL + '?action=getSuivi&_=' + Date.now())
+  .then(function(r){ return r.json(); }).then(function(res) {
     if(res && res.success) {
-      var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
-      state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
-      filtrer(state.currentFilter || 'tous');
+      var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous');
     } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; }
-  }).catch(function(err) { 
-    console.error("Détail de l'erreur réseau de lecture :", err);
-    sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU DE LECTURE</td></tr>'; 
-  });
+  }).catch(function(err) { console.error("Détail de l'erreur réseau de lecture :", err); sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU DE LECTURE</td></tr>'; });
 }
 
 function renderSuivi(demandes) { var body = document.getElementById('suivi-body'); if (!body) return; if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; return; } body.innerHTML = demandes.map(function(d) { var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—'; var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg')); return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>'; }).join(''); }
 function resetForm() { ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); }
 function buildRecap() { var edeal = document.getElementById('f-edeal').value.trim(); var recapObj = document.getElementById('recap-obj'); if (recapObj) recapObj.textContent = edeal; var produitLabels = state.selectedProduits.map(function(pid) { var pFound = PRODUITS.find(function(p){ return p.id===pid; }); return pFound ? pFound.label : pid; }).join(', '); document.getElementById('recap-content').innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div><div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div><div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div><div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div><div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div></div>'; }
+
+/* 🛠️ ENCAPSULATION ET NETTOYAGE ABSOLU DE LA SYNTAXE HTML DANS LE GESTIONNAIRE DE COMPILATION PDF */
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
@@ -441,10 +456,12 @@ function genererPDFBase64(fData) {
     var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
     var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
     Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
-    var tagStart = '<' + '!DOCTYPE html' + '><h' + 'tml><he' + 'ad><me' + 'ta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref'>{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
-    var tagEnd = '</bo' + 'dy></ht' + 'ml>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
+    
+    var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+    var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
 }
+function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
 </html>
