@@ -75,7 +75,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v4.5-TechEmailMapping</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v4.6-CustomMailBody</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -84,7 +84,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v4.5-TechEmailMapping</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v4.6-CustomMailBody</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -147,10 +147,16 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <hr class="divider">
     <div class="card-title">Registre Métier Bureau d'Études</div>
     <div class="frow">
-      <!-- 🛠️ INTERFACE CONFIGURATION : Clarté du format attendu avec point-virgule -->
       <label class="flabel">Techniciens BE Habilités et Emails (Format : Nom;adresse@provost.fr — un par ligne)</label>
       <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont;jdupont@provost.fr&#10;Marc Voisin;mvoisin@provost.fr"></textarea>
     </div>
+    
+    <!-- 🛠️ INTERFACE PARAMÈTRES : Zone d'édition du corps de mail par défaut -->
+    <div class="frow">
+      <label class="flabel">Corps du mail de transmission par défaut</label>
+      <textarea class="ftextarea" id="mail-body-config" style="min-height: 110px;" placeholder="Entrez le message qui sera envoyé automatiquement au technicien..."></textarea>
+    </div>
+    
     <div class="btn-row"><button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder les configurations</button></div>
   </div>
 </section>
@@ -183,25 +189,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "";
 
-// 🛠️ MOTEUR DE DÉCODAGE DES ADRESSES EMAILS ASSOCIEES AUX TECHNICIENS
+var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été attribuée.\n\nVous trouverez en pièces jointes le récapitulatif technique au format PDF ainsi que l'ensemble des documents et plans déposés d'origine par le commercial.\n\nCordialement,\nL'équipe Bureau d'Études\nProvost SA";
+
 function getTechMap() {
-  var raw = localStorage.getItem('tech_list') || "";
-  var map = {};
-  raw.split('\n').forEach(function(line) {
-    var parts = line.split(';');
-    var name = parts[0] ? parts[0].trim() : "";
-    if (name) {
-      map[name] = parts[1] ? parts[1].trim() : "";
-    }
-  });
+  var raw = localStorage.getItem('tech_list') || ""; var map = {};
+  raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } });
   return map;
 }
-
-function getTechList() {
-  var map = getTechMap();
-  var list = Object.keys(map);
-  return list.length > 0 ? list : [];
-}
+function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
 
 function jwtDecode(token) {
   try {
@@ -220,7 +215,17 @@ function handleCredentialResponse(response) {
 }
 if (sessionStorage.getItem('admin_auth') === '1') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); }
 function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
-function sauvegarderConfig() { localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); }
+
+// 🛠️ PERSISTANCE : Sauvegarde du texte du mail par défaut dans le stockage d'autorité local
+function sauvegarderConfig() { 
+  localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); 
+  localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); 
+  localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); 
+  localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); 
+  localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); 
+  toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); 
+}
+
 function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; }
 function handleImageUpload(input) { if (!input.files || !input.files[0]) return; var file = input.files[0]; var preview = document.getElementById('m-image-preview'); var gh = getGHConfig(); if (!gh.token) { alert("Configurez GitHub d'abord."); return; } preview.innerHTML = "⏳ Envoi..."; var filename = 'images/img_' + Date.now() + '_' + file.name.replace(/\s+/g, '_'); var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + filename; var reader = new FileReader(); reader.onload = function(e) { fetch(apiUrl, { method: 'PUT', headers: {'Authorization': 'token '+gh.token}, body: JSON.stringify({ message: 'Upload img', content: e.target.result.split(',')[1] }) }).then(function(r){return r.json();}).then(function(res){ if(res.content) { tempImageUrl = 'https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/'+filename; preview.innerHTML = "✅ En ligne"; } }); }; reader.readAsDataURL(file); }
 
@@ -233,7 +238,17 @@ function renderProduitTabs() {
   (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); });
 }
 function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
-function chargerDepuisGitHub() { var gh = getGHConfig(); majStatusGH(); if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } if (!gh.user) { formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; } fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); }
+
+// ── 🛠️ CHARGEMENT DE SECURITE : Restaure le template personnalisé ou applique le secours d'usine
+function chargerDepuisGitHub() { 
+  var gh = getGHConfig(); majStatusGH(); 
+  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} 
+  if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
+  if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
+  if (!gh.user) { formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; } 
+  fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); 
+}
+
 function sauvegarder() { var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){ fetch(apiUrl, { method: 'PUT', headers: {'Authorization':'token '+gh.token}, body: JSON.stringify({ message: 'Mise a jour', content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), sha: info.sha||'' }) }).then(function(){ toast('✓ Publié !', 'ok'); }); }); }
 
 function renderQuestions() {
@@ -284,7 +299,6 @@ function renderSuivi(demandes) {
     var optsStatus = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
     var optsTechs = ['','—'].concat(techs).map(function(t){ return '<option value="' + t + '" ' + (d.attribueA===t?'selected':'') + '>' + (t||'Non attribué') + '</option>'; }).join('');
     
-    // ── 🛠️ CORRECTION PASSAGE DE L'INDEX : Injection de la position "i" dans l'action de mail ──
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
       '<td><select class="st-select" id="st-' + i + '">' + optsStatus + '</select></td>' +
       '<td><select class="st-select" style="width:120px;" id="ass-' + i + '">' + optsTechs + '</select></td>' +
@@ -297,24 +311,20 @@ function renderSuivi(demandes) {
 
 function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value})); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); }); }
 function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); } }).catch(function(err){ toast("Erreur réseau : " + err.message, "err"); }); }
+function abrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
 function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
 
-// ── 🛠️ ALGORITHME DE RECHERCHE CROISÉE AUTO-NOM ET PRE-REMPLISSAGE DU MAIL DE TRANSMISSION BE ──
+// ── 🛠️ TRANSMISSION : Injection du corps de mail personnalisé ou du secours d'usine dans le pipeline
 function envoyerMailDossier(edeal, index) {
-  var techSelect = document.getElementById('ass-' + index);
-  var currentTech = techSelect ? techSelect.value.trim() : '';
-  var defaultEmail = '';
-  
-  if (currentTech && currentTech !== '—' && currentTech !== '') {
-    var map = getTechMap();
-    defaultEmail = map[currentTech] || '';
-  }
-  
+  var techSelect = document.getElementById('ass-' + index); var currentTech = techSelect ? techSelect.value.trim() : ''; var defaultEmail = '';
+  if (currentTech && currentTech !== '—' && currentTech !== '') { var map = getTechMap(); defaultEmail = map[currentTech] || ''; }
   var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez ou confirmez l'adresse email du technicien Provost pour lui transférer le dossier " + edeal + " :\n(Le mail partira depuis entrees-be@provost.fr avec le PDF récapitulatif et toutes les PJ d'origine)", defaultEmail);
   if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail Provost non reconnue."); return; }
   
+  var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT;
   toast("⏳ Extraction binaire des PJ et envoi du mail...", "ok");
-  var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email}));
+  
+  var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email, body: customBody}));
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Dossier technique envoyé avec succès !", "ok"); } else { alert("❌ Blocage Google Apps Script :\n\n" + (res.error || "Droits d'alias non accordés.")); } }).catch(function(err){ alert("Erreur réseau critique : " + err.message); });
 }
 
