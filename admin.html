@@ -86,8 +86,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <!-- INCREMENTATION DE VERSION VISIBLE -->
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.6-DebugPurge</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.7-PurgeTrace</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -316,15 +315,12 @@ function renderSuivi(demandes) {
     </tr>`;
   }).join('');
 }
-
-/* 🛠️ FIX DE STRING CONCATENATION DANS SAVELINE */
 function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
 }
 
-// ── ACTION DE LA PURGE MANUELLE AVEC AFFICHAGE DYNAMIQUE DE L'ERREUR REELLE ──
 function declencherPurgeManuelle() {
   if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return;
   var fd = new FormData();
@@ -338,7 +334,6 @@ function declencherPurgeManuelle() {
       alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message);
       chargerSuivi();
     } else {
-      // 🛠️ FIX DEBUG : Affiche le vrai motif de l'erreur envoyé par le script Google
       toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err");
     }
   })
@@ -355,22 +350,47 @@ function ouvrirDemande(edeal) {
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
+// ── 🛠️ INTERCEPTION ET AFFICHAGE DES TRACES POUR LES FICHIERS PURGÉS (> 15 JOURS) ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
   html+=detailSection('Informations générales',[detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Produit(s)',(fd.produits||[]).join(', ')),detailRow('Contraintes',(infos.contraintes||[]).join(', ')),detailRow('Accès',(infos.acces||[]).join(', ')),detailRow('Zone',(infos.zone||[]).join(', ')),detailRow('Éléments',(infos.elements||[]).join(', ')),detailRow('Commentaire',fd.commentaire)].join(''));
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
   Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label];return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows)html+=detailSection(pm[pid]||pid,rows);});
+  
   html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  if(res.pdfBase64){html+=`<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger('${res.pdfBase64}','${res.pdfNom}','application/pdf')">⬇️ ${res.pdfNom}</button></div>`;}
-  (res.fichiers||[]).forEach(function(f){html+=`<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger('${f.b64}','${f.nom}','${f.type}')">📎 ${f.nom}</button></div>`;});
+  
+  // Trace du Récapitulatif PDF
+  if(res.pdfBase64){
+    if (res.pdfBase64 === "SUPPRIME_15J") {
+      html+=`<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
+        ❌ <s style="color:var(--text-light); font-weight:600;">${res.pdfNom}</s> 
+        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
+      </div>`;
+    } else {
+      html+=`<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger('${res.pdfBase64}','${res.pdfNom}','application/pdf')">⬇️ ${res.pdfNom}</button></div>`;
+    }
+  }
+  
+  // Trace des Pièces Jointes du commercial
+  (res.fichiers||[]).forEach(function(f){
+    if (f.b64 === "SUPPRIME_15J") {
+      html+=`<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">
+        ❌ <s style="color:var(--text-light); font-weight:600;">${f.nom}</s> 
+        <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>
+      </div>`;
+    } else {
+      html+=`<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger('${f.b64}','${f.nom}','${f.type}')">📎 ${f.nom}</button></div>`;
+    }
+  });
+  
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur"></div></div>';
-  html+=`<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..."></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail('${res.edeal}')">✓ Sauvegarder</button></div>`;
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">'+['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){return'<option>'+s+'</option>';}).join('')+'</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur" value="${res.attribueA||''}"></div></div>';
+  html+=`<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="${res.commentaireBE||''}"></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail('${res.edeal}')">✓ Sauvegarder</button></div>`;
   document.getElementById('detail-body').innerHTML=html;
 }
 
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
-function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid #border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
+function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
 
 function telecharger(b64,nom,type){
   try{
@@ -388,6 +408,7 @@ function saveDetail(edeal){
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok');}).catch(function(){toast('Erreur réseau','err');});
 }
 
+function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerDepuisGitHub);
 </script>
 </body>
