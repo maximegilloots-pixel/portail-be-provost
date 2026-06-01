@@ -623,6 +623,10 @@
   ],
   "liste_produits": [
     {
+      "id": "infos_generales",
+      "label": "Infos Générales (Étape 1)"
+    },
+    {
       "id": "proplus_lp3",
       "label": "Proplus LP3"
     },
@@ -659,6 +663,13 @@
         "Tubulaire",
         "Tôlé"
       ]
+    }
+  ],
+  "infos_generales": [
+    {
+      "id": "q_1780314061436",
+      "label": "TEST ?",
+      "type": "text"
     }
   ]
 }
