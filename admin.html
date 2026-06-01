@@ -78,7 +78,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.1-AdminStep1Seed</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.2-ArchitectureFix</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -87,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.1-AdminStep1Seed</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.2-ArchitectureFix</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -221,7 +221,6 @@ function handleImageUpload(input) {
   reader.readAsDataURL(file);
 }
 
-// 🛠️ SEED COMPLET INITIAL DES QUESTIONS DE L'ÉTAPE 1
 var DEFAULT_INFOS_GENERALES = [
   {id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},
   {id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},
@@ -231,22 +230,19 @@ var DEFAULT_INFOS_GENERALES = [
   {id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}
 ];
 
+// ── 🛠️ FIX SECURE DE L'INITIALISATION : infos_generales est un bloc à part, jamais inclus dans la liste produits
 function initChampsProduits() {
   if (!formData.liste_produits) {
     formData.liste_produits = [
-      {id:'infos_generales', label:'Infos Générales (Étape 1)'},
       {id:'proplus_lp3', label:'Proplus LP3'},
       {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
       {id:'install_ext', label:'Installation extérieure'}
     ];
   } else {
-    var hasInfos = formData.liste_produits.some(function(p){ return p.id === 'infos_generales'; });
-    if (!hasInfos) {
-      formData.liste_produits.unshift({id:'infos_generales', label:'Infos Générales (Étape 1)'});
-    }
+    // Purge de sécurité si l'ancienne version défectueuse s'était enregistrée sur GitHub
+    formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
   }
   
-  // 🛠️ REMPLISSAGE AUTOMATIQUE SÉCURISÉ EN CAS DE PREMIER DÉPLOIEMENT OU TABLEAU VIDE
   if (!formData.infos_generales || !formData.infos_generales.length) {
     formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES));
   }
@@ -255,14 +251,25 @@ function initChampsProduits() {
   }
 }
 
+// ── 🛠️ CORRECTION DES ONGLETS : Ajoute de force l'onglet Étape 1 sans polluer liste_produits
 function renderProduitTabs() {
   var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = '';
+  
+  // Bouton fixe de l'Étape 1
+  var btnGen = document.createElement('button');
+  btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '');
+  btnGen.textContent = 'Infos Générales (Étape 1)';
+  btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); };
+  container.appendChild(btnGen);
+
+  // Boutons des produits d'usine réels
   (formData.liste_produits || []).forEach(function(p) {
     var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : '');
     btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
     container.appendChild(btn);
   });
 }
+
 function ajouterNouveauProduit() {
   var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now();
   if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom });
@@ -421,7 +428,7 @@ function renderDetail(res) {
     detailRow('Commercial',fd.commercial),
     detailRow('Département',fd.ville),
     detailRow('Date chantier',fd.dateChantier),
-    detailRow('Produit(s)',(fd.produits||[]).join(', '))
+    detailRow('Profil produit(s)',(fd.produits||[]).join(', '))
   ];
 
   if (infos) {
@@ -429,7 +436,7 @@ function renderDetail(res) {
       var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v));
     });
   }
-  infoRows.push(detailRow('Commentaire', fd.commentaire));
+  infoRows.push(detailRow('Commentaire commercial', fd.commentaire));
   html+=detailSection('Informations générales', infoRows.join(''));
   
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
