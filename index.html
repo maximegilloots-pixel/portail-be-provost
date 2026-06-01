@@ -452,6 +452,14 @@ function genererPDFBase64(fData) {
     var tagEnd = '</bo' + 'dy></ht' + 'ml>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
 }
+
+}).catch(function(err) {
+    // 🛠️ ON FORCE L'ÉCRITURE DE L'ERREUR DANS LA CONSOLE :
+    console.error("LE COUPABLE EST ICI :", err);
+    
+    sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU DE LECTURE</td></tr>';
+  });
+}
 </script>
 </body>
 </html>
