@@ -75,7 +75,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v4.6-CustomMailBody</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v5.0-ExtendedPurgeRegen</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -84,9 +84,9 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v4.6-CustomMailBody</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v5.0-ExtendedPurgeRegen</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
-    <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
+    <span class="github-status gh-ok" id="gh-status">GitHub : Connecté</span>
   </div>
 </div>
 
@@ -117,7 +117,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <div class="card-title">Gestion des demandes</div>
     <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
-      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
+      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 30 jours</button>
       <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
         <option value="">Tous les techniciens</option>
       </select>
@@ -148,15 +148,12 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <div class="card-title">Registre Métier Bureau d'Études</div>
     <div class="frow">
       <label class="flabel">Techniciens BE Habilités et Emails (Format : Nom;adresse@provost.fr — un par ligne)</label>
-      <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont;jdupont@provost.fr&#10;Marc Voisin;mvoisin@provost.fr"></textarea>
+      <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont;jdupont@provost.fr"></textarea>
     </div>
-    
-    <!-- 🛠️ INTERFACE PARAMÈTRES : Zone d'édition du corps de mail par défaut -->
     <div class="frow">
       <label class="flabel">Corps du mail de transmission par défaut</label>
-      <textarea class="ftextarea" id="mail-body-config" style="min-height: 110px;" placeholder="Entrez le message qui sera envoyé automatiquement au technicien..."></textarea>
+      <textarea class="ftextarea" id="mail-body-config" style="min-height: 110px;" placeholder="Message e-mail automatique..."></textarea>
     </div>
-    
     <div class="btn-row"><button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder les configurations</button></div>
   </div>
 </section>
@@ -187,68 +184,22 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
-var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "";
+var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "", lastOpenedDemande = null;
+var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été attribuée...";
 
-var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été attribuée.\n\nVous trouverez en pièces jointes le récapitulatif technique au format PDF ainsi que l'ensemble des documents et plans déposés d'origine par le commercial.\n\nCordialement,\nL'équipe Bureau d'Études\nProvost SA";
-
-function getTechMap() {
-  var raw = localStorage.getItem('tech_list') || ""; var map = {};
-  raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } });
-  return map;
-}
+function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var map = {}; raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } }); return map; }
 function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
-
-function jwtDecode(token) {
-  try {
-    var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) { base64 += '='; }
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) { console.error("Erreur décodage jeton Google:", e); return {}; }
-}
-
-function handleCredentialResponse(response) {
-  var payload = jwtDecode(response.credential);
-  if (payload.email && payload.email.endsWith('@provost.fr')) {
-    sessionStorage.setItem('admin_auth', '1'); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerPermanente();
-  } else { document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block'; }
-}
-if (sessionStorage.getItem('admin_auth') === '1') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); }
+function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
+function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('admin_auth', '1'); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerPermanente(); } else { alert("Email @provost.fr requis."); } }
 function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
-
-// 🛠️ PERSISTANCE : Sauvegarde du texte du mail par défaut dans le stockage d'autorité local
-function sauvegarderConfig() { 
-  localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); 
-  localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); 
-  localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); 
-  localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); 
-  localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); 
-  toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); 
-}
-
-function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; }
-function handleImageUpload(input) { if (!input.files || !input.files[0]) return; var file = input.files[0]; var preview = document.getElementById('m-image-preview'); var gh = getGHConfig(); if (!gh.token) { alert("Configurez GitHub d'abord."); return; } preview.innerHTML = "⏳ Envoi..."; var filename = 'images/img_' + Date.now() + '_' + file.name.replace(/\s+/g, '_'); var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + filename; var reader = new FileReader(); reader.onload = function(e) { fetch(apiUrl, { method: 'PUT', headers: {'Authorization': 'token '+gh.token}, body: JSON.stringify({ message: 'Upload img', content: e.target.result.split(',')[1] }) }).then(function(r){return r.json();}).then(function(res){ if(res.content) { tempImageUrl = 'https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/'+filename; preview.innerHTML = "✅ En ligne"; } }); }; reader.readAsDataURL(file); }
+function sauvegarderConfig() { localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); }
+function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); if(el) { el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; } }
 
 var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
 function initChampsProduits() { if (!formData.liste_produits) { formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; } else { formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); } if (!formData.infos_generales || !formData.infos_generales.length) { formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); } if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) { formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); } }
-
-function renderProduitTabs() {
-  var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = '';
-  var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen);
-  (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); });
-}
+function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
 function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
-
-// ── 🛠️ CHARGEMENT DE SECURITE : Restaure le template personnalisé ou applique le secours d'usine
-function chargerDepuisGitHub() { 
-  var gh = getGHConfig(); majStatusGH(); 
-  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} 
-  if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
-  if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
-  if (!gh.user) { formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; } 
-  fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); 
-}
-
+function chargerDepuisGitHub() { var gh = getGHConfig(); majStatusGH(); if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; } fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); }
 function sauvegarder() { var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){ fetch(apiUrl, { method: 'PUT', headers: {'Authorization':'token '+gh.token}, body: JSON.stringify({ message: 'Mise a jour', content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), sha: info.sha||'' }) }).then(function(){ toast('✓ Publié !', 'ok'); }); }); }
 
 function renderQuestions() {
@@ -310,22 +261,17 @@ function renderSuivi(demandes) {
 }
 
 function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value})); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); }); }
-function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); } }).catch(function(err){ toast("Erreur réseau : " + err.message, "err"); }); }
-function abrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
-function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
+function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 30 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); } }).catch(function(err){ alert("Erreur : " + err.message); }); }
+function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} lastOpenedDemande = res; renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
 
-// ── 🛠️ TRANSMISSION : Injection du corps de mail personnalisé ou du secours d'usine dans le pipeline
 function envoyerMailDossier(edeal, index) {
   var techSelect = document.getElementById('ass-' + index); var currentTech = techSelect ? techSelect.value.trim() : ''; var defaultEmail = '';
   if (currentTech && currentTech !== '—' && currentTech !== '') { var map = getTechMap(); defaultEmail = map[currentTech] || ''; }
-  var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez ou confirmez l'adresse email du technicien Provost pour lui transférer le dossier " + edeal + " :\n(Le mail partira depuis entrees-be@provost.fr avec le PDF récapitulatif et toutes les PJ d'origine)", defaultEmail);
-  if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail Provost non reconnue."); return; }
-  
-  var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT;
-  toast("⏳ Extraction binaire des PJ et envoi du mail...", "ok");
-  
+  var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez l'adresse email du technicien :", defaultEmail);
+  if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail invalide."); return; }
+  var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; toast("⏳ Transfert du mail...", "ok");
   var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email, body: customBody}));
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Dossier technique envoyé avec succès !", "ok"); } else { alert("❌ Blocage Google Apps Script :\n\n" + (res.error || "Droits d'alias non accordés.")); } }).catch(function(err){ alert("Erreur réseau critique : " + err.message); });
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Dossier technique envoyé !", "ok"); } else { alert("❌ Erreur : " + res.error); } }).catch(function(err){ alert("Erreur réseau : " + err.message); });
 }
 
 function renderDetail(res) {
@@ -335,9 +281,32 @@ function renderDetail(res) {
   infoRows.push(detailRow('Commentaire commercial', fd.commentaire)); html+=detailSection('Informations générales', infoRows.join(''));
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
   Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label]; return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows) html+=detailSection(pm[pid]||pid,rows);});
+  
   html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  if(res.pdfBase64){ var cleanPdfB64 = String(res.pdfBase64).trim(); if (cleanPdfB64 === "SUPPRIME_15J" || cleanPdfB64 === "") { html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span></div>'; } else { html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>'; } }
-  (res.fichiers||[]).forEach(function(f){ var cleanFileB64 = String(f.b64).trim(); if (cleanFileB64 === "SUPPRIME_15J" || cleanFileB64 === "") { html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">❌ <s style="color:var(--text-light); font-weight:600;">' + f.nom + '</s> <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span></div>'; } else { html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>'; } });
+  
+  // ── 🛠️ AJUSTEMENT RETOUR LIQUIDATION : Remplacement du bandeau figé par le bouton de régénération manuelle
+  if(res.pdfBase64){
+    var cleanPdfB64 = String(res.pdfBase64).trim();
+    if (cleanPdfB64 === "SUPPRIME_30J" || cleanPdfB64 === "") {
+      html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">' +
+        '❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> ' +
+        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Supprimé car > 30 jours)</span>' +
+        '<button class="save-row" style="background:var(--blue); padding:4px 10px; margin-left:10px;" onclick="actionRegenererPDF(\'' + res.edeal + '\')">🔄 Regénérer le PDF (Reset 30j)</button>' +
+      '</div>';
+    } else {
+      html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>';
+    }
+  }
+  
+  (res.fichiers||[]).forEach(function(f){
+    var cleanFileB64 = String(f.b64).trim();
+    if (cleanFileB64 === "SUPPRIME_30J" || cleanFileB64 === "") {
+      html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px;">❌ <s style="color:var(--text-light);">' + f.nom + '</s> <span style="color:var(--text-light); font-size:10px;">(PJ purgée définitivement)</span></div>';
+    } else {
+      html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>';
+    }
+  });
+  
   var optStatut = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>'; }).join('');
   var optTechs = ['','—'].concat(getTechList()).map(function(t){ return '<option value="' + t + '" ' + (currentSuivi.attribueA === t ? 'selected' : '') + '>' + (t||'Non attribué') + '</option>'; }).join('');
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour du dossier</div>';
@@ -346,10 +315,38 @@ function renderDetail(res) {
   document.getElementById('detail-body').innerHTML=html;
 }
 
+// ── 🛠️ COMPILATEUR JAVASCRIPT FRONTEND : Ré-assemble le code HTML pur et ordonne le reset de date à la passerelle Google ──
+function actionRegenererPDF(edeal) {
+  if(!lastOpenedDemande || !lastOpenedDemande.formData) { alert("Défaut : Contenu JSON introuvable en BDD."); return; }
+  var fData = lastOpenedDemande.formData; var dateStr = new Date().toLocaleDateString('fr-FR');
+  var prodsList = formData.liste_produits || [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
+  var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
+  
+  function row(label, val) { if (!val || val === '') return ''; return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>'; }
+  function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
+  
+  var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
+  var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+  
+  Object.keys(diag).forEach(function(pid) {
+    var pd = diag[pid]; var rows = ''; var pFound = prodsList.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid;
+    Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); });
+    if (rows) sections += section(labelProduit, rows);
+  });
+  
+  var tagStart = '<' + '!DOCTYPE html' + '><h' + 'tml><he' + 'ad><me' + 'ta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+  var tagEnd = '</bo' + 'dy></ht' + 'ml>';
+  var pdfBase64 = btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd)));
+  
+  toast("⏳ Régénération du PDF et réinitialisation de la date...", "ok");
+  var fd = new FormData(); fd.append('action', 'regenererPDF'); fd.append('data', JSON.stringify({edeal: edeal, pdfBase64: pdfBase64}));
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✅ PDF restauré et horodatage relancé !", "ok"); document.getElementById('detail-modal').classList.remove('open'); chargerSuivi(); } else { alert("Erreur Google."); } }).catch(function(err){ alert("Erreur : " + err.message); });
+}
+
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
 function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
 function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr; }
-function telecharger(b64,nom,type){ if (!b64 || String(b64).trim() === "SUPPRIME_15J") { alert("⚠️ Fichier non disponible."); return; } try{ if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){ try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){} } var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);}); var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();}catch(err){alert('Erreur : '+err.message);} }
+function telecharger(b64,nom,type){ if (!b64 || String(b64).trim() === "SUPPRIME_30J") { alert("⚠️ Fichier non disponible."); return; } try{ if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){ try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){} } var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);}); var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();}catch(err){alert('Erreur : '+err.message);} }
 function saveDetail(edeal){ var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value})); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok'); chargerSuivi(); document.getElementById('detail-modal').classList.remove('open'); }).catch(function(){toast('Erreur réseau','err');}); }
 function toast(msg,type){var el=document.getElementById('toast');if(!el)return;document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
 function chargerPermanente(){ chargerDepuisGitHub(); }
