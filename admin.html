@@ -78,7 +78,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.2-ArchitectureFix</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.4-LayoutFilters</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -87,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.2-ArchitectureFix</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.4-LayoutFilters</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -118,10 +118,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <section class="section" id="section-suivi">
   <div class="card">
     <div class="card-title">Gestion des demandes</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap;">
+    <!-- 🛠️ AJUSTEMENT RETOUR : Insertion du nouveau filtre select dynamic "Technicien" à côté de la recherche globale -->
+    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
       <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
-      <input id="filter-input" placeholder="Filtrer..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)">
+      <select id="tech-filter" class="fselect" style="width:180px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="filtrerTech(this.value)">
+        <option value="">Tous les techniciens</option>
+      </select>
+      <input id="filter-input" placeholder="Filtrer par EDEAL, client, commercial..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)">
     </div>
     <div class="table-wrap">
       <table>
@@ -230,7 +234,6 @@ var DEFAULT_INFOS_GENERALES = [
   {id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}
 ];
 
-// ── 🛠️ FIX SECURE DE L'INITIALISATION : infos_generales est un bloc à part, jamais inclus dans la liste produits
 function initChampsProduits() {
   if (!formData.liste_produits) {
     formData.liste_produits = [
@@ -239,7 +242,6 @@ function initChampsProduits() {
       {id:'install_ext', label:'Installation extérieure'}
     ];
   } else {
-    // Purge de sécurité si l'ancienne version défectueuse s'était enregistrée sur GitHub
     formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
   }
   
@@ -251,18 +253,15 @@ function initChampsProduits() {
   }
 }
 
-// ── 🛠️ CORRECTION DES ONGLETS : Ajoute de force l'onglet Étape 1 sans polluer liste_produits
 function renderProduitTabs() {
   var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = '';
   
-  // Bouton fixe de l'Étape 1
   var btnGen = document.createElement('button');
   btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '');
   btnGen.textContent = 'Infos Générales (Étape 1)';
   btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); };
   container.appendChild(btnGen);
 
-  // Boutons des produits d'usine réels
   (formData.liste_produits || []).forEach(function(p) {
     var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : '');
     btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
@@ -365,18 +364,54 @@ function showTab(tab, e) {
 
 function chargerSuivi() {
   fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){return r.json();}).then(function(res){
-    allDemandes=res.demandes||[]; renderSuivi(allDemandes);
+    allDemandes=res.demandes||[]; 
+    populateTechFilter(allDemandes);
+    appliquerFiltres();
   });
 }
-function filtrer(q) { q=q.toLowerCase(); renderSuivi(allDemandes.filter(function(d){ return (d.edeal+d.client+d.commercial).toLowerCase().includes(q); })); }
+
+// 🛠️ MOTEUR DE POPULATION DU SELECTEUR TECHNICIENS
+function populateTechFilter(demandes) {
+  var select = document.getElementById('tech-filter'); if(!select) return;
+  var currentVal = select.value;
+  select.innerHTML = '<option value="">Tous les techniciens</option>';
+  var techs = [];
+  demandes.forEach(function(d) {
+    if(d.attribueA && d.attribueA.trim() !== '' && d.attribueA.trim() !== '—' && techs.indexOf(d.attribueA.trim()) === -1) {
+      techs.push(d.attribueA.trim());
+    }
+  });
+  techs.sort().forEach(function(t) {
+    var opt = document.createElement('option'); opt.value = t; opt.textContent = t;
+    if(t === currentVal) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+// 🛠️ FILTRE CROISÉ RECHERCHE GENERALE + SELECTEUR TECHNICIEN
+function appliquerFiltres() {
+  var query = document.getElementById('filter-input').value.toLowerCase();
+  var tech = document.getElementById('tech-filter').value.toLowerCase();
+  
+  var filtered = allDemandes.filter(function(d) {
+    var matchesQuery = (d.edeal + d.client + d.commercial).toLowerCase().includes(query);
+    var matchesTech = tech === "" || (d.attribueA && d.attribueA.toLowerCase().trim() === tech);
+    return matchesQuery && matchesTech;
+  });
+  renderSuivi(filtered);
+}
+
+function filtrer(q) { appliquerFiltres(); }
+function filtrerTech(t) { appliquerFiltres(); }
 
 function renderSuivi(demandes) {
   var body=document.getElementById('admin-suivi-body');
   var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
-  if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande définitive</td></tr>'; return; }
+  if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande correspondante</td></tr>'; return; }
   body.innerHTML=filtrées.map(function(d,i){
     var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + d.date + '</td>' +
+    // Utilisation de la fonction formatShortDate pour abréger les dates côté Admin également
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
       '<td><select class="st-select" id="st-' + i + '">' + opts + '</select></td>' +
       '<td><input class="assign-input" id="ass-' + i + '" value="' + d.attribueA + '"></td>' +
       '<td><input class="assign-input" style="width:140px" id="com-' + i + '" value="' + d.commentaireBE + '"></td>' +
@@ -387,7 +422,7 @@ function renderSuivi(demandes) {
 function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
-  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
+  fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); });
 }
 
 function declencherPurgeManuelle() {
@@ -419,6 +454,7 @@ function ouvrirDemande(edeal) {
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
+// ── RETOUR DICTIONNAIRE ADMIN : Changement complet de "Nom ingénieur" par "Nom technicien" ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
   var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
@@ -481,7 +517,7 @@ function renderDetail(res) {
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
     '<div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div>' +
-    '<div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom ingénieur" value="' + (currentSuivi.attribueA || '') + '"></div>' +
+    '<div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom technicien" value="' + (currentSuivi.attribueA || '') + '"></div>' +
   '</div>';
   html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="' + (currentSuivi.commentaireBE || '') + '"></div>' +
     '<div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\'' + res.edeal + '\')">✓ Sauvegarder</button></div>';
@@ -491,6 +527,25 @@ function renderDetail(res) {
 
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
 function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
+
+function formatShortDate(dateStr) {
+  if (!dateStr) return '—';
+  if (dateStr.indexOf('GMT') !== -1 || dateStr.indexOf('T') !== -1) {
+    var d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      var day = ("0" + d.getDate()).slice(-2);
+      var month = ("0" + (d.getMonth() + 1)).slice(-2);
+      var hours = ("0" + d.getHours()).slice(-2);
+      var minutes = ("0" + d.getMinutes()).slice(-2);
+      return day + "/" + month + "/" + d.getFullYear() + " " + hours + ":" + minutes;
+    }
+  }
+  var parts = dateStr.split(':');
+  if (parts.length >= 2) {
+    return parts[0] + ':' + parts[1].substring(0,2);
+  }
+  return dateStr;
+}
 
 function telecharger(b64,nom,type){
   if (!b64 || String(b64).trim() === "SUPPRIME_15J") {
