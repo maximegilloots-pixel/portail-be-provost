@@ -34,11 +34,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
-.steps{display:flex;flex-direction:column;gap:10px}
-.step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
-.step strong{display:block;font-size:12px;color:var(--dark)}
-.step span{font-size:11px;color:var(--text-light)}
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
 .wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
 .wz:last-child{border-right:none}
@@ -53,17 +48,16 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .ftextarea{min-height:80px;resize:vertical}
 .req{color:var(--red)}
 .produits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
-.produit-cb{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--white)}
+.produit-cb{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--white);user-select:none}
 .produit-cb.checked{border-color:var(--blue);background:var(--blue-light)}
-.produit-cb input{display:none}
 .cb-box{width:16px;height:16px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center}
 .produit-cb.checked .cb-box{background:var(--blue);border-color:var(--blue)}
 .cb-check{display:none;color:white;font-size:10px;font-weight:900}
 .produit-cb.checked .cb-check{display:block}
+.produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
 .q-options{display:flex;flex-direction:column;gap:5px}
 .q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text)}
-.q-option input[type=radio],.q-option input[type=checkbox]{display:none}
 .opt-dot,.opt-sq{width:14px;height:14px;border:2px solid var(--border);flex-shrink:0}
 .opt-dot{border-radius:50%} .opt-sq{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
 .q-text-input{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none}
@@ -73,7 +67,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .q-option.selected .opt-sq{background:var(--green)!important;border-color:var(--green)!important;color:white!important}
 .finput.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
 .dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;background:var(--bg);position:relative}
-.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .dz-title{font-size:13px;font-weight:700;color:var(--dark);margin:8px 0 3px}
 .file-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
 .file-item{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:11px}
@@ -138,7 +131,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v4.0-BulletproofSystem</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v4.1-FilterCheckboxFix</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -151,7 +144,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v4.0-BulletproofSystem</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v4.1-FilterCheckboxFix</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -206,7 +199,7 @@ tbody tr:hover{background:var(--bg)}
   <div class="fstep" id="step3">
     <div class="card">
       <div class="card-title">Pièces jointes complémentaires (15 Mo maximum cumulé)</div>
-      <div class="dropzone" id="dropzone"><input type="file" id="file-input" multiple><div class="dz-title">Glissez vos fichiers ici</div></div>
+      <div class="dropzone" id="dropzone"><input type="file" id="file-input" multiple style="display:none;"><div class="dz-title">Glissez vos fichiers ici</div></div>
       <div class="file-list" id="file-list"></div>
       <div class="btn-row" style="justify-content:space-between;width:100%;">
         <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
@@ -237,10 +230,12 @@ tbody tr:hover{background:var(--bg)}
 <section class="section" id="section-suivi">
   <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
   <div class="table-hd">
+    <!-- 🛠️ INTERFACE SUIVI : Ajout du bouton de filtre "Attribuées" demandé -->
     <div style="display:flex;gap:6px;" id="filter-btn-container">
       <button class="btn btn-sm btn-outline btn-filter active-filter" data-filter="tous">Toutes</button>
       <button class="btn btn-sm btn-outline btn-filter" data-filter="Brouillon">Brouillons</button>
       <button class="btn btn-sm btn-outline btn-filter" data-filter="En attente">En attente</button>
+      <button class="btn btn-sm btn-outline btn-filter" data-filter="Attribuée">Attribuées</button>
       <button class="btn btn-sm btn-outline btn-filter" data-filter="Manque d'infos">Manque d'infos</button>
     </div>
     <div style="display:flex; gap:6px; align-items:center;">
@@ -293,6 +288,7 @@ window.addEventListener('DOMContentLoaded', function() {
   if(dz) {
     dz.addEventListener('dragover', function(e){e.preventDefault();});
     dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);});
+    dz.addEventListener('click', function() { document.getElementById('file-input').click(); });
   }
   
   var fInput = document.getElementById('file-input');
@@ -320,7 +316,6 @@ function handleCredentialResponse(response) {
   }
 }
 
-// ── 🛠️ SHIELDING GITHUB CONFIG : Ne crash jamais, charge l'usine locale si le fichier distant est défectueux ou vide
 function chargerConfigFormulaire() {
   fetch(CONFIG_URL + '?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(cfg) {
     RawConfig = cfg; 
@@ -376,7 +371,7 @@ var QUESTIONS_INSTALL_EXT = [
   {id:'qe_toiture_fin', label:'Si toiture — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Bacs anti condensation','Panneaux polycarbonate','Autre :']},
   {id:'qe_pente', label:'Si toiture — indiquer la pente', type:'radio', options:['Penté haut','Penté bas']},
   {id:'qe_bardage', label:'Bardage à prévoir', type:'checkbox', multi:true, options:['Pas de bardage à prévoir','Bardage arrière','Bardage lateral (2 côtés)','Bardage lateral (1 côté)','Autre :']},
-  {id:'qe_bardage_fin', border_radius:'7px', label:'Si bardage — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Autre :']},
+  {id:'qe_bardage_fin', label:'Si bardage — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Autre :']},
   {id:'qe_finition_el', label:'Éléments de finition', type:'checkbox', multi:true, options:['Angle droit / Tôle finition angle','Bande de rive / Cornière de rive','U de finition de bardage','U de finition de toiture','Bandeau de finition','Faitière','Faitière contre mur','Bande de faitage','Profil bas de bardage','Tôle de finition de toiture',"Bavette de rejet d'eau",'Autre :']},
   {id:'qe_eaux', label:"Descentes d'eaux pluviales", type:'radio', options:['Oui','Non','Autre :']},
   {id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons (à dimensionner)','Autre :']},
@@ -384,40 +379,181 @@ var QUESTIONS_INSTALL_EXT = [
   {id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}
 ];
 
+// ── 🛠️ RE-CONSTRUCTION FIABILISÉE DU FORMULAIRE : Élimination complète des input checkbox fantômes au profit d'un div.onclick universel
 function initFormulaire() {
   var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
   PRODUITS.forEach(function(p) {
-    var el = document.createElement('label'); el.className = 'produit-cb'; el.dataset.id = p.id;
-    el.innerHTML = '<input type="checkbox" onchange="toggleProduit(\'' + p.id + '\')"><div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>';
+    var el = document.createElement('div'); el.className = 'produit-cb'; el.setAttribute('data-id', p.id);
+    el.innerHTML = '<div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>';
+    el.onclick = function() { toggleProduit(p.id); };
     grid.appendChild(el);
   });
   buildInfosGeneralesDynamic(); 
 }
 
-function buildInfosGeneralesDynamic() {
-  var container = document.getElementById('infos-generales-dynamic-container'); if(!container) return; container.innerHTML = '';
-  var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length > 0) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+function toggleProduit(id) { 
+  var c = document.querySelector('.produit-cb[data-id="' + id + '"]'); if(c) c.classList.toggle('checked');
+  state.selectedProduits=[]; 
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); 
+}
+
+function goStep(n) {
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active');
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); });
+  if(n===4) buildRecap();
+}
+
+function goStep2() {
+  if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
+  if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
+  buildDiagnostic(); goStep(2);
+}
+
+function getQuestionsListForProduct(pid) {
+  if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid];
+  if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS;
+  if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS;
+  if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT;
+  return [];
+}
+
+function buildDiagnostic() {
+  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
+  state.selectedProduits.forEach(function(pid) {
+    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
+    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header">' + (prod?prod.label:pid) + '</div>';
+    questions.forEach(function(q) {
+      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
+      if(q.image) qDiv.innerHTML += '<img src="' + q.image + '" style="max-width:100%;display:block;margin:6px 0;border-radius:6px;">';
+      if(q.type==='text' || q.type==='textarea') {
+        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=pid+'_'+q.id; qDiv.appendChild(inp);
+      } else {
+        var optsDiv = document.createElement('div'); optsDiv.className='q-options';
+        (q.options||[]).forEach(function(o){
+          var div=document.createElement('div'); div.className='q-option'; div.dataset.field=pid+'_'+q.id; div.dataset.val=o;
+          div.innerHTML= ((q.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>') + '<span>' + o + '</span>';
+          div.onclick=function(){ if(q.type==='radio')document.querySelectorAll('.q-option[data-field="' + pid+'_'+q.id + '"]').forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
+          optsDiv.appendChild(div);
+        });
+        qDiv.appendChild(optsDiv);
+      }
+      block.appendChild(qDiv);
+    });
+    container.appendChild(block);
+  });
+}
+
+function collectFormData() {
+  var data = {
+    edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(),
+    client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(),
+    dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(),
+    selectedProduits: state.selectedProduits,
+    produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
+    infos: {}, diagnostic: {}
+  };
   
-  questions.forEach(function(q) {
-    var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
-    if(q.image) qDiv.innerHTML += '<img src="' + q.image + '" style="max-width:100%;display:block;margin:6px 0;border-radius:6px;">';
-    var fid = 'info_' + q.id;
-    if(q.type==='text' || q.type==='textarea') {
-      var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid; qDiv.appendChild(inp);
-    } else {
-      var optsDiv = document.createElement('div'); optsDiv.className='q-options';
-      (q.options||[]).forEach(function(o){
-        var div=document.createElement('div'); div.className='q-option'; div.dataset.field=fid; div.dataset.val=o;
-        div.innerHTML = ((q.type === 'checkbox') ? '<div class="opt-sq">✓</div>' : '<div class="opt-dot"></div>') + '<span>' + o + '</span>';
-        div.onclick=function(){
-          if(q.type==='radio') document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')});
-          this.classList.toggle('selected');
-        };
-        optsDiv.appendChild(div);
-      });
-      qDiv.appendChild(optsDiv);
+  var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+  infoQuestions.forEach(function(q) {
+    var fid = 'info_' + q.id; var el = document.getElementById(fid);
+    if (el) { data.infos[q.label] = el.value.trim(); } else {
+      var vals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.dataset.val); });
+      data.infos[q.label] = vals;
     }
-    container.appendChild(qDiv);
+  });
+  
+  state.selectedProduits.forEach(function(pid) {
+    var prodData = {}; var questions = getQuestionsListForProduct(pid);
+    questions.forEach(function(q) {
+      var fid = pid+'_'+q.id; var el = document.getElementById(fid);
+      if (el) { prodData[q.label] = el.value.trim(); } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector('.q-option[data-field="' + fid + '"]')) {
+        var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.dataset.val); });
+        prodData[q.label] = opVals;
+      } else {
+        if (state.loadedDraft && state.loadedDraft.diagnostic && state.loadedDraft.diagnostic[pid] && state.loadedDraft.diagnostic[pid][q.label] !== undefined) { prodData[q.label] = state.loadedDraft.diagnostic[pid][q.label]; } else { prodData[q.label] = (q.type === 'text' || q.type === 'textarea') ? "" : []; }
+      }
+    });
+    data.diagnostic[pid] = prodData;
+  });
+  return data;
+}
+
+function sauvegarderBrouillon() {
+  var edeal = document.getElementById('f-edeal').value.trim();
+  if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
+  if(state.selectedFiles.length > 0) { alert("⚠️ Action impossible\n\nLes PJ ne sont pas supportées en brouillon."); return; }
+  
+  var fData = collectFormData(); fData.isBrouillon = true;
+  document.getElementById('loading-overlay').style.display = 'flex';
+  
+  var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
+  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) {
+    document.getElementById('loading-overlay').style.display = 'none';
+    if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Echec du dépôt"), "err"); }
+  }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
+}
+
+function reprendreBrouillon(edeal) {
+  toast("⏳ Chargement de la pré-demande...", "ok");
+  fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
+  .then(function(r){return r.json();}).then(function(res){
+    if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
+    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || '';
+    document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || '';
+    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) {
+      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled');
+    });
+    document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    
+    if(fd.infos) {
+      var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+      infoQuestions.forEach(function(q) {
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return;
+        if(q.type === 'text' || q.type === 'textarea') {
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); }
+        } else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
+      });
+    }
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    buildDiagnostic();
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} }
+        else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
+      });
+    });
+    state.selectedFiles = []; renderFiles(); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+  });
+}
+
+function envoyerDemande() {
+  var fData = collectFormData(); fData.isBrouillon = false;
+  document.getElementById('loading-overlay').style.display = 'flex'; 
+  
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  genererPDFBase64(fData).then(function(pdfBase64) {
+    var promises = localFiles.map(function(file) {
+      return new Promise(function(resolve) {
+        var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file);
+      });
+    });
+    Promise.all(promises).then(function(newFiles) {
+      var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
+      newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
+      
+      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd})
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        document.getElementById('loading-overlay').style.display = 'none';
+        if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); } else { alert("⚠️ Échec : " + (res.error || "Rejet Sheets.")); }
+      }).catch(function(err){ document.getElementById('loading-overlay').style.display = 'none'; alert("Erreur réseau critique : " + err.message); });
+    });
   });
 }
 
@@ -451,12 +587,6 @@ function renderFiles() {
 }
 function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite de 15 Mo dépassée !\n\nUtilisez le dossier \"transfert\" du serveur \"groupe\"."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
 
-function buildRecap() {
-  var edeal = document.getElementById('f-edeal').value.trim(); var recapObj = document.getElementById('recap-obj'); if (recapObj) recapObj.textContent = edeal;
-  var produitLabels = state.selectedProduits.map(function(pid) { var pFound = PRODUITS.find(function(p){ return p.id===pid; }); return pFound ? pFound.label : pid; }).join(', ');
-  document.getElementById('recap-content').innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div><div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div><div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div><div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div><div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div></div>';
-}
-
 function filtrer(statut) { 
   state.currentFilter = statut;
   var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); 
@@ -472,7 +602,6 @@ function showTab(tab) {
   if (tab === 'suivi') chargerSuivi(); 
 }
 
-// ── 🛠️ DIAGNOSTIC RADAR DU SUIVI : Écrit les messages d'erreurs en rouge sur la page s'il y a un souci Google Sheets
 function chargerSuivi() {
   var sbody = document.getElementById('suivi-body'); if(!sbody) return; 
   sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
@@ -485,11 +614,11 @@ function chargerSuivi() {
       state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
       filtrer(state.currentFilter || 'tous');
     } else {
-      sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE : ' + (res.error || "Droits d'exécution refusés") + '<br><span style="font-size:11px; font-weight:normal; color:var(--text-light);">Assure-toi d\'avoir déployé ton Apps Script en mode "Nouvelle Version" accessible à "Quiconque" (Anyone).</span></td></tr>';
+      sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE : ' + (res.error || "Droits d'exécution refusés") + '</td></tr>';
     }
   })
   .catch(function(err) {
-    sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU NAVIGATEUR (CORS ou Blocage d\'URL)<br><span style="font-size:11px; font-weight:normal; color:var(--text-light);">' + err.message + '</span></td></tr>';
+    sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU NAVIGATEUR (CORS)<br><span style="font-size:11px; font-weight:normal; color:var(--text-light);">' + err.message + '</span></td></tr>';
   });
 }
 
@@ -498,12 +627,19 @@ function renderSuivi(demandes) {
   if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée sous ton identifiant commercial.</td></tr>'; return; }
   body.innerHTML = demandes.map(function(d) {
     var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—';
-    var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-urg');
+    // 🛠️ ATTRIBUTION DU BADGE CORRECT POUR "ATTRIBUÉE"
+    var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg'));
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
   }).join('');
 }
 
-// ── 🛠️ FIX SECURE COMPILATION GENERATION PDF RECAPITULATIF ──
+function resetForm() {
+  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1);
+}
+
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
