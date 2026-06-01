@@ -38,7 +38,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .opts-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
 .opt-row{display:flex;gap:6px;align-items:center}
 .opt-row input{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;outline:none}
-.add-opt{font-size:11px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
 .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-dark)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
@@ -76,7 +75,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v4.3-MailDelegation</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v4.5-TechEmailMapping</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -85,7 +84,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v4.3-MailDelegation</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v4.5-TechEmailMapping</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -148,8 +147,9 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <hr class="divider">
     <div class="card-title">Registre Métier Bureau d'Études</div>
     <div class="frow">
-      <label class="flabel">Techniciens BE Habilités (un nom par ligne)</label>
-      <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont&#10;Marc Voisin"></textarea>
+      <!-- 🛠️ INTERFACE CONFIGURATION : Clarté du format attendu avec point-virgule -->
+      <label class="flabel">Techniciens BE Habilités et Emails (Format : Nom;adresse@provost.fr — un par ligne)</label>
+      <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont;jdupont@provost.fr&#10;Marc Voisin;mvoisin@provost.fr"></textarea>
     </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder les configurations</button></div>
   </div>
@@ -183,9 +183,24 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "";
 
+// 🛠️ MOTEUR DE DÉCODAGE DES ADRESSES EMAILS ASSOCIEES AUX TECHNICIENS
+function getTechMap() {
+  var raw = localStorage.getItem('tech_list') || "";
+  var map = {};
+  raw.split('\n').forEach(function(line) {
+    var parts = line.split(';');
+    var name = parts[0] ? parts[0].trim() : "";
+    if (name) {
+      map[name] = parts[1] ? parts[1].trim() : "";
+    }
+  });
+  return map;
+}
+
 function getTechList() {
-  var raw = localStorage.getItem('tech_list') || ""; if(!raw.trim()) return ["Non attribué"];
-  return raw.split('\n').map(function(t){ return t.trim(); }).filter(function(t){ return t.length > 0; });
+  var map = getTechMap();
+  var list = Object.keys(map);
+  return list.length > 0 ? list : [];
 }
 
 function jwtDecode(token) {
@@ -269,14 +284,14 @@ function renderSuivi(demandes) {
     var optsStatus = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
     var optsTechs = ['','—'].concat(techs).map(function(t){ return '<option value="' + t + '" ' + (d.attribueA===t?'selected':'') + '>' + (t||'Non attribué') + '</option>'; }).join('');
     
-    // 🛠️ INTERFACE SUIVI : Ajout du bouton orange ✉️ Mail à la volée sur chaque dossier
+    // ── 🛠️ CORRECTION PASSAGE DE L'INDEX : Injection de la position "i" dans l'action de mail ──
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
       '<td><select class="st-select" id="st-' + i + '">' + optsStatus + '</select></td>' +
       '<td><select class="st-select" style="width:120px;" id="ass-' + i + '">' + optsTechs + '</select></td>' +
       '<td><input class="assign-input" style="width:140px;" id="com-' + i + '" value="' + d.commentaireBE + '"></td>' +
       '<td><button class="save-row" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> ' +
           '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button> ' +
-          '<button class="save-row" style="background:var(--yellow);color:var(--dark);margin-left:4px;font-weight:bold;" onclick="envoyerMailDossier(\'' + d.edeal + '\')">✉️ Mail</button></td></tr>';
+          '<button class="save-row" style="background:var(--yellow);color:var(--dark);margin-left:4px;font-weight:bold;" onclick="envoyerMailDossier(\'' + d.edeal + '\', ' + i + ')">✉️ Mail</button></td></tr>';
   }).join('');
 }
 
@@ -284,24 +299,23 @@ function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSu
 function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); } }).catch(function(err){ toast("Erreur réseau : " + err.message, "err"); }); }
 function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
 
-// ── 🛠️ AUTOMATE DE DECLENCHEMENT ET DE ROUTAGE RESEAU DE L'E-MAIL DEPUIS L'ADMINISTRATION ──
-function envoyerMailDossier(edeal) {
-  var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez l'adresse email du technicien Provost pour lui transférer le dossier " + edeal + " :\n(Le mail partira depuis entrees-be@provost.fr avec le PDF récapitulatif et toutes les PJ d'origine)");
-  if (!email) return; email = email.trim();
-  if (email.indexOf('@') === -1) { alert("Adresse e-mail Provost non reconnue."); return; }
+// ── 🛠️ ALGORITHME DE RECHERCHE CROISÉE AUTO-NOM ET PRE-REMPLISSAGE DU MAIL DE TRANSMISSION BE ──
+function envoyerMailDossier(edeal, index) {
+  var techSelect = document.getElementById('ass-' + index);
+  var currentTech = techSelect ? techSelect.value.trim() : '';
+  var defaultEmail = '';
+  
+  if (currentTech && currentTech !== '—' && currentTech !== '') {
+    var map = getTechMap();
+    defaultEmail = map[currentTech] || '';
+  }
+  
+  var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez ou confirmez l'adresse email du technicien Provost pour lui transférer le dossier " + edeal + " :\n(Le mail partira depuis entrees-be@provost.fr avec le PDF récapitulatif et toutes les PJ d'origine)", defaultEmail);
+  if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail Provost non reconnue."); return; }
   
   toast("⏳ Extraction binaire des PJ et envoi du mail...", "ok");
-  var fd = new FormData();
-  fd.append('action', 'envoyerMailTech');
-  fd.append('data', JSON.stringify({edeal: edeal, email: email}));
-  
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r){ return r.json(); })
-  .then(function(res){
-    if(res && res.success) { toast("✉️ Dossier technique envoyé avec succès !", "ok"); } 
-    else { alert("❌ Blocage Google Apps Script :\n\n" + (res.error || "Droits d'alias non accordés.")); }
-  })
-  .catch(function(err){ alert("Erreur réseau critique : " + err.message); });
+  var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email}));
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Dossier technique envoyé avec succès !", "ok"); } else { alert("❌ Blocage Google Apps Script :\n\n" + (res.error || "Droits d'alias non accordés.")); } }).catch(function(err){ alert("Erreur réseau critique : " + err.message); });
 }
 
 function renderDetail(res) {
