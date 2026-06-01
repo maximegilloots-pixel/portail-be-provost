@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portail BE — Provost</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -36,8 +36,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
-.step strong{display:block;font-size:12px;color:var(--dark)}
+.step_charge_ur strong{display:block;font-size:12px;color:var(--dark)}
 .step span{font-size:11px;color:var(--text-light)}
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
 .wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
@@ -136,7 +135,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v5.1-DraftWorkflowFix</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v5.2-DiagnosticSaveFix</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -149,7 +148,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v5.1-DraftWorkflowFix</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v5.2-DiagnosticSaveFix</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -306,7 +305,7 @@ function chargerConfigFormulaire() {
   fetch(CONFIG_URL + '?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(cfg) {
     RawConfig = cfg; if (cfg && cfg.liste_produits) PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
     initFormulaire();
-  }).catch(function(err){ initFormulaire(); });
+  }).catch(function(err) { initFormulaire(); });
 }
 
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
@@ -335,7 +334,7 @@ function buildInfosGeneralesDynamic() {
     } else {
       var optsDiv = document.createElement('div'); optsDiv.className='q-options';
       (q.options||[]).forEach(function(o){
-        var div=document.createElement('div'); div.className='q-option'; div.dataset.field=fid; div.dataset.val=o;
+        var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', o);
         div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '">✓</div><span>' + o + '</span>';
         div.onclick=function(){ if(q.type==='radio') document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
         optsDiv.appendChild(div);
@@ -363,7 +362,7 @@ function buildDiagnostic() {
       } else {
         var optsDiv = document.createElement('div'); optsDiv.className='q-options';
         (q.options||[]).forEach(function(o){
-          var div=document.createElement('div'); div.className='q-option'; div.dataset.field=pid+'_'+q.id; div.dataset.val=o;
+          var div=document.createElement('div'); div.className = 'q-option'; div.setAttribute('data-field', pid+'_'+q.id); div.setAttribute('data-val', o);
           div.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '">✓</div><span>' + o + '</span>';
           div.onclick=function(){ if(q.type==='radio')document.querySelectorAll('.q-option[data-field="' + pid+'_'+q.id + '"]').forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
           optsDiv.appendChild(div);
@@ -376,32 +375,49 @@ function buildDiagnostic() {
   });
 }
 
+// ── 🛠️ PARSEUR ROBUSTE INTÉGRAL DE SÉCURITÉ : Extraction prévisible par type (Bannit les faux vides) ──
 function collectFormData() {
   var data = {
     edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }), infos: {}, diagnostic: {}
   };
+  
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
-  infoQuestions.forEach(function(q) { var fid = 'info_' + q.id; var el = document.getElementById(fid); if (el) { data.infos[q.label] = el.value.trim(); } else { var vals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.dataset.val); }); data.infos[q.label] = vals; } });
-  state.selectedProduits.forEach(function(pid) { var prodData = {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q) { var fid = pid+'_'+q.id; var el = document.getElementById(fid); if (el) { prodData[q.label] = el.value.trim(); } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector('.q-option[data-field="' + fid + '"]')) { var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.dataset.val); }); prodData[q.label] = opVals; } else { if (state.loadedDraft && state.loadedDraft.diagnostic && state.loadedDraft.diagnostic[pid] && state.loadedDraft.diagnostic[pid][q.label] !== undefined) { prodData[q.label] = state.loadedDraft.diagnostic[pid][q.label]; } else { prodData[q.label] = (q.type === 'text' || q.type === 'textarea') ? "" : []; } } }); data.diagnostic[pid] = prodData; });
+  infoQuestions.forEach(function(q) {
+    var fid = 'info_' + q.id;
+    if (q.type === 'text' || q.type === 'textarea') {
+      var el = document.getElementById(fid); data.infos[q.label] = el ? el.value.trim() : "";
+    } else {
+      var vals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.getAttribute('data-val') || ""); });
+      data.infos[q.label] = vals;
+    }
+  });
+  
+  state.selectedProduits.forEach(function(pid) {
+    var prodData = {}; var questions = getQuestionsListForProduct(pid);
+    questions.forEach(function(q) {
+      var fid = pid+'_'+q.id;
+      if (q.type === 'text' || q.type === 'textarea') {
+        var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : "";
+      } else {
+        var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.getAttribute('data-val') || ""); });
+        prodData[q.label] = opVals;
+      }
+    });
+    data.diagnostic[pid] = prodData;
+  });
   return data;
 }
 
-// ── 🛠️ FIX ENREGISTREMENT : Redirige d'autorité vers le suivi et vide le formulaire après validation d'un brouillon
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim(); if(!edeal){ toast("Le N° EDEAL est obligatoire.", "err"); return; } if(state.selectedFiles.length > 0) { alert("⚠️ Les PJ ne sont pas supportées en brouillon."); return; }
   var fData = collectFormData(); fData.isBrouillon = true; document.getElementById('loading-overlay').style.display = 'flex';
   var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { 
     document.getElementById('loading-overlay').style.display = 'none'; 
-    if(res.success){ 
-      toast("✅ Pré-demande enregistrée !", "ok"); 
-      resetForm(); // Réinitialise l'usine locale de saisie
-      showTab('suivi'); // Redirige sur l'écran des statuts
-    } else { toast("Échec", "err"); } 
+    if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } 
   }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
-// ── 🛠️ FIX REPRENDRE : Force l'affichage de l'onglet Saisie dès le chargement asynchrone des données
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
   fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
@@ -437,10 +453,7 @@ function reprendreBrouillon(edeal) {
         else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
       });
     });
-    state.selectedFiles = []; renderFiles(); 
-    showTab('demande'); // Aligne de force l'onglet de saisie pour voir le formulaire s'ouvrir
-    goStep(1); 
-    toast("📋 Pré-demande chargée.", "ok");
+    state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
   });
 }
 
@@ -455,8 +468,6 @@ function envoyerDemande() {
   });
 }
 
-function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } return clean; }
-function parseShortDateToTime(s) { if(!s || s === '—') return 0; try { var parts = s.split(' '); var dParts = parts[0].split('/'); if(dParts.length < 3) return 0; var tParts = parts[1] ? parts[1].split(':') : [0,0]; return new Date(parseInt(dParts[2]), parseInt(dParts[1]) - 1, parseInt(dParts[0]), parseInt(tParts[0]), parseInt(tParts[1])).getTime(); } catch(e) { return 0; } }
 function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
 function renderFiles() { var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = ''; state.selectedFiles.forEach(function(f, i) { list.appendChild(document.createElement('div')).className = 'file-item'; list.lastChild.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>'; }); }
 function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
