@@ -623,10 +623,6 @@
   ],
   "liste_produits": [
     {
-      "id": "infos_generales",
-      "label": "Infos Générales (Étape 1)"
-    },
-    {
       "id": "proplus_lp3",
       "label": "Proplus LP3"
     },
@@ -674,6 +670,11 @@
     {
       "id": "q_1780314380907",
       "label": "test 2",
+      "type": "text"
+    },
+    {
+      "id": "q_1780314723950",
+      "label": "test 23",
       "type": "text"
     }
   ]
