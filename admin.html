@@ -69,6 +69,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 .github-status{font-size:10px;padding:3px 10px;border-radius:20px;display:inline-block;font-weight:700}
 .gh-ok{background:#d4edda;color:#1a5c36}
 .gh-err{background:#fce8e6;color:#8b1a1a}
+.info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:8px;padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;line-height:1.5}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -77,7 +78,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v2.9-AdminLoginFix</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.0-DynamicStep1</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -86,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.9-AdminLoginFix</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.0-DynamicStep1</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -167,7 +168,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
-var formData = {}, currentProduit = 'proplus_lp3', editingIndex = -1, allDemandes = [], tempImageUrl = "";
+var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "";
 
 function jwtDecode(token) {
   try {
@@ -220,14 +221,22 @@ function handleImageUpload(input) {
   reader.readAsDataURL(file);
 }
 
+// 🛠️ INITIALISATION DE LA RUBRIQUE INFOS GENERALES DANS L'ADMIN
 function initChampsProduits() {
   if (!formData.liste_produits) {
     formData.liste_produits = [
+      {id:'infos_generales', label:'Infos Générales (Étape 1)'},
       {id:'proplus_lp3', label:'Proplus LP3'},
       {id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},
       {id:'install_ext', label:'Installation extérieure'}
     ];
+  } else {
+    var hasInfos = formData.liste_produits.some(function(p){ return p.id === 'infos_generales'; });
+    if (!hasInfos) {
+      formData.liste_produits.unshift({id:'infos_generales', label:'Infos Générales (Étape 1)'});
+    }
   }
+  if (!formData.infos_generales) formData.infos_generales = [];
   if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
     formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || []));
   }
@@ -249,10 +258,10 @@ function ajouterNouveauProduit() {
 function chargerDepuisGitHub() {
   var gh = getGHConfig(); majStatusGH();
   if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;}
-  if (!gh.user) { formData = {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; }
+  if (!gh.user) { formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); return; }
   fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now())
   .then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); })
-  .catch(function(){ formData = {proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); });
+  .catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); });
 }
 function sauvegarder() {
   var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json';
@@ -261,9 +270,24 @@ function sauvegarder() {
     .then(function(){ toast('✓ Publié !', 'ok'); });
   });
 }
+
 function renderQuestions() {
   var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
-  if(!questions.length){ list.innerHTML='<div style="padding:10px;font-style:italic;">Aucune question</div>'; return; }
+  
+  // 🔒 AFFICHAGE DE L'AVERTISSEMENT DES CHAMPS CARDINAUX FIXES SANCTUARISÉS
+  if (currentProduit === 'infos_generales') {
+    var lockedEl = document.createElement('div');
+    lockedEl.className = 'info-box';
+    lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires';
+    list.appendChild(lockedEl);
+  }
+
+  if(!questions.length){ 
+    var emptyDiv = document.createElement('div'); emptyDiv.style.padding = '10px'; emptyDiv.style.fontStyle = 'italic';
+    emptyDiv.textContent = 'Aucune question complémentaire dynamic ajoutée'; list.appendChild(emptyDiv);
+    return; 
+  }
+  
   questions.forEach(function(q, i) {
     var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true;
     el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + q.label + ' ' + (q.image?'[🖼️ Image]':'') + '</div><span class="q-item-type">' + typeLbl(q.type) + '</span></div>' +
@@ -369,30 +393,34 @@ function declencherPurgeManuelle() {
 function ouvrirDemande(edeal) {
   document.getElementById('detail-edeal').textContent=edeal;
   document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>';
-  document.getElementById('detail-modal').classList.add('open');
+  document.getElementById('detail-modal').open();
   fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal))
   .then(function(r){return r.json();})
   .then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); })
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
-// ── 🛠️ FIX COMPLET DU RECAPITULATIF : Extraction universelle sans backticks ES6 ──
+// ── COMPILATION DYNAMIQUE DU FORMULAIRE DE SUIVI POUR L'ÉTAPE 1 ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
   var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
   
-  html+=detailSection('Informations générales',[
+  var infoRows = [
     detailRow('Client',fd.client),
     detailRow('Commercial',fd.commercial),
     detailRow('Département',fd.ville),
     detailRow('Date chantier',fd.dateChantier),
-    detailRow('Produit(s)',(fd.produits||[]).join(', ')),
-    detailRow('Contraintes',(infos.contraintes||[]).join(', ')),
-    detailRow('Accès',(infos.acces||[]).join(', ')),
-    detailRow('Zone',(infos.zone||[]).join(', ')),
-    detailRow('Éléments',(infos.elements||[]).join(', ')),
-    detailRow('Commentaire',fd.commentaire)
-  ].join(''));
+    detailRow('Produit(s)',(fd.produits||[]).join(', '))
+  ];
+
+  // Injection ordonnée des réponses dynamiques de l'Étape 1
+  if (infos) {
+    Object.keys(infos).forEach(function(label) {
+      var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v));
+    });
+  }
+  infoRows.push(detailRow('Commentaire', fd.commentaire));
+  html+=detailSection('Informations générales', infoRows.join(''));
   
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
   Object.keys(fd.diagnostic||{}).forEach(function(pid){
