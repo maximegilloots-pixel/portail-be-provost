@@ -380,69 +380,27 @@ function sauvegarderBrouillon() {
 // ── 🛠️ REPRISE 100% SÉCURISÉE EN POST : Résout le bouton "Reprendre" et injecte les diagnostics sans crash de caractères spéciaux
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  var fd = new FormData(); fd.append('action', 'getDemande'); fd.append('edeal', edeal);
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
   
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if(!res.success || !res.formData) { toast("⚠️ Erreur lors de la lecture du brouillon.", "err"); return; }
-    var fd = res.formData; state.loadedDraft = fd;
-    
-    document.getElementById('f-edeal').value = fd.edeal || '';
-    document.getElementById('f-client').value = fd.client || '';
-    document.getElementById('f-ville').value = fd.ville || '';
-    document.getElementById('f-date').value = fd.dateChantier || '';
-    document.getElementById('f-commentaire').value = fd.commentaire || '';
-    
-    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { 
-      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); 
-    });
-    
+  .then(function(r){return r.json();}).then(function(res){
+    if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
+    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || ''; document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || ''; document.getElementById('f-commentaire').value = fd.commentaire || '';
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); });
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
-    
     if(fd.infos) {
       var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
-      infoQuestions.forEach(function(q) {
-        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return;
-        if(q.type === 'text' || q.type === 'textarea') {
-          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); }
-        } else {
-          (Array.isArray(val)?val:[val]).forEach(function(v){
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){
-              if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected');
-            });
-          });
-        }
-      });
+      infoQuestions.forEach(function(q) { var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; if(q.type === 'text' || q.type === 'textarea') { var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } });
     }
-    
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
-    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
-    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
-    
-    buildDiagnostic(); 
-    state.rebuildDiagnosticRequired = false; // Verrou de sécurité
-    
-    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
-      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
-      questions.forEach(function(q){
-        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
-        if(q.type==='text'||q.type==='textarea'){
-          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');}
-        } else {
-          (Array.isArray(val)?val:[val]).forEach(function(v){
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){
-              if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected');
-            });
-          });
-        }
-      });
-    });
-    
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    buildDiagnostic(); state.rebuildDiagnosticRequired = false;
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){ var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q){ var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return; if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } }); });
     state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
-  }).catch(function(err) { alert("Erreur lors du traitement : " + err.message); });
+  });
 }
-
 function envoyerDemande() {
   var fData = collectFormData(); fData.isBrouillon = false; document.getElementById('loading-overlay').style.display = 'flex'; var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
   genererPDFBase64(fData).then(function(pdfBase64) {
@@ -462,9 +420,21 @@ function showTab(tab) { document.querySelectorAll('.section').forEach(function(s
 
 // ── 🛠️ SUIVI EN POST : Évite définitivement les interceptions et déconnexions multi-comptes Google
 function chargerSuivi() {
-  var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
-  var fd = new FormData(); fd.append('action', 'getSuivi');
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if(res && res.success) { var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous'); } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; } }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU</td></tr>'; });
+  var sbody = document.getElementById('suivi-body'); if(!sbody) return;
+  sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
+  
+  var fd = new FormData();
+  fd.append('action', 'getSuivi');
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if(res && res.success) {
+      var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
+      state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
+      filtrer(state.currentFilter || 'tous');
+    } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; }
+  }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU DE LECTURE</td></tr>'; });
 }
 
 function renderSuivi(demandes) { var body = document.getElementById('suivi-body'); if (!body) return; if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; return; } body.innerHTML = demandes.map(function(d) { var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—'; var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg')); return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>'; }).join(''); }
