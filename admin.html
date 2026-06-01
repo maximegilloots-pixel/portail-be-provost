@@ -118,14 +118,29 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <section class="section" id="section-suivi">
   <div class="card">
     <div class="card-title">Gestion des demandes</div>
-    <!-- 🛠️ AJUSTEMENT RETOUR : Insertion du nouveau filtre select dynamic "Technicien" à côté de la recherche globale -->
+    <!-- 🛠️ AJUSTEMENT RETOUR ADMIN : Insertion des filtres croisés "Technicien", "Statut" et "Commercial" et resserrement de la barre EDEAL/Client -->
     <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
       <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
-      <select id="tech-filter" class="fselect" style="width:180px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="filtrerTech(this.value)">
+      
+      <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
         <option value="">Tous les techniciens</option>
       </select>
-      <input id="filter-input" placeholder="Filtrer par EDEAL, client, commercial..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)">
+      
+      <select id="status-filter" class="fselect" style="width:130px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+        <option value="">Tous les statuts</option>
+        <option value="En attente">En attente</option>
+        <option value="Attribuée">Attribuée</option>
+        <option value="En cours">En cours</option>
+        <option value="Terminée">Terminée</option>
+        <option value="Urgent">Urgent</option>
+      </select>
+      
+      <select id="commercial-filter" class="fselect" style="width:160px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+        <option value="">Tous les commerciaux</option>
+      </select>
+      
+      <input id="filter-input" placeholder="Recherche par N° EDEAL ou Client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="appliquerFiltres()">
     </div>
     <div class="table-wrap">
       <table>
@@ -189,7 +204,7 @@ function handleCredentialResponse(response) {
     sessionStorage.setItem('admin_auth', '1');
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-content').classList.add('visible');
-    chargerDepuisGitHub();
+    chargerPermanente();
   } else {
     document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block';
   }
@@ -244,7 +259,6 @@ function initChampsProduits() {
   } else {
     formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
   }
-  
   if (!formData.infos_generales || !formData.infos_generales.length) {
     formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES));
   }
@@ -255,13 +269,11 @@ function initChampsProduits() {
 
 function renderProduitTabs() {
   var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = '';
-  
   var btnGen = document.createElement('button');
   btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '');
   btnGen.textContent = 'Infos Générales (Étape 1)';
   btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); };
   container.appendChild(btnGen);
-
   (formData.liste_produits || []).forEach(function(p) {
     var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : '');
     btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
@@ -274,6 +286,7 @@ function ajouterNouveauProduit() {
   if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom });
   formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions();
 }
+
 function chargerDepuisGitHub() {
   var gh = getGHConfig(); majStatusGH();
   if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;}
@@ -282,6 +295,7 @@ function chargerDepuisGitHub() {
   .then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); })
   .catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); });
 }
+
 function sauvegarder() {
   var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json';
   fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){
@@ -292,20 +306,15 @@ function sauvegarder() {
 
 function renderQuestions() {
   var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
-  
   if (currentProduit === 'infos_generales') {
-    var lockedEl = document.createElement('div');
-    lockedEl.className = 'info-box';
+    var lockedEl = document.createElement('div'); lockedEl.className = 'info-box';
     lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires';
     list.appendChild(lockedEl);
   }
-
   if(!questions.length){ 
     var emptyDiv = document.createElement('div'); emptyDiv.style.padding = '10px'; emptyDiv.style.fontStyle = 'italic';
-    emptyDiv.textContent = 'Aucune question complémentaire dynamic ajoutée'; list.appendChild(emptyDiv);
-    return; 
+    emptyDiv.textContent = 'Aucune question complémentaire dynamic ajoutée'; list.appendChild(emptyDiv); return; 
   }
-  
   questions.forEach(function(q, i) {
     var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true;
     el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + q.label + ' ' + (q.image?'[🖼️ Image]':'') + '</div><span class="q-item-type">' + typeLbl(q.type) + '</span></div>' +
@@ -353,11 +362,7 @@ function showTab(tab, e) {
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
   document.getElementById('section-'+tab).classList.add('active');
-  if (e && e.target) {
-    e.target.classList.add('active');
-  } else {
-    var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active');
-  }
+  if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); }
   if(tab==='suivi') chargerSuivi();
   if(tab==='parametres') chargerDepuisGitHub();
 }
@@ -365,44 +370,58 @@ function showTab(tab, e) {
 function chargerSuivi() {
   fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){return r.json();}).then(function(res){
     allDemandes=res.demandes||[]; 
-    populateTechFilter(allDemandes);
+    populateAdminFilters(allDemandes);
     appliquerFiltres();
   });
 }
 
-// 🛠️ MOTEUR DE POPULATION DU SELECTEUR TECHNICIENS
-function populateTechFilter(demandes) {
-  var select = document.getElementById('tech-filter'); if(!select) return;
-  var currentVal = select.value;
-  select.innerHTML = '<option value="">Tous les techniciens</option>';
-  var techs = [];
-  demandes.forEach(function(d) {
-    if(d.attribueA && d.attribueA.trim() !== '' && d.attribueA.trim() !== '—' && techs.indexOf(d.attribueA.trim()) === -1) {
-      techs.push(d.attribueA.trim());
-    }
-  });
-  techs.sort().forEach(function(t) {
-    var opt = document.createElement('option'); opt.value = t; opt.textContent = t;
-    if(t === currentVal) opt.selected = true;
-    select.appendChild(opt);
-  });
+// ── 🛠️ ALIMENTATION DYNAMIQUE DES SELECTEURS DE FILTRES CROISÉS (TECH + COMMERCIAUX) ──
+function populateAdminFilters(demandes) {
+  var selectTech = document.getElementById('tech-filter');
+  if(selectTech) {
+    var currentTech = selectTech.value; selectTech.innerHTML = '<option value="">Tous les techniciens</option>';
+    var techs = [];
+    demandes.forEach(function(d) {
+      if(d.attribueA && d.attribueA.trim() !== '' && d.attribueA.trim() !== '—' && techs.indexOf(d.attribueA.trim()) === -1) techs.push(d.attribueA.trim());
+    });
+    techs.sort().forEach(function(t) {
+      var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt);
+    });
+  }
+
+  var selectComm = document.getElementById('commercial-filter');
+  if(selectComm) {
+    var currentComm = selectComm.value; selectComm.innerHTML = '<option value="">Tous les commerciaux</option>';
+    var comms = [];
+    demandes.forEach(function(d) {
+      if(d.commercial && d.commercial.trim() !== '' && comms.indexOf(d.commercial.trim()) === -1) comms.push(d.commercial.trim());
+    });
+    comms.sort().forEach(function(c) {
+      var opt = document.createElement('option'); opt.value = c; opt.textContent = c; if(c === currentComm) opt.selected = true; selectComm.appendChild(opt);
+    });
+  }
 }
 
-// 🛠️ FILTRE CROISÉ RECHERCHE GENERALE + SELECTEUR TECHNICIEN
+// ── 🛠️ MOTEUR DE RECHERCHE COMBINÉ : Recherche stricte EDEAL/Client + Statut + Commercial + Technicien ──
 function appliquerFiltres() {
-  var query = document.getElementById('filter-input').value.toLowerCase();
-  var tech = document.getElementById('tech-filter').value.toLowerCase();
+  var query = document.getElementById('filter-input').value.toLowerCase().trim();
+  var tech = document.getElementById('tech-filter').value.toLowerCase().trim();
+  var status = document.getElementById('status-filter').value.toLowerCase().trim();
+  var commercial = document.getElementById('commercial-filter').value.toLowerCase().trim();
   
   var filtered = allDemandes.filter(function(d) {
-    var matchesQuery = (d.edeal + d.client + d.commercial).toLowerCase().includes(query);
+    var matchesQuery = query === "" || 
+                       (d.edeal && d.edeal.toLowerCase().includes(query)) || 
+                       (d.client && d.client.toLowerCase().includes(query));
+                       
     var matchesTech = tech === "" || (d.attribueA && d.attribueA.toLowerCase().trim() === tech);
-    return matchesQuery && matchesTech;
+    var matchesStatus = status === "" || (d.statut && d.statut.toLowerCase().trim() === status);
+    var matchesComm = commercial === "" || (d.commercial && d.commercial.toLowerCase().trim() === commercial);
+    
+    return matchesQuery && matchesTech && matchesStatus && matchesComm;
   });
   renderSuivi(filtered);
 }
-
-function filtrer(q) { appliquerFiltres(); }
-function filtrerTech(t) { appliquerFiltres(); }
 
 function renderSuivi(demandes) {
   var body=document.getElementById('admin-suivi-body');
@@ -410,7 +429,6 @@ function renderSuivi(demandes) {
   if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande correspondante</td></tr>'; return; }
   body.innerHTML=filtrées.map(function(d,i){
     var opts=['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
-    // Utilisation de la fonction formatShortDate pour abréger les dates côté Admin également
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
       '<td><select class="st-select" id="st-' + i + '">' + opts + '</select></td>' +
       '<td><input class="assign-input" id="ass-' + i + '" value="' + d.attribueA + '"></td>' +
@@ -427,101 +445,41 @@ function saveLine(i,edeal) {
 
 function declencherPurgeManuelle() {
   if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return;
-  var fd = new FormData();
-  fd.append('action', 'lancerPurgeManuelle');
-  toast("⏳ Exécution de la purge...", "ok");
-  
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r){ return r.json(); })
-  .then(function(res) {
-    if (res.success) {
-      alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message);
-      chargerSuivi();
-    } else {
-      toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err");
-    }
-  })
-  .catch(function(err){ toast("Erreur réseau : " + err.message, "err"); });
+  var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok");
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) {
+    if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); }
+  }).catch(function(err){ toast("Erreur réseau : " + err.message, "err"); });
 }
 
 function ouvrirDemande(edeal) {
   document.getElementById('detail-edeal').textContent=edeal;
   document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>';
   document.getElementById('detail-modal').classList.add('open');
-  fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal))
-  .then(function(r){return r.json();})
-  .then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); })
-  .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
+  fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
-// ── RETOUR DICTIONNAIRE ADMIN : Changement complet de "Nom ingénieur" par "Nom technicien" ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
   var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
-  
-  var infoRows = [
-    detailRow('Client',fd.client),
-    detailRow('Commercial',fd.commercial),
-    detailRow('Département',fd.ville),
-    detailRow('Date chantier',fd.dateChantier),
-    detailRow('Profil produit(s)',(fd.produits||[]).join(', '))
-  ];
-
-  if (infos) {
-    Object.keys(infos).forEach(function(label) {
-      var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v));
-    });
-  }
+  var infoRows = [detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Profil produit(s)',(fd.produits||[]).join(', '))];
+  if (infos) { Object.keys(infos).forEach(function(label) { var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v)); }); }
   infoRows.push(detailRow('Commentaire commercial', fd.commentaire));
   html+=detailSection('Informations générales', infoRows.join(''));
-  
   var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
-  Object.keys(fd.diagnostic||{}).forEach(function(pid){
-    var pd=fd.diagnostic[pid];
-    var rows=Object.keys(pd).map(function(label){
-      var v=pd[label]; return detailRow(label,Array.isArray(v)?v.join(', '):v);
-    }).join('');
-    if(rows) html+=detailSection(pm[pid]||pid,rows);
-  });
-  
+  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label]; return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows) html+=detailSection(pm[pid]||pid,rows);});
   html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
-  
   if(res.pdfBase64){
     var cleanPdfB64 = String(res.pdfBase64).trim();
-    if (cleanPdfB64 === "SUPPRIME_15J" || cleanPdfB64 === "") {
-      html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">' +
-        '❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> ' +
-        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>' +
-      '</div>';
-    } else {
-      html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>';
-    }
+    if (cleanPdfB64 === "SUPPRIME_15J" || cleanPdfB64 === "") { html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span></div>'; } else { html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>'; }
   }
-  
   (res.fichiers||[]).forEach(function(f){
     var cleanFileB64 = String(f.b64).trim();
-    if (cleanFileB64 === "SUPPRIME_15J" || cleanFileB64 === "") {
-      html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">' +
-        '❌ <s style="color:var(--text-light); font-weight:600;">' + f.nom + '</s> ' +
-        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span>' +
-      '</div>';
-    } else {
-      html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>';
-    }
+    if (cleanFileB64 === "SUPPRIME_15J" || cleanFileB64 === "") { html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px;">❌ <s style="color:var(--text-light); font-weight:600;">' + f.nom + '</s> <span style="color:var(--red); font-weight:700; font-size:11px;">(Cette PJ a été supprimée car la demande a été déposée il y a plus de 15 jours)</span></div>'; } else { html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>'; }
   });
-  
-  var optStatut = ['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){
-    return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>';
-  }).join('');
-  
+  var optStatut = ['En attente','Attribuée','En cours','Terminée','Urgent'].map(function(s){ return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>'; }).join('');
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour</div>';
-  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
-    '<div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div>' +
-    '<div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom technicien" value="' + (currentSuivi.attribueA || '') + '"></div>' +
-  '</div>';
-  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="' + (currentSuivi.commentaireBE || '') + '"></div>' +
-    '<div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\'' + res.edeal + '\')">✓ Sauvegarder</button></div>';
-  
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div><div><label class="flabel">Attribué à</label><input class="finput" id="det-attrib" placeholder="Nom technicien" value="' + (currentSuivi.attribueA || '') + '"></div></div>';
+  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="' + (currentSuivi.commentaireBE || '') + '"></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\'' + res.edeal + '\')">✓ Sauvegarder</button></div>';
   document.getElementById('detail-body').innerHTML=html;
 }
 
@@ -533,43 +491,28 @@ function formatShortDate(dateStr) {
   if (dateStr.indexOf('GMT') !== -1 || dateStr.indexOf('T') !== -1) {
     var d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
-      var day = ("0" + d.getDate()).slice(-2);
-      var month = ("0" + (d.getMonth() + 1)).slice(-2);
-      var hours = ("0" + d.getHours()).slice(-2);
-      var minutes = ("0" + d.getMinutes()).slice(-2);
+      var day = ("0" + d.getDate()).slice(-2); var month = ("0" + (d.getMonth() + 1)).slice(-2); var hours = ("0" + d.getHours()).slice(-2); var minutes = ("0" + d.getMinutes()).slice(-2);
       return day + "/" + month + "/" + d.getFullYear() + " " + hours + ":" + minutes;
     }
   }
-  var parts = dateStr.split(':');
-  if (parts.length >= 2) {
-    return parts[0] + ':' + parts[1].substring(0,2);
-  }
-  return dateStr;
+  var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr;
 }
 
 function telecharger(b64,nom,type){
-  if (!b64 || String(b64).trim() === "SUPPRIME_15J") {
-    alert("⚠️ Fichier non disponible\n\nCe fichier a été supprimé définitivement car la demande a été déposée il y a plus de 15 jours.");
-    return;
-  }
+  if (!b64 || String(b64).trim() === "SUPPRIME_15J") { alert("⚠️ Fichier non disponible\n\nCe fichier a été supprimé définitivement car la demande a été déposée il y a plus de 15 jours."); return; }
   try{
-    if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){
-      try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){}
-    }
-    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
-    var blob=new Blob([bytes],{type:type||'application/octet-stream'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
+    if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){ try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){} }
+    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);}); var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();
   }catch(err){alert('Erreur de décodage : '+err.message);}
 }
 
 function saveDetail(edeal){
-  var fd=new FormData(); fd.append('action','updateSuivi');
-  fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value}));
+  var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value}));
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok'); chargerSuivi(); document.getElementById('detail-modal').classList.remove('open'); }).catch(function(){toast('Erreur réseau','err');});
 }
-
 function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
-if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerDepuisGitHub);
+function chargerPermanente(){ chargerDepuisGitHub(); }
+if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
 </script>
 </body>
 </html>
