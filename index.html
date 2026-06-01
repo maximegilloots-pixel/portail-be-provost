@@ -395,24 +395,74 @@ function sauvegarderBrouillon() {
 
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal) + '&_=' + Date.now())
-  .then(function(r){return r.json();}).then(function(res){
-    if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
-    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || ''; document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || ''; document.getElementById('f-commentaire').value = fd.commentaire || '';
-    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); });
+  
+  // On prépare les données au format formulaire POST
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(!res.success || !res.formData) { toast("⚠️ Brouillon introuvable", "err"); return; }
+    var fd = res.formData; state.loadedDraft = fd;
+    
+    document.getElementById('f-edeal').value = fd.edeal || '';
+    document.getElementById('f-client').value = fd.client || '';
+    document.getElementById('f-ville').value = fd.ville || '';
+    document.getElementById('f-date').value = fd.dateChantier || '';
+    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { 
+      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); 
+    });
+    
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    
     if(fd.infos) {
       var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
-      infoQuestions.forEach(function(q) { var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; if(q.type === 'text' || q.type === 'textarea') { var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } });
+      infoQuestions.forEach(function(q) { 
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; 
+        if(q.type === 'text' || q.type === 'textarea') { 
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } 
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+          }); 
+        } 
+      });
     }
+    
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
-    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
-    buildDiagnostic(); state.rebuildDiagnosticRequired = false;
-    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){ var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q){ var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return; if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } }); });
-    state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
+    buildDiagnostic(); 
+    state.rebuildDiagnosticRequired = false; // Verrou pour goStep2
+    
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'){ 
+          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} 
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+          }); 
+        }
+      });
+    });
+    
+    state.selectedFiles = []; renderFiles(); 
+    showTab('demande'); 
+    goStep(1); 
+    toast("📋 Pré-demande chargée.", "ok");
+  }).catch(function(err) {
+    console.error(err);
+    toast("❌ Erreur lors de la reprise", "err");
   });
 }
-
 function envoyerDemande() {
   var fData = collectFormData(); fData.isBrouillon = false; document.getElementById('loading-overlay').style.display = 'flex'; var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
   genererPDFBase64(fData).then(function(pdfBase64) {
