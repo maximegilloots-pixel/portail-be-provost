@@ -82,7 +82,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .file-item{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:11px}
 .file-rm{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
-/* 🛠️ FIX COULEUR BOUTON : Le texte redevient blanc à 100% sur fond bleu */
 .btn-primary{background:var(--blue);color:var(--white)}
 .btn-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(45,75,140,.28)}
 .btn-yellow{background:var(--yellow);color:var(--dark)}
@@ -107,7 +106,7 @@ tbody tr:hover{background:var(--bg)}
 .empty-td td{text-align:center;padding:28px;color:var(--text-light);font-style:italic}
 .info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:var(--radius-sm);padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;display:flex;gap:9px}
 .divider{border:none;border-top:1.5px solid var(--border);margin:16px 0}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color river:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-left:4px solid var(--green)}
 .toast.err{border-left:4px solid var(--red)}
@@ -132,7 +131,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v3.3-ButtonColorFix</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v3.4-LayoutFilters</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -145,7 +144,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v3.3-ButtonColorFix</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v3.4-LayoutFilters</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -172,9 +171,13 @@ tbody tr:hover{background:var(--bg)}
   <div class="fstep active" id="step1">
     <div class="card">
       <div class="card-title">Informations générales</div>
+      <!-- 🛠️ AJUSTEMENT RETOUR : Le client est mis sous l'EDEAL, le commercial et la ville partagent la ligne du dessous -->
       <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div><div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div></div>
-      <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
+      <div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
+        <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
+      </div>
       <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
       
       <div id="infos-generales-dynamic-container"></div>
@@ -574,11 +577,84 @@ function envoyerDemande() {
   });
 }
 
-function resetForm() {
-  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
-  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1);
+function genererPDFBase64(fData) {
+  return new Promise(function(resolve) {
+    var dateStr = new Date().toLocaleDateString('fr-FR');
+    var produits = (fData.produits||[]).join(', ');
+    var infos = fData.infos || {};
+    var diag  = fData.diagnostic || {};
+
+    function row(label, val) {
+      if (!val || val === '') return '';
+      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
+        '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
+        '<div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
+    }
+    function rowList(label, vals) {
+      if (!vals || !vals.length) return '';
+      return row(label, vals.join(', '));
+    }
+    function section(title, rows) {
+      if (!rows) return '';
+      return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
+        '<div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div>' +
+        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
+    }
+
+    var infoRows = '';
+    Object.keys(infos).forEach(function(lbl) {
+      var v = infos[lbl]; infoRows += Array.isArray(v) ? rowList(lbl, v) : row(lbl, v);
+    });
+
+    var sections = '';
+    sections += section('Informations générales',
+      row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
+      row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) +
+      row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) +
+      infoRows +
+      row('Commentaire', fData.commentaire)
+    );
+    
+    Object.keys(diag).forEach(function(pid) {
+      var pd = diag[pid]; var rows = '';
+      var pFound = PRODUITS.find(function(p) { return p.id === pid; });
+      var labelProduit = pFound ? pFound.label : pid;
+      Object.keys(pd).forEach(function(label) {
+        var v = pd[label]; rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
+      });
+      if (rows) sections += section(labelProduit, rows);
+    });
+
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+      '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
+      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
+      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body>' +
+      '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
+      '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
+      sections + '</body></html>';
+
+    resolve(btoa(unescape(encodeURIComponent(html))));
+  });
+}
+
+// 🛠️ PARSEUR DE DATE ROBUSTE COMMERCIAUX : Nettoie et force le format JJ/MM/AAAA XX:XX exigé
+function formatShortDate(dateStr) {
+  if (!dateStr) return '—';
+  if (dateStr.indexOf('GMT') !== -1 || dateStr.indexOf('T') !== -1) {
+    var d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      var day = ("0" + d.getDate()).slice(-2);
+      var month = ("0" + (d.getMonth() + 1)).slice(-2);
+      var hours = ("0" + d.getHours()).slice(-2);
+      var minutes = ("0" + d.getMinutes()).slice(-2);
+      return day + "/" + month + "/" + d.getFullYear() + " " + hours + ":" + minutes;
+    }
+  }
+  var parts = dateStr.split(':');
+  if (parts.length >= 2) {
+    return parts[0] + ':' + parts[1].substring(0,2);
+  }
+  return dateStr;
 }
 
 function addFiles(files) { 
@@ -649,7 +725,8 @@ function renderSuivi(demandes) {
   if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande</td></tr>'; return; }
   body.innerHTML = demandes.map(function(d) {
     var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—';
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.date + '</td><td>' + d.produits + '</td><td><span class="badge ' + (d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')) + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
+    // Utilisation du format court abrégé pour la colonne date
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + (d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')) + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
   }).join('');
 }
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
