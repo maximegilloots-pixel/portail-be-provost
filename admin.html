@@ -78,7 +78,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.0-DynamicStep1</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.1-AdminStep1Seed</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -87,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.0-DynamicStep1</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.1-AdminStep1Seed</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -221,7 +221,16 @@ function handleImageUpload(input) {
   reader.readAsDataURL(file);
 }
 
-// 🛠️ INITIALISATION DE LA RUBRIQUE INFOS GENERALES DANS L'ADMIN
+// 🛠️ SEED COMPLET INITIAL DES QUESTIONS DE L'ÉTAPE 1
+var DEFAULT_INFOS_GENERALES = [
+  {id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},
+  {id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},
+  {id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},
+  {id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},
+  {id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},
+  {id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}
+];
+
 function initChampsProduits() {
   if (!formData.liste_produits) {
     formData.liste_produits = [
@@ -236,7 +245,11 @@ function initChampsProduits() {
       formData.liste_produits.unshift({id:'infos_generales', label:'Infos Générales (Étape 1)'});
     }
   }
-  if (!formData.infos_generales) formData.infos_generales = [];
+  
+  // 🛠️ REMPLISSAGE AUTOMATIQUE SÉCURISÉ EN CAS DE PREMIER DÉPLOIEMENT OU TABLEAU VIDE
+  if (!formData.infos_generales || !formData.infos_generales.length) {
+    formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES));
+  }
   if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) {
     formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || []));
   }
@@ -274,7 +287,6 @@ function sauvegarder() {
 function renderQuestions() {
   var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
   
-  // 🔒 AFFICHAGE DE L'AVERTISSEMENT DES CHAMPS CARDINAUX FIXES SANCTUARISÉS
   if (currentProduit === 'infos_generales') {
     var lockedEl = document.createElement('div');
     lockedEl.className = 'info-box';
@@ -393,14 +405,13 @@ function declencherPurgeManuelle() {
 function ouvrirDemande(edeal) {
   document.getElementById('detail-edeal').textContent=edeal;
   document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>';
-  document.getElementById('detail-modal').open();
+  document.getElementById('detail-modal').classList.add('open');
   fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal))
   .then(function(r){return r.json();})
   .then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} renderDetail(res); })
   .catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';});
 }
 
-// ── COMPILATION DYNAMIQUE DU FORMULAIRE DE SUIVI POUR L'ÉTAPE 1 ──
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{};
   var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
@@ -413,7 +424,6 @@ function renderDetail(res) {
     detailRow('Produit(s)',(fd.produits||[]).join(', '))
   ];
 
-  // Injection ordonnée des réponses dynamiques de l'Étape 1
   if (infos) {
     Object.keys(infos).forEach(function(label) {
       var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v));
