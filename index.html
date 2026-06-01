@@ -404,8 +404,19 @@ function envoyerDemande() {
 function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
 function renderFiles() { var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = ''; state.selectedFiles.forEach(function(f, i) { list.appendChild(document.createElement('div')).className = 'file-item'; list.lastChild.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>'; }); }
 function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
-function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
-
+function filtrer(statut) { 
+  state.currentFilter = statut; 
+  var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); 
+  
+  // Tri corrigé en utilisant directement l'objet Date natif
+  list.sort(function(a, b) { 
+    var timeA = a.date ? new Date(a.date).getTime() : 0;
+    var timeB = b.date ? new Date(b.date).getTime() : 0;
+    return state.sortAsc ? timeA - timeB : timeB - timeA; 
+  }); 
+  
+  renderSuivi(list); 
+}
 function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
 
 // ── 🛠Header LECTURE SECURE : Rétablissement impératif du mode GET pour autoriser la lecture par le navigateur
