@@ -131,7 +131,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v2.3-PJSafety</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v2.4-RecapPurgeFix</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -144,7 +144,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v2.3-PJSafety</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v2.4-RecapPurgeFix</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -203,10 +203,9 @@ tbody tr:hover{background:var(--bg)}
       <div class="card-title">Pièces jointes complémentaires (15 Mo maximum cumulé)</div>
       <div class="dropzone" id="dropzone" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)"><input type="file" id="file-input" multiple onchange="addFiles(this.files)"><div class="dz-title">Glissez vos fichiers ici</div></div>
       <div class="file-list" id="file-list"></div>
-      
       <div class="btn-row" style="justify-content:space-between;width:100%;">
         <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
-        <div style="color:var(--red); font-size:11px; font-weight:bold; display:flex; align-items:center; gap:5px;">
+        <div style="color:var(--red); font-size:11px; font-weight:bold;">
           ⚠️ Les pièces jointes ne sont pas sauvegardées en pré-demande / brouillon.
         </div>
         <button class="btn btn-primary" onclick="goStep(4)">Vérifier et envoyer →</button>
@@ -218,6 +217,10 @@ tbody tr:hover{background:var(--bg)}
     <div class="card">
       <div class="card-title">Récapitulatif avant envoi</div><div id="recap-content"></div>
       <hr class="divider">
+      <div class="info-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        La demande sera déposée définitivement au BE. Objet : <strong id="recap-obj"></strong>
+      </div>
       <div class="btn-row" style="justify-content:space-between;width:100%;">
         <button class="btn btn-outline" onclick="goStep(3)">← Retour</button>
         <button class="btn btn-primary" id="btn-send" onclick="envoyerDemande()">🚀 Déposer définitivement au BE</button>
@@ -325,7 +328,7 @@ var QUESTIONS_INSTALL_EXT = [
   {id:'qe_toiture_lg', label:'Si toiture — longueur de débord', type:'text', placeholder:'En standard : longueur de débord 500 mm'},
   {id:'qe_toiture_fin', label:'Si toiture — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Bacs anti condensation','Panneaux polycarbonate','Autre :']},
   {id:'qe_pente', label:'Si toiture — indiquer la pente', type:'radio', options:['Penté haut','Penté bas']},
-  {id:'qe_bardage', label:'Bardage à prévoir', type:'checkbox', multi:true, options:['Pas de bardage à prévoir','Bardage arrière','Bardage latéral (2 côtés)','Bardage latéral (1 côté)','Autre :']},
+  {id:'qe_bardage', label:'Bardage à prévoir', type:'checkbox', multi:true, options:['Pas de bardage à prévoir','Bardage arrière','Bardage lateral (2 côtés)','Bardage lateral (1 côté)','Autre :']},
   {id:'qe_bardage_fin', label:'Si bardage — finition', type:'checkbox', multi:true, options:['Blanc RAL 9010','Galva Z','Autre :']},
   {id:'qe_finition_el', label:'Éléments de finition', type:'checkbox', multi:true, options:['Angle droit / Tôle finition angle','Bande de rive / Cornière de rive','U de finition de bardage','U de finition de toiture','Bandeau de finition','Faitière','Faitière contre mur','Bande de faitage','Profil bas de bardage','Tôle de finition de toiture',"Bavette de rejet d'eau",'Autre :']},
   {id:'qe_eaux', label:"Descentes d'eaux pluviales", type:'radio', options:['Oui','Non','Autre :']},
@@ -453,9 +456,8 @@ function collectFormData() {
 
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
-  if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
+  if(!edeal){ toast("Le N° EDEAL is obligatoire pour sauver un brouillon.", "err"); return; }
   
-  // Bloque la sauvegarde de brouillon si des PJ sont présentes (protection doublons)
   if(state.selectedFiles.length > 0) {
     alert("⚠️ Action impossible\n\nVous ne pouvez pas enregistrer une pré-demande avec des pièces jointes. Veuillez supprimer les fichiers de la liste pour enregistrer votre brouillon technique.");
     return;
@@ -514,7 +516,7 @@ function reprendreBrouillon(edeal) {
       });
     });
 
-    state.selectedFiles = []; // Un brouillon réinitialisé repart toujours sans PJ lourde
+    state.selectedFiles = []; 
     renderFiles();
     showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
   });
@@ -525,14 +527,19 @@ function envoyerDemande() {
   var btn = document.getElementById('btn-send'); btn.disabled = true;
   toast("⏳ Envoi définitif au BE...", "ok");
   
+  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  
   genererPDFBase64(fData).then(function(pdfBase64) {
-    var promises = state.selectedFiles.map(function(file) {
+    var promises = localFiles.map(function(file) {
       return new Promise(function(resolve) {
         var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file);
       });
     });
     Promise.all(promises).then(function(newFiles) {
       var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
+      
+      serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
       newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
       
       fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
@@ -610,9 +617,8 @@ function resetForm() {
   state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1);
 }
 
-// 🛠️ LIMITATION DES 15 MO ET ALERTE TRANSFERT SERVEUR GROUPE AUTOMATIQUE
 function addFiles(files) { 
-  var maxSizeBytes = 15 * 1024 * 1024; // 15 Mo nets en octets
+  var maxSizeBytes = 15 * 1024 * 1024; 
   var tailleActuelle = state.selectedFiles.reduce(function(acc, file) { return acc + file.size; }, 0);
 
   for(var i=0; i<files.length; i++){ 
@@ -643,9 +649,12 @@ function renderFiles() {
 function dzOver(e){e.preventDefault();}
 function dzDrop(e){e.preventDefault(); addFiles(e.dataTransfer.files);}
 
+// 🛠️ FIX APERÇU ÉTAPE 4 : Vérification de présence sécurisée de recapObj pour éviter tout blocage script
 function buildRecap() {
   var edeal = document.getElementById('f-edeal').value.trim();
-  document.getElementById('recap-obj').textContent = edeal;
+  var recapObj = document.getElementById('recap-obj');
+  if (recapObj) recapObj.textContent = edeal;
+  
   var produitLabels = state.selectedProduits.map(function(pid) {
     var pFound = PRODUITS.find(function(p){ return p.id===pid; });
     return pFound ? pFound.label : pid;
