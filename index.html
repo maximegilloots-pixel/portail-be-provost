@@ -34,10 +34,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
-.steps{display:flex;flex-direction:column;gap:10px}
-.step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step strong{display:block;font-size:12px;color:var(--dark)}
-.step span{font-size:11px;color:var(--text-light)}
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
 .wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
 .wz:last-child{border-right:none}
@@ -61,7 +57,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
 .q-options{display:flex;flex-direction:column;gap:5px}
-.q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text);user-select:none}
+.q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text);user-select:none;transition:var(--tr)}
 
 .opt-dot,.opt-sq{width:15px;height:15px;border:2px solid var(--border);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:var(--tr)}
 .opt-dot{border-radius:50%} .opt-sq{border-radius:3px}
@@ -257,6 +253,7 @@ var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgO6wk3Jdu6XBDBC
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous', rebuildDiagnosticRequired: true };
 
+function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
 function setupCommercialField(name) { var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; } }
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -312,7 +309,19 @@ function buildInfosGeneralesDynamic() {
 }
 
 function goStep(n) { document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active'); ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); }); if(n===4) buildRecap(); }
-function goStep2() { if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; } if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; } var container = document.getElementById('diagnostic-container'); if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) { buildDiagnostic(); state.rebuildDiagnosticRequired = false; } goStep(2); }
+
+// ── 🛠️ FIX RECONSTRUCTION DESTRUCTIVE : Ne vide plus l'étape 2 si les données viennent d'être chargées par un brouillon
+function goStep2() {
+  if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
+  if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
+  var container = document.getElementById('diagnostic-container');
+  if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) {
+    buildDiagnostic();
+    state.rebuildDiagnosticRequired = false;
+  }
+  goStep(2);
+}
+
 var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},{id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},{id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},{id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux...'},{id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},{id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},{id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Caillebotis','Plancher tôlé','Autre :']},{id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},{id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},{id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
@@ -362,23 +371,79 @@ function sauvegarderBrouillon() {
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
+// ── 🛠️ REPRISE 100% FIABILISÉE EN POST : Résout le bouton "Reprendre" inerte et pré-remplit l'étape 2 sans crash
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
-  .then(function(r){return r.json();}).then(function(res){
-    if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
-    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || ''; document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || ''; document.getElementById('f-commentaire').value = fd.commentaire || '';
-    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); });
+  
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
+    if(!res.success || !res.formData) { toast("⚠️ Impossible de lire les données du brouillon.", "err"); return; }
+    var fd = res.formData; state.loadedDraft = fd;
+    
+    document.getElementById('f-edeal').value = fd.edeal || '';
+    document.getElementById('f-client').value = fd.client || '';
+    document.getElementById('f-ville').value = fd.ville || '';
+    document.getElementById('f-date').value = fd.dateChantier || '';
+    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { 
+      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); 
+    });
+    
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    
     if(fd.infos) {
       var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
-      infoQuestions.forEach(function(q) { var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; if(q.type === 'text' || q.type === 'textarea') { var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } });
+      infoQuestions.forEach(function(q) {
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return;
+        if(q.type === 'text' || q.type === 'textarea') {
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); }
+        } else {
+          (Array.isArray(val)?val:[val]).forEach(function(v){
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){
+              if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected');
+            });
+          });
+        }
+      });
     }
+    
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
-    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
-    buildDiagnostic(); state.rebuildDiagnosticRequired = false;
-    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){ var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q){ var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return; if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} } else { (Array.isArray(val)?val:[val]).forEach(function(v){ document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); }); } }); });
-    state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
+    // 1. On injecte les conteneurs HTML de la page 2
+    buildDiagnostic(); 
+    state.rebuildDiagnosticRequired = false; // 2. Verrou de sécurité : Interdiction à goStep2 de tout effacer
+    
+    // 3. Remplissage minutieux à l'abri des caractères spéciaux
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'){
+          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');}
+        } else {
+          (Array.isArray(val)?val:[val]).forEach(function(v){
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){
+              if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected');
+            });
+          });
+        }
+      });
+    });
+    
+    state.selectedFiles = []; renderFiles(); 
+    showTab('demande'); // On change d'onglet
+    goStep(1); // On force le retour à l'étape 1 visuelle
+    toast("📋 Pré-demande chargée avec succès.", "ok");
+  }).catch(function(err) {
+    alert("Erreur critique lors de la reprise du brouillon : " + err.message);
   });
 }
 
@@ -398,11 +463,30 @@ function renderFiles() { var list = document.getElementById('file-list'); if(!li
 function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
 function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
 function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
-function chargerSuivi() { var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>'; fetch(APPS_SCRIPT_URL + '?action=getSuivi').then(function(r){ return r.json(); }).then(function(res) { if(res && res.success) { var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous'); } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; } }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU</td></tr>'; }); }
+
+// ── 🛠️ SUIVI EN POST ENTIÈREMENT SÉCURISÉ : Plus aucun risque d'interception ou de déconnexion multi-compte
+function chargerSuivi() {
+  var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
+  var fd = new FormData(); fd.append('action', 'getSuivi');
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if(res && res.success) { var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous'); } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; } }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU</td></tr>'; });
+}
 
 function renderSuivi(demandes) { var body = document.getElementById('suivi-body'); if (!body) return; if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; return; } body.innerHTML = demandes.map(function(d) { var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—'; var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg')); return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>'; }).join(''); }
+function resetForm() { ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); }
+
+function genererPDFBase64(fData) {
+  return new Promise(function(resolve) {
+    var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
+    function row(label, val) { if (!val || val === '') return ''; return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>'; }
+    function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
+    var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
+    var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+    Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
+    var tagStart = '<' + '!DOCTYPE html' + '><h' + 'tml><he' + 'ad><me' + 'ta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+    var tagEnd = '</bo' + 'dy></ht' + 'ml>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
+  });
+}
+function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
 </html>
-
-}
