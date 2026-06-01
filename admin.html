@@ -78,7 +78,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="login-screen" id="login-screen">
   <div class="login-card">
     <div class="login-logo">⚙️ ADMIN BE</div>
-    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.4-LayoutFilters</span></div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v3.5-StatusDynamic</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
     <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
     <div class="login-err" id="login-err"></div>
@@ -87,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.4-LayoutFilters</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v3.5-StatusDynamic</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -118,7 +118,6 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <section class="section" id="section-suivi">
   <div class="card">
     <div class="card-title">Gestion des demandes</div>
-    <!-- 🛠️ AJUSTEMENT RETOUR ADMIN : Insertion des filtres croisés "Technicien", "Statut" et "Commercial" et resserrement de la barre EDEAL/Client -->
     <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
       <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
       <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
@@ -127,13 +126,8 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
         <option value="">Tous les techniciens</option>
       </select>
       
-      <select id="status-filter" class="fselect" style="width:130px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+      <select id="status-filter" class="fselect" style="width:140px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
         <option value="">Tous les statuts</option>
-        <option value="En attente">En attente</option>
-        <option value="Attribuée">Attribuée</option>
-        <option value="En cours">En cours</option>
-        <option value="Terminée">Terminée</option>
-        <option value="Urgent">Urgent</option>
       </select>
       
       <select id="commercial-filter" class="fselect" style="width:160px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
@@ -364,7 +358,7 @@ function showTab(tab, e) {
   document.getElementById('section-'+tab).classList.add('active');
   if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); }
   if(tab==='suivi') chargerSuivi();
-  if(tab==='parametres') chargerDepuisGitHub();
+  if(tab==='parametres') chargerPermanente();
 }
 
 function chargerSuivi() {
@@ -374,8 +368,9 @@ function chargerSuivi() {
     appliquerFiltres();
   });
 }
+function filtrer(q) { appliquerFiltres(); }
 
-// ── 🛠️ ALIMENTATION DYNAMIQUE DES SELECTEURS DE FILTRES CROISÉS (TECH + COMMERCIAUX) ──
+// ── 🛠️ ALIMENTATION DES FILTRES : Extraction et population du filtre dynamique de Statut ──
 function populateAdminFilters(demandes) {
   var selectTech = document.getElementById('tech-filter');
   if(selectTech) {
@@ -386,6 +381,18 @@ function populateAdminFilters(demandes) {
     });
     techs.sort().forEach(function(t) {
       var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt);
+    });
+  }
+
+  var selectStatus = document.getElementById('status-filter');
+  if(selectStatus) {
+    var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>';
+    var statuses = [];
+    demandes.forEach(function(d) {
+      if(d.statut && d.statut.trim() !== '' && d.statut.trim() !== 'Brouillon' && statuses.indexOf(d.statut.trim()) === -1) statuses.push(d.statut.trim());
+    });
+    statuses.sort().forEach(function(s) {
+      var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt);
     });
   }
 
@@ -402,7 +409,6 @@ function populateAdminFilters(demandes) {
   }
 }
 
-// ── 🛠️ MOTEUR DE RECHERCHE COMBINÉ : Recherche stricte EDEAL/Client + Statut + Commercial + Technicien ──
 function appliquerFiltres() {
   var query = document.getElementById('filter-input').value.toLowerCase().trim();
   var tech = document.getElementById('tech-filter').value.toLowerCase().trim();
