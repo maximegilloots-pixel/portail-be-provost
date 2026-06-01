@@ -34,11 +34,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
-.steps{display:flex;flex-direction:column;gap:10px}
-.step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
-.step strong{display:block;font-size:12px;color:var(--dark)}
-.step span{font-size:11px;color:var(--text-light)}
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
 .wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
 .wz:last-child{border-right:none}
@@ -51,7 +46,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .finput,.fselect,.ftextarea{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);background:var(--white);outline:none}
 .finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.09)}
 .ftextarea{min-height:80px;resize:vertical}
-.fhint{font-size:11px;color:var(--text-light);margin-top:3px}
 .req{color:var(--red)}
 .produits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
 .produit-cb{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--white)}
@@ -61,7 +55,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .produit-cb.checked .cb-box{background:var(--blue);border-color:var(--blue)}
 .cb-check{display:none;color:white;font-size:10px;font-weight:900}
 .produit-cb.checked .cb-check{display:block}
-.produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px}
 .q-options{display:flex;flex-direction:column;gap:5px}
 .q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text)}
@@ -77,7 +70,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;background:var(--bg);position:relative}
 .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .dz-title{font-size:13px;font-weight:700;color:var(--dark);margin:8px 0 3px}
-.dz-sub{font-size:11px;color:var(--text-light)}
 .file-list{display:flex;flex-direction:column;gap:5px;margin-top:10px}
 .file-item{display:flex;align-items:center;gap:9px;padding:7px 11px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:11px}
 .file-rm{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-light);font-size:16px}
@@ -93,8 +85,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .b-wait{background:var(--yellow-bg);color:#7a5500}
 .b-draft{background:rgba(35,45,70,0.1);color:var(--dark)}
 .b-attr{background:var(--green-bg);color:var(--green)}
-.b-prog{background:var(--blue-light);color:var(--blue)}
-.b-done{background:rgba(42,125,82,.15);color:var(--green)}
 .b-urg{background:var(--red-bg);color:var(--red)}
 .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:12px}
@@ -121,17 +111,30 @@ tbody tr:hover{background:var(--bg)}
 .login-bar{width:100%;height:4px;background:var(--yellow)}
 .app-content{display:none}
 .app-content.visible{display:block}
+
+/* 🛠️ STYLE BARRE DE CHARGEMENT TECHNIQUE SIMULÉE ANTI-LAG */
+.loading-overlay{position:fixed;intent:0;width:100vw;height:100vh;background:rgba(255,255,255,0.88);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
+.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
+.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
+@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+<!-- 🛠️ INTERFACE : Fenêtre de chargement dynamique lors du lag d'envoi -->
+<div class="loading-overlay" id="loading-overlay">
+  <div style="font-size:16px; font-weight:900; color:var(--dark); letter-spacing:-0.5px;">🚀 Transfert de la demande au BE...</div>
+  <div style="font-size:12px; color:var(--text-light); margin-top:3px;">Veuillez patienter, synchronisation de la base Google Sheets.</div>
+  <div class="progress-bar-container"><div class="progress-bar-fill"></div></div>
+</div>
 
 <div class="login-screen" id="login-screen">
   <div class="login-bar"></div>
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v3.4-LayoutFilters</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v3.6-LoadingTechDropdown</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -144,7 +147,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v3.4-LayoutFilters</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v3.6-LoadingTechDropdown</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -171,12 +174,11 @@ tbody tr:hover{background:var(--bg)}
   <div class="fstep active" id="step1">
     <div class="card">
       <div class="card-title">Informations générales</div>
+      <!-- 🛠️ AMÉLIORATION ERGONOMIE RETOUR : Alignement vertical strict et limpide pour éviter les confusions -->
       <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
-        <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
-      </div>
+      <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
+      <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
       <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
       
       <div id="infos-generales-dynamic-container"></div>
@@ -232,8 +234,7 @@ tbody tr:hover{background:var(--bg)}
 <section class="section" id="section-suivi">
   <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
   <div class="table-hd">
-    <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-outline" data-filter="tous">Toutes</button><button class="btn btn-sm btn-outline" data-filter="Brouillon">Brouillons / Pré-demandes</button><button class="btn btn-sm btn-outline" data-filter="En attente">En attente</button><button class="btn btn-sm btn-outline" data-filter="Terminée">Terminées</button></div>
-    <!-- 🛠️ AJOUT RETOUR COMMERCIAL : Insertion du bouton de tri temporel chronologique -->
+    <div style="display:flex;gap:6px;"><button class="btn btn-sm btn-outline" data-filter="tous">Toutes</button><button class="btn btn-sm btn-outline" data-filter="Brouillon">Brouillons / Pré-demandes</button><button class="btn btn-sm btn-outline" data-filter="En attente">En attente</button><button class="btn btn-sm btn-outline" data-filter="Manque d'infos">Manque d'infos</button></div>
     <div style="display:flex; gap:6px; align-items:center;">
       <button class="refresh-btn" onclick="toggleSortDate()">📅 Trier par date (<span id="sort-dir">Récent</span>)</button>
       <button class="refresh-btn" onclick="chargerSuivi()">🔄 Actualiser</button>
@@ -289,10 +290,7 @@ if (sessionStorage.getItem('portail_auth') === '1') {
 
 function chargerConfigFormulaire() {
   fetch(CONFIG_URL + '?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(cfg) {
-    RawConfig = cfg; 
-    if (cfg.liste_produits) {
-      PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
-    }
+    RawConfig = cfg; if (cfg.liste_produits) PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
     initFormulaire();
   }).catch(function(){ initFormulaire(); });
 }
@@ -368,8 +366,7 @@ function buildInfosGeneralesDynamic() {
     
     var fid = 'info_' + q.id;
     if(q.type==='text' || q.type==='textarea') {
-      var inp = document.createElement(q.type==='text'?'input':'textarea');
-      inp.className='q-text-input'; inp.id=fid; qDiv.appendChild(inp);
+      var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid; qDiv.appendChild(inp);
     } else {
       var optsDiv = document.createElement('div'); optsDiv.className='q-options';
       (q.options||[]).forEach(function(o){
@@ -389,9 +386,7 @@ function buildInfosGeneralesDynamic() {
 }
 
 function toggleOption(el) {
-  var field = el.dataset.field; 
-  document.querySelectorAll('.q-option[data-field="' + field + '"]').forEach(function(o){o.classList.remove('selected')});
-  el.classList.add('selected');
+  var field = el.dataset.field; document.querySelectorAll('.q-option[data-field="' + field + '"]').forEach(function(o){o.classList.remove('selected')}); el.classList.add('selected');
 }
 
 function toggleProduit(id) { 
@@ -455,33 +450,23 @@ function collectFormData() {
     produits: state.selectedProduits.map(function(pid){ return PRODUITS.find(function(p){return p.id===pid;}).label; }),
     infos: {}, diagnostic: {}
   };
-  
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   infoQuestions.forEach(function(q) {
     var fid = 'info_' + q.id; var el = document.getElementById(fid);
-    if (el) {
-      data.infos[q.label] = el.value.trim();
-    } else {
+    if (el) { data.infos[q.label] = el.value.trim(); } else {
       var vals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.dataset.val); });
       data.infos[q.label] = vals;
     }
   });
-  
   state.selectedProduits.forEach(function(pid) {
     var prodData = {}; var questions = getQuestionsListForProduct(pid);
     questions.forEach(function(q) {
       var fid = pid+'_'+q.id; var el = document.getElementById(fid);
-      if (el) {
-        prodData[q.label] = el.value.trim();
-      } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector('.q-option[data-field="' + fid + '"]')) {
+      if (el) { prodData[q.label] = el.value.trim(); } else if (q.type !== 'text' && q.type !== 'textarea' && document.querySelector('.q-option[data-field="' + fid + '"]')) {
         var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.dataset.val); });
         prodData[q.label] = opVals;
       } else {
-        if (state.loadedDraft && state.loadedDraft.diagnostic && state.loadedDraft.diagnostic[pid] && state.loadedDraft.diagnostic[pid][q.label] !== undefined) {
-          prodData[q.label] = state.loadedDraft.diagnostic[pid][q.label];
-        } else {
-          prodData[q.label] = (q.type === 'text' || q.type === 'textarea') ? "" : [];
-        }
+        if (state.loadedDraft && state.loadedDraft.diagnostic && state.loadedDraft.diagnostic[pid] && state.loadedDraft.diagnostic[pid][q.label] !== undefined) { prodData[q.label] = state.loadedDraft.diagnostic[pid][q.label]; } else { prodData[q.label] = (q.type === 'text' || q.type === 'textarea') ? "" : []; }
       }
     });
     data.diagnostic[pid] = prodData;
@@ -492,26 +477,23 @@ function collectFormData() {
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim();
   if(!edeal){ toast("Le N° EDEAL est obligatoire pour sauver un brouillon.", "err"); return; }
-  if(state.selectedFiles.length > 0) {
-    alert("⚠️ Action impossible\n\nVous ne pouvez pas enregistrer une pré-demande avec des pièces jointes. Veuillez supprimer les fichiers de la liste pour enregistrer votre brouillon technique.");
-    return;
-  }
+  if(state.selectedFiles.length > 0) { alert("⚠️ Action impossible\n\nLes PJ ne sont pas supportées en brouillon."); return; }
+  
   var fData = collectFormData(); fData.isBrouillon = true;
-  var btn = document.querySelector('button[onclick="sauvegarderBrouillon()"]'); if(btn) btn.disabled = true;
-  toast("⏳ Sauvegarde de la pré-demande...", "ok");
+  document.getElementById('loading-overlay').style.display = 'flex'; // Affiche la barre de chargement anti-lag
+  
   var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) {
-    if(btn) btn.disabled = false; if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
-  }).catch(function(){ if(btn) btn.disabled = false; toast("Erreur réseau","err"); });
+    document.getElementById('loading-overlay').style.display = 'none';
+    if(res.success){ toast("✅ Pré-demande enregistrée sur le serveur !", "ok"); chargerSuivi(); }
+  }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
   fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
   .then(function(r){return r.json();}).then(function(res){
-    if(!res.success || !res.formData) return; var fd = res.formData;
-    state.loadedDraft = fd;
-    
+    if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
     document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || '';
     document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || '';
     document.getElementById('f-commentaire').value = fd.commentaire || '';
@@ -519,36 +501,26 @@ function reprendreBrouillon(edeal) {
     ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) {
       var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled');
     });
-
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
-    
     if(fd.infos) {
       var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
       infoQuestions.forEach(function(q) {
         var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return;
         if(q.type === 'text' || q.type === 'textarea') {
           var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); }
-        } else {
-          (Array.isArray(val)?val:[val]).forEach(function(v){
-            var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected');
-          });
-        }
+        } else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
       });
     }
-    
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); var input = el.querySelector('input'); if(input) input.checked = false;});
     state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
-    state.selectedProduits.forEach(function(pid){ 
-      var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); var inp = c.querySelector('input'); if(inp) inp.checked = true; } 
-    });
-    
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); var inp = c.querySelector('input'); if(inp) inp.checked = true; } });
     buildDiagnostic();
     if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
       var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
       questions.forEach(function(q){
         var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
         if(q.type==='text'||q.type==='textarea'){ var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} }
-        else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o=document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
+        else { (Array.isArray(val)?val:[val]).forEach(function(v){ var o = document.querySelector('.q-option[data-field="' + fid + '"][data-val="' + v + '"]'); if(o) o.classList.add('selected'); }); }
       });
     });
     state.selectedFiles = []; renderFiles(); goStep(1); toast("📋 Pré-demande chargée.", "ok");
@@ -557,12 +529,9 @@ function reprendreBrouillon(edeal) {
 
 function envoyerDemande() {
   var fData = collectFormData(); fData.isBrouillon = false;
-  var btn = document.getElementById('btn-send'); btn.disabled = true;
-  toast("⏳ Envoi définitif au BE...", "ok");
+  document.getElementById('loading-overlay').style.display = 'flex'; // Active la barre de chargement lors du dépôt final au BE
   
-  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
   var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
-  
   genererPDFBase64(fData).then(function(pdfBase64) {
     var promises = localFiles.map(function(file) {
       return new Promise(function(resolve) {
@@ -571,11 +540,11 @@ function envoyerDemande() {
     });
     Promise.all(promises).then(function(newFiles) {
       var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64);
-      serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
       newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
       fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res){
-        btn.disabled = false; if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); }
-      });
+        document.getElementById('loading-overlay').style.display = 'none';
+        if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); }
+      }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
     });
   });
 }
@@ -583,59 +552,13 @@ function envoyerDemande() {
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR');
-    var produits = (fData.produits||[]).join(', ');
-    var infos = fData.infos || {};
-    var diag  = fData.diagnostic || {};
-
-    function row(label, val) {
-      if (!val || val === '') return '';
-      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px">' +
-        '<div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div>' +
-        '<div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>';
-    }
-    function rowList(label, vals) {
-      if (!vals || !vals.length) return '';
-      return row(label, vals.join(', '));
-    }
-    function section(title, rows) {
-      if (!rows) return '';
-      return '<div style="margin-bottom:12px;page-break-inside:avoid">' +
-        '<div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div>' +
-        '<div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>';
-    }
-
-    var infoRows = '';
-    Object.keys(infos).forEach(function(lbl) {
-      var v = infos[lbl]; infoRows += Array.isArray(v) ? rowList(lbl, v) : row(lbl, v);
-    });
-
-    var sections = '';
-    sections += section('Informations générales',
-      row('N° EDEAL', fData.edeal) + row('Client', fData.client) +
-      row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) +
-      row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) +
-      infoRows +
-      row('Commentaire', fData.commentaire)
-    );
-    
-    Object.keys(diag).forEach(function(pid) {
-      var pd = diag[pid]; var rows = '';
-      var pFound = PRODUITS.find(function(p) { return p.id === pid; });
-      var labelProduit = pFound ? pFound.label : pid;
-      Object.keys(pd).forEach(function(label) {
-        var v = pd[label]; rows += Array.isArray(v) ? rowList(label, v) : row(label, v);
-      });
-      if (rows) sections += section(labelProduit, rows);
-    });
-
-    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-      '<style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}' +
-      '.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}' +
-      '.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body>' +
-      '<div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div>' +
-      '<div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' +
-      sections + '</body></html>';
-
+    var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
+    function row(label, val) { if (!val || val === '') return ''; return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>'; }
+    function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
+    var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
+    var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+    Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>' + sections + '</body></html>';
     resolve(btoa(unescape(encodeURIComponent(html))));
   });
 }
@@ -645,106 +568,27 @@ function formatShortDate(dateStr) {
   if (dateStr.indexOf('GMT') !== -1 || dateStr.indexOf('T') !== -1) {
     var d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
-      var day = ("0" + d.getDate()).slice(-2);
-      var month = ("0" + (d.getMonth() + 1)).slice(-2);
-      var hours = ("0" + d.getHours()).slice(-2);
-      var minutes = ("0" + d.getMinutes()).slice(-2);
-      return day + "/" + month + "/" + d.getFullYear() + " " + hours + ":" + minutes;
+      return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
     }
   }
-  var parts = dateStr.split(':');
-  if (parts.length >= 2) {
-    return parts[0] + ':' + parts[1].substring(0,2);
-  }
-  return dateStr;
+  var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr;
 }
-
-function parseShortDateToTime(s) {
-  if(!s) return 0;
-  try {
-    var parts = s.split(' ');
-    var dParts = parts[0].split('/');
-    var tParts = parts[1] ? parts[1].split(':') : [0,0];
-    return new Date(dParts[2], dParts[1]-1, dParts[0], tParts[0], tParts[1]).getTime();
-  } catch(e) { return 0; }
-}
-
-// 🛠️ MOTEUR INTERNE COMMERCIAL : Commutateur de tri dynamique chronologique croissant/décroissant
-function toggleSortDate() {
-  state.sortAsc = !state.sortAsc;
-  document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent';
-  filtrer(state.currentFilter || 'tous');
-}
-
-function addFiles(files) { 
-  var maxSizeBytes = 15 * 1024 * 1024; var tailleActuelle = state.selectedFiles.reduce(function(acc, file) { return acc + file.size; }, 0);
-  for(var i=0; i<files.length; i++){ 
-    var f = files[i]; 
-    if (tailleActuelle + f.size > maxSizeBytes) {
-      alert("⚠️ Limite de 15 Mo dépassée !\n\nLa taille cumulée de vos pièces jointes dépasse le plafond de 15 Mo.\n\nPour vos fichiers lourds, veuillez créer un dossier au nom de l'affaire EDEAL directement dans le dossier \"transfert\" du serveur \"groupe\" et y déposer vos documents.");
-      return; 
-    }
-    if(!state.selectedFiles.find(function(x){return x.name===f.name})) { state.selectedFiles.push(f); tailleActuelle += f.size; }
-  } 
-  renderFiles(); 
-}
+function parseShortDateToTime(s) { try { var parts = s.split(' '); var dParts = parts[0].split('/'); var tParts = parts[1] ? parts[1].split(':') : [0,0]; return new Date(dParts[2], dParts[1]-1, dParts[0], tParts[0], tParts[1]).getTime(); } catch(e) { return 0; } }
+function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
 
 function renderFiles() {
   var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = '';
-  state.selectedFiles.forEach(function(f, i) {
-    var item = document.createElement('div'); item.className = 'file-item';
-    item.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>';
-    list.appendChild(item);
-  });
+  state.selectedFiles.forEach(function(f, i) { list.appendChild(document.createElement('div')).className = 'file-item'; list.lastChild.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>'; });
 }
+function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0;i<files.length;i++){ if(tot+files[i].size>max){ alert("⚠️ Limite de 15 Mo dépassée !\n\nUtilisez le dossier \"transfert\" du serveur \"groupe\"."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
 
-document.addEventListener('DOMContentLoaded', function() {
-  var dz = document.getElementById('dropzone');
-  if(dz) {
-    dz.addEventListener('dragover', function(e){e.preventDefault();});
-    dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);});
-  }
-});
-
-function showTab(tab) {
-  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('section-'+tab).classList.add('active'); document.getElementById('tab-'+tab).classList.add('active');
-  if (tab === 'suivi') chargerSuivi();
+function buildRecap() {
+  var edeal = document.getElementById('f-edeal').value.trim(); var recapObj = document.getElementById('recap-obj'); if (recapObj) recapObj.textContent = edeal;
+  var produitLabels = state.selectedProduits.map(function(pid) { var pFound = PRODUITS.find(function(p){ return p.id===pid; }); return pFound ? pFound.label : pid; }).join(', ');
+  document.getElementById('recap-content').innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div><div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div><div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div><div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div><div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div></div>';
 }
-
-function chargerSuivi() {
-  var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9">Chargement...</td></tr>';
-  fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){ return r.json(); }).then(function(res) {
-    var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
-    state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
-    filtrer(state.currentFilter || 'tous');
-  });
-}
-
-function filtrer(statut) { 
-  state.currentFilter = statut;
-  var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); 
-  
-  // Application sécurisée du tri chronologique demandé
-  list.sort(function(a, b) {
-    var timeA = parseShortDateToTime(formatShortDate(a.date));
-    var timeB = parseShortDateToTime(formatShortDate(b.date));
-    return state.sortAsc ? timeA - timeB : timeB - timeA;
-  });
-  
-  renderSuivi(list); 
-}
-
-function renderSuivi(demandes) {
-  var body = document.getElementById('suivi-body'); if (!body) return;
-  if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande</td></tr>'; return; }
-  body.innerHTML = demandes.map(function(d) {
-    var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—';
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + (d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':'b-done')) + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
-  }).join('');
-}
-function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show '+(type||''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
+function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { var timeA = parseShortDateToTime(formatShortDate(a.date)); var timeB = parseShortDateToTime(formatShortDate(b.date)); return state.sortAsc ? timeA - timeB : timeB - timeA; }); renderSuivi(list); }
+function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); }); document.getElementById('section-'+tab).classList.add('active'); document.getElementById('tab-'+tab).classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
 </script>
 </body>
 </html>
