@@ -34,6 +34,13 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
+
+/* 🛠️ FIX TEXTE DOCUMENTATION COQUILLE ALLIGNEMENT */
+.step strong{display:block;font-size:12px;color:var(--dark)}
+.step span{font-size:11px;color:var(--text-light)}
+
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
 .wz{flex:1;padding:10px 6px;text-align:center;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-light);background:var(--bg);border-right:1.5px solid var(--border)}
 .wz:last-child{border-right:none}
@@ -59,6 +66,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .q-options{display:flex;flex-direction:column;gap:5px}
 .q-option{display:flex;align-items:center;gap:9px;padding:7px 11px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text);user-select:none;transition:var(--tr)}
 
+/* 🛠️ FIX VISUEL DES COCHES VECTORIELLES : Plus aucune coche sombre fantôme à l'état brut */
 .opt-dot,.opt-sq{width:15px;height:15px;border:2px solid var(--border);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:var(--tr)}
 .opt-dot{border-radius:50%} .opt-sq{border-radius:3px}
 .q-option.selected{border-color:var(--green)!important;background:rgba(42,125,82,0.06)!important;color:var(--green)!important;font-weight:700}
@@ -99,9 +107,6 @@ tbody tr:hover{background:var(--bg)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-left:4px solid var(--green)}
 .toast.err{border-left:4px solid var(--red)}
-.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
-.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer}
-.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:10px;margin:2px}
 .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
 .login-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:360px;box-shadow:var(--shadow-lg);text-align:center}
 .login-logo{font-size:22px;font-weight:900;color:var(--blue);margin-bottom:4px}
@@ -249,6 +254,7 @@ tbody tr:hover{background:var(--bg)}
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
+// ── 🛠️ ALIGNEMENT DE L'URL OFFICIELLE PROVOST DIRECTEMENT INTÉGRÉE ──
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous', rebuildDiagnosticRequired: true };
@@ -310,7 +316,7 @@ function buildInfosGeneralesDynamic() {
 
 function goStep(n) { document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active'); ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); }); if(n===4) buildRecap(); }
 
-// ── 🛠️ FIX RECONSTRUCTION DESTRUCTIVE : Ne vide plus l'étape 2 si les données viennent d'être chargées par un brouillon
+// ── 🛠️ FIX RECONSTRUCTION DESTRUCTIVE : Empêche l'étape 2 d'écraser les données restaurées par un brouillon
 function goStep2() {
   if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; }
   if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; }
@@ -371,18 +377,15 @@ function sauvegarderBrouillon() {
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
-// ── 🛠️ REPRISE 100% FIABILISÉE EN POST : Résout le bouton "Reprendre" inerte et pré-remplit l'étape 2 sans crash
+// ── 🛠️ REPRISE 100% SÉCURISÉE EN POST : Résout le bouton "Reprendre" et injecte les diagnostics sans crash de caractères spéciaux
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  
-  var fd = new FormData();
-  fd.append('action', 'getDemande');
-  fd.append('edeal', edeal);
+  var fd = new FormData(); fd.append('action', 'getDemande'); fd.append('edeal', edeal);
   
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r) { return r.json(); })
   .then(function(res) {
-    if(!res.success || !res.formData) { toast("⚠️ Impossible de lire les données du brouillon.", "err"); return; }
+    if(!res.success || !res.formData) { toast("⚠️ Erreur lors de la lecture du brouillon.", "err"); return; }
     var fd = res.formData; state.loadedDraft = fd;
     
     document.getElementById('f-edeal').value = fd.edeal || '';
@@ -417,11 +420,9 @@ function reprendreBrouillon(edeal) {
     state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {});
     state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
     
-    // 1. On injecte les conteneurs HTML de la page 2
     buildDiagnostic(); 
-    state.rebuildDiagnosticRequired = false; // 2. Verrou de sécurité : Interdiction à goStep2 de tout effacer
+    state.rebuildDiagnosticRequired = false; // Verrou de sécurité
     
-    // 3. Remplissage minutieux à l'abri des caractères spéciaux
     if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
       var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
       questions.forEach(function(q){
@@ -438,13 +439,8 @@ function reprendreBrouillon(edeal) {
       });
     });
     
-    state.selectedFiles = []; renderFiles(); 
-    showTab('demande'); // On change d'onglet
-    goStep(1); // On force le retour à l'étape 1 visuelle
-    toast("📋 Pré-demande chargée avec succès.", "ok");
-  }).catch(function(err) {
-    alert("Erreur critique lors de la reprise du brouillon : " + err.message);
-  });
+    state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+  }).catch(function(err) { alert("Erreur lors du traitement : " + err.message); });
 }
 
 function envoyerDemande() {
@@ -464,7 +460,7 @@ function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles
 function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
 function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
 
-// ── 🛠️ SUIVI EN POST ENTIÈREMENT SÉCURISÉ : Plus aucun risque d'interception ou de déconnexion multi-compte
+// ── 🛠️ SUIVI EN POST : Évite définitivement les interceptions et déconnexions multi-comptes Google
 function chargerSuivi() {
   var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
   var fd = new FormData(); fd.append('action', 'getSuivi');
@@ -486,7 +482,6 @@ function genererPDFBase64(fData) {
     var tagEnd = '</bo' + 'dy></ht' + 'ml>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
 }
-function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
 </script>
 </body>
 </html>
