@@ -86,7 +86,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.3-PJSafety</span></h1></div>
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.5-PurgeManual</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -117,7 +117,11 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <section class="section" id="section-suivi">
   <div class="card">
     <div class="card-title">Gestion des demandes</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;"><button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button><input id="filter-input" placeholder="Filtrer..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap;">
+      <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
+      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 15 jours</button>
+      <input id="filter-input" placeholder="Filtrer..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="filtrer(this.value)">
+    </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
@@ -275,7 +279,6 @@ function renderQuestions() {
   });
 }
 function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',radio:'Unique',checkbox:'Multiple'}[t]||t; }
-// ... suite et fin du fichier admin.html inchangé d'origine ...
 function openAddModal() {
   editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter';
   document.getElementById('m-label').value=''; document.getElementById('m-type').value='text';
@@ -343,6 +346,26 @@ function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
+}
+
+// ── ACTION DE LA PURGE MANUELLE VIA LE BOUTON ADMIN ──
+function declencherPurgeManuelle() {
+  if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return;
+  var fd = new FormData();
+  fd.append('action', 'lancerPurgeManuelle');
+  toast("⏳ Exécution de la purge...", "ok");
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if (res.success) {
+      alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message);
+      chargerSuivi();
+    } else {
+      toast("Erreur lors de la purge", "err");
+    }
+  })
+  .catch(function(){ toast("Erreur de connexion réseau", "err"); });
 }
 
 function ouvrirDemande(edeal) {
