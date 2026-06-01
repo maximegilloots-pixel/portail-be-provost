@@ -3,70 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Console Admin BE — Provost</title>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<title>Admin BE — Provost</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-mid:#3a5ca8;
-  --blue-light:rgba(45,75,140,0.08);--blue-lighter:rgba(45,75,140,0.04);
-  --yellow:#fab423;--yellow-bg:rgba(250,180,35,0.13);
-  --dark:#1e2638;--text:#3a4255;--text-light:#8a93a8;
-  --border:#e4e8f0;--white:#fff;--bg:#f5f7fb;
-  --green:#2a7d52;--green-bg:rgba(42,125,82,0.09);
-  --red:#c0392b;--red-bg:rgba(192,57,43,0.09);
-  --radius:12px;--radius-sm:8px;
-  --shadow:0 4px 20px rgba(35,45,70,0.06);
-  --shadow-lg:0 12px 40px rgba(35,45,70,0.12);
-  --tr:all 0.25s ease;
-}
-body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding:20px;min-height:100vh}
-.admin-header{max-width:1200px;margin:0 auto 20px;display:flex;align-items:center;justify-content:between;border-bottom:2px solid var(--border);padding-bottom:15px}
-.admin-layout{display:grid;grid-template-columns:280px 1fr;gap:24px;max-width:1200px;margin:0 auto}
-.sidebar{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);height:fit-content}
-.nav-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:12px;padding-left:8px}
-.nav-btn{width:100%;padding:11px 14px;background:transparent;border:none;border-radius:var(--radius-sm);text-align:left;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:var(--tr);margin-bottom:4px;display:flex;align-items:center;justify-content:between}
-.nav-btn:hover{background:var(--blue-light);color:var(--blue)}
-.nav-btn.active{background:var(--blue);color:var(--white);box-shadow:0 4px 12px rgba(45,75,140,0.2)}
-.main-content{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
-.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:12px}
-.q-admin-list{display:flex;flex-direction:column;gap:12px}
-.q-admin-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;background:var(--bg);transition:var(--tr);display:flex;align-items:center;justify-content:space-between;gap:16px}
-.q-admin-card:hover{border-color:var(--blue-mid);background:var(--white);box-shadow:var(--shadow)}
-.q-info-block{flex:1}
-.q-admin-label{font-weight:700;color:var(--dark);font-size:14px;margin-bottom:4px}
-.q-admin-meta{display:flex;gap:12px;align-items:center}
-.q-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:var(--blue-light);color:var(--blue)}
-.q-has-img{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;background:var(--yellow-bg);color:#7a5500}
-.action-cluster{display:flex;gap:6px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:var(--tr)}
-.btn-primary{background:var(--blue);color:var(--white)}
-.btn-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(45,75,140,.25)}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
-.btn-danger{background:transparent;border:1px solid var(--border);color:var(--red)}
-.btn-danger:hover{background:var(--red-bg);border-color:var(--red)}
-.btn-sm{padding:6px 12px;font-size:11px;border-radius:40px}
-.modal-overlay{position:fixed;inset:0;background:rgba(30,38,56,0.5);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999}
-.modal-overlay.active{display:flex}
-.modal-card{background:var(--white);border-radius:var(--radius);padding:24px;width:500px;box-shadow:var(--shadow-lg);position:relative;animation:pop .25s ease-out}
-@keyframes pop{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-.modal-title{font-size:16px;font-weight:900;color:var(--dark);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px}
-.frow{margin-bottom:14px}
-.flabel{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
-.finput,.fselect,.ftextarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);outline:none;transition:var(--tr)}
-.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.1)}
+:root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;padding:20px}
+.admin-header{background:var(--blue);color:#fff;padding:18px 24px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.admin-header h1{font-size:18px;font-weight:900;letter-spacing:-0.5px}
+.tabs{display:flex;gap:3px;background:var(--white);border:1.5px solid var(--border);border-radius:40px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 16px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;background:transparent;transition:var(--tr)}
+.tab.active{background:var(--blue);color:#fff}
+.section{display:none}.section.active{display:block}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:700;color:var(--dark);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:'';width:3px;height:12px;background:var(--yellow);border-radius:2px}
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-item{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:grab}
+.q-item-body{flex:1}
+.q-item-label{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.q-item-type{font-size:10px;color:var(--text-light);background:var(--border);padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.q-item-actions{display:flex;gap:5px;flex-shrink:0}
+.btn-icon{width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.btn-icon:hover{border-color:var(--blue);color:var(--blue)}
+.btn-icon.del:hover{border-color:var(--red);color:var(--red)}
+.modal-bg{position:fixed;inset:0;background:rgba(35,45,70,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:12px;padding:24px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(35,45,70,.2)}
+.modal-title{font-size:15px;font-weight:900;color:var(--dark);margin-bottom:18px}
+.frow{margin-bottom:12px}
+.flabel{display:block;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.finput,.fselect,.ftextarea{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;color:var(--dark);outline:none;transition:var(--tr)}
 .ftextarea{min-height:70px;resize:vertical}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:11px 18px;border-radius:var(--radius);font-size:12px;font-weight:500;box-shadow:var(--shadow-lg);z-index:99999;display:flex;align-items:center;gap:9px;transform:translateY(70px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.opts-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.opt-row{display:flex;gap:6px;align-items:center}
+.opt-row input{flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;outline:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:40px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tr)}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-dark)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-green{background:var(--green);color:#fff}
+.btn-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.produit-tab{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.produit-btn{padding:5px 12px;border:1.5px solid var(--border);border-radius:40px;background:var(--white);font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
+.produit-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 20px rgba(35,45,70,.15);z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s ease}
 .toast.show{transform:translateY(0);opacity:1}
-.toast.ok{border-left:4px solid var(--green)}
-.toast.err{border-left:4px solid var(--red)}
-.login-screen{position:fixed;inset:0;background:linear-gradient(135deg, #1a2f5e 0%, #2d4b8c 100%);display:flex;align-items:center;justify-content:center;z-index:99999;flex-direction:column}
-.login-card{background:var(--white);border-radius:16px;padding:40px;width:400px;box-shadow:var(--shadow-lg);text-align:center;position:relative;overflow:hidden}
-.login-logo{font-size:26px;font-weight:900;color:var(--blue);margin-bottom:6px;letter-spacing:-0.5px}
-.login-sub{font-size:12px;color:var(--text-light);margin-bottom:30px;font-weight:500}
-.login-bar{width:100%;height:5px;background:var(--yellow);position:absolute;top:0;left:0}
-.app-wrap{display:none} .app-wrap.visible{display:block}
+.toast.ok{border-left:4px solid var(--green)}.toast.err{border-left:4px solid var(--red)}
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1.5px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead tr{background:var(--bg)}
+th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);border-bottom:1.5px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.td-edeal{font-weight:700;color:var(--blue);font-family:monospace}
+.st-select{padding:4px 8px;border:1.5px solid var(--border);border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;outline:none;background:#fff}
+.save-row{padding:5px 10px;border:none;background:var(--green);color:#fff;border-radius:20px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;cursor:pointer}
+.add-opt{padding:4px 12px;border:1.5px solid var(--border);background:var(--white);border-radius:20px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;cursor:pointer;margin-top:4px}
+.login-screen{position:fixed;inset:0;background:#f5f7fb;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:36px 40px;width:360px;box-shadow:0 8px 32px rgba(35,45,70,.14);text-align:center}
+.login-logo{font-size:20px;font-weight:900;color:var(--blue);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text-light);margin-bottom:24px}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.app-content{display:none}
+.app-content.visible{display:block}
+.github-status{font-size:10px;padding:3px 10px;border-radius:20px;display:inline-block;font-weight:700}
+.gh-ok{background:#d4edda;color:#1a5c36}
+.gh-err{background:#f8d7da;color:#721c24}
+.info-box{background:var(--blue-light);border:1.5px solid rgba(45,75,140,.15);border-radius:8px;padding:11px 14px;font-size:11px;color:var(--blue);margin-bottom:14px;line-height:1.5}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -74,319 +76,303 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 
 <div class="login-screen" id="login-screen">
   <div class="login-card">
-    <div class="login-bar"></div>
-    <div class="login-logo">PROVOST</div>
-    <div class="login-sub">Console d'Administration — Configuration Formulaires</div>
+    <div class="login-logo">⚙️ ADMIN BE</div>
+    <div class="login-sub">Portail Administration — Provost <span style="font-weight:bold; color:var(--red);">v5.1-MasterFormsUI</span></div>
     <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
-    <div style="display: flex; justify-content: center;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
-    <div id="login-err" style="color:var(--red); font-size:12px; margin-top:10px; display:none"></div>
+    <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
+    <div class="login-err" id="login-err"></div>
   </div>
 </div>
 
-<div class="app-wrap" id="app-wrap">
-  <header class="admin-header">
-    <div>
-      <h1 style="font-size:20px; font-weight:900; color:var(--dark); letter-spacing:-0.5px;">PROVOST — Console Formulaires</h1>
-      <p style="font-size:12px; color:var(--text-light)">Configurez en temps réel les questions et schémas du portail commercial</p>
-    </div>
-    <button class="btn btn-primary" onclick="sauvegarderConfigurationGlobale()">💾 Enregistrer sur Google Sheets</button>
-  </header>
-
-  <div class="admin-layout">
-    <aside class="sidebar">
-      <div class="nav-title">Sections Générales</div>
-      <button class="nav-btn active" data-sec="infos_generales" onclick="switchSection('infos_generales')">📋 Infos générales</button>
-      <div class="nav-title" style="margin-top:15px;">Diagnostics Produits</div>
-      <button class="nav-btn" data-sec="proplus_lp3" onclick="switchSection('proplus_lp3')">📦 Proplus LP3</button>
-      <button class="nav-btn" data-sec="proplus_lp3_2n" onclick="switchSection('proplus_lp3_2n')">🏢 Proplus LP3 - 2 Niv.</button>
-      <button class="nav-btn" data-sec="install_ext" onclick="switchSection('install_ext')">🌤️ Installation Ext.</button>
-    </aside>
-
-    <main class="main-content">
-      <div class="section-head">
-        <h2 id="current-section-title" style="font-size:16px; font-weight:900; color:var(--dark); text-transform:uppercase; letter-spacing:0.5px;">Infos générales</h2>
-        <button class="btn btn-outline btn-sm" onclick="ouvrirModaleQuestion(null)">➕ Ajouter une question</button>
-      </div>
-      <div class="q-admin-list" id="q-admin-list"></div>
-    </main>
+<div class="app-content" id="app-content">
+<div class="admin-header">
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v5.1-MasterFormsUI</span></h1></div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="github-status gh-ok" id="gh-status">GitHub : Connecté</span>
   </div>
 </div>
 
-<!-- 🛠️ WINDOW MODAL : Éditeur de question complet conforme Google Form -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-title" id="modal-title-text">Nouvelle Question</div>
-    <input type="hidden" id="m-index">
+<nav class="tabs">
+  <button class="tab active" onclick="showTab('questions', event)">Éditeur de questions</button>
+  <button class="tab" onclick="showTab('suivi', event)">Suivi & Attributions</button>
+  <button class="tab" onclick="showTab('parametres', event)">Paramètres</button>
+</nav>
+
+<section class="section active" id="section-questions">
+  <div class="card">
+    <div class="card-title">Formulaire à modifier</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+      <div class="produit-tab" id="produit-tabs-container"></div>
+      <button class="btn btn-outline btn-sm" style="border-color:var(--blue); color:var(--blue)" onclick="ajouterNouveauProduit()">+ Nouvelle section / produit</button>
+    </div>
+    <div class="q-list" id="q-list-container"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="openAddModal()">+ Ajouter une question</button>
+      <button class="btn btn-green" onclick="sauvegarder()">💾 Publier sur le portail</button>
+      <button class="btn btn-outline" onclick="exporter()">⬇️ Backup JSON</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-suivi">
+  <div class="card">
+    <div class="card-title">Gestion des demandes</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
+      <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
+      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 30 jours</button>
+      <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+        <option value="">Tous les techniciens</option>
+      </select>
+      <select id="status-filter" class="fselect" style="width:140px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+        <option value="">Tous les statuts</option>
+      </select>
+      <select id="commercial-filter" class="fselect" style="width:160px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+        <option value="">Tous les commerciaux</option>
+      </select>
+      <input id="filter-input" placeholder="Recherche par N° EDEAL ou Client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="appliquerFiltres()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
+        <tbody id="admin-suivi-body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="section-parametres">
+  <div class="card">
+    <div class="card-title">Configuration GitHub</div>
+    <div class="frow"><label class="flabel">Utilisateur GitHub</label><input class="finput" id="gh-user"></div>
+    <div class="frow"><label class="flabel">Repository</label><input class="finput" id="gh-repo"></div>
+    <div class="frow"><label class="flabel">Token PAT</label><input class="finput" type="password" id="gh-token"></div>
+    <hr class="divider">
+    <div class="card-title">Registre Métier Bureau d'Études</div>
     <div class="frow">
-      <label class="flabel">ID de la question (Unique, sans espace ni accent)</label>
-      <input type="text" id="m-id" class="finput" placeholder="ex: hauteur_sous_poutre">
+      <label class="flabel">Techniciens BE Habilités et Emails (Format : Nom;adresse@provost.fr — un par ligne)</label>
+      <textarea class="ftextarea" id="tech-list-config" placeholder="Exemple :&#10;Jean Dupont;jdupont@provost.fr"></textarea>
     </div>
     <div class="frow">
-      <label class="flabel">Intitulé de la question (Label visible)</label>
-      <input type="text" id="m-label" class="finput" placeholder="ex: Quelle est la hauteur disponible (mm) ?">
+      <label class="flabel">Corps du mail de transmission par défaut</label>
+      <textarea class="ftextarea" id="mail-body-config" style="min-height: 110px;" placeholder="Message e-mail automatique..."></textarea>
     </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="sauvegarderConfig()">💾 Sauvegarder les configurations</button></div>
+  </div>
+</section>
+</div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Éditer question</div>
+    <div class="frow"><label class="flabel">Libellé</label><input class="finput" id="m-label"></div>
     <div class="frow">
-      <label class="flabel">Typologie de réponse (Type Google Form)</label>
-      <!-- 🆕 INTEGRATION DES TYPOLOGIES COMPLÈTES GOOGLE FORMS -->
-      <select id="m-type" class="fselect" onchange="toggleOptionsSection()">
-        <option value="text">Texte court (Réponse courte)</option>
-        <option value="textarea">Zone texte (Paragraphe)</option>
-        <option value="dropdown">Choix dans une liste (Menu déroulant) 🆕</option>
-        <option value="scale">Échelle linéaire de 1 à 5 (Évaluation) 🆕</option>
-        <option value="radio">Choix unique (Bouton radio)</option>
-        <option value="checkbox">Choix multiples (Cases à cocher)</option>
+      <label class="flabel">Type de réponse (Format Google Forms)</label>
+      <!-- 🆕 INTÉGRATION SÉCURISÉE DES TYPOLOGIES COMPLÈTES DROPDOWN ET SCALE -->
+      <select class="fselect" id="m-type" onchange="toggleOptsSection()">
+        <option value="text">Texte</option>
+        <option value="textarea">Zone texte</option>
+        <option value="dropdown">Menu déroulant 🆕</option>
+        <option value="scale">Échelle linéaire (1-5) 🆕</option>
+        <option value="radio">Choix unique</option>
+        <option value="checkbox">Choix multiple</option>
       </select>
     </div>
-    <div class="frow" id="m-opts-row" style="display:none;">
-      <label class="flabel">Options de réponse (Une option par ligne)</label>
-      <textarea id="m-options" class="ftextarea" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
-    </div>
-    <div class="frow">
-      <label class="flabel">URL de l'image illustrative (Schéma technique du BE / Facultatif)</label>
-      <input type="text" id="m-image" class="finput" placeholder="https://url-de-mon-image.png">
-    </div>
-    <div class="frow" id="m-holder-row">
-      <label class="flabel">Placeholder (Texte indicatif en arrière-plan / Facultatif)</label>
-      <input type="text" id="m-placeholder" class="finput" placeholder="ex: Saisir une valeur...">
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
-      <button class="btn btn-outline" onclick="fermerModale()">Annuler</button>
-      <button class="btn btn-primary" onclick="sauvegarderQuestionFormulaire()">Valider la question</button>
-    </div>
+    <div id="m-opts-section"><label class="flabel">Options</label><div class="opts-list" id="m-opts-list"></div><button class="add-opt" onclick="addOpt()">+ Option</button></div>
+    <div class="frow"><label class="flabel">Illustration Image (Optionnelle)</label><input type="file" id="m-image-file" accept="image/*" class="finput" onchange="handleImageUpload(this)"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
+    <div class="frow"><label class="flabel">Aide / Placeholder</label><input class="finput" id="m-hint"></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="saveModal()">Enregistrer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>
   </div>
 </div>
 
+<div class="modal-bg" id="detail-modal">
+  <div class="modal" style="width:680px; max-height:85vh">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin-bottom:0">Demande <span id="detail-edeal" style="color:var(--blue)"></span></div>
+      <button onclick="document.getElementById('detail-modal').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-light)">×</button>
+    </div>
+    <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
+  </div>
+</div>
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
-var currentSection = 'infos_generales';
-var configDatabase = { infos_generales: [], proplus_lp3: [], proplus_lp3_2n: [], install_ext: [] };
+var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "", lastOpenedDemande = null;
+var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été attribuée...";
 
-function jwtDecode(token) { try { var b64Url = token.split('.')[1]; var b64 = b64Url.replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(window.atob(b64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''))); } catch (e) { return {}; } }
+function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var map = {}; raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } }); return map; }
+function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
+function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
+function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('admin_auth', '1'); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerPermanente(); } else { alert("Email @provost.fr requis."); } }
+function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
+function sauvegarderConfig() { localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); }
+function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); if(el) { el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; } }
 
-window.addEventListener('DOMContentLoaded', function() {
-  if (sessionStorage.getItem('portail_admin_auth') === '1') {
-    activerConsoleAdmin();
-  }
-});
+var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
+function initChampsProduits() { if (!formData.liste_produits) { formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; } else { formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); } if (!formData.infos_generales || !formData.infos_generales.length) { formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); } if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) { formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); } }
+function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
+function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
+function chargerDepuisGitHub() { var gh = getGHConfig(); majStatusGH(); if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; } fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); }
+function sauvegarder() { var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){ fetch(apiUrl, { method: 'PUT', headers: {'Authorization':'token '+gh.token}, body: JSON.stringify({ message: 'Mise a jour', content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), sha: info.sha||'' }) }).then(function(){ toast('✓ Publié !', 'ok'); }); }); }
 
-function handleCredentialResponse(response) {
-  var payload = jwtDecode(response.credential);
-  if (payload.email && payload.email.endsWith('@provost.fr')) {
-    sessionStorage.setItem('portail_admin_auth', '1');
-    activerConsoleAdmin();
-  } else {
-    var errEl = document.getElementById('login-err');
-    errEl.textContent = "Accès refusé. Utilisez votre compte pro @provost.fr";
-    errEl.style.display = 'block';
-  }
+function renderQuestions() {
+  var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
+  if (currentProduit === 'infos_generales') { var lockedEl = document.createElement('div'); lockedEl.className = 'info-box'; lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires'; list.appendChild(lockedEl); }
+  if(!questions.length){ var emptyDiv = document.createElement('div'); emptyDiv.style.padding = '10px'; emptyDiv.style.fontStyle = 'italic'; emptyDiv.textContent = 'Aucune question complémentaire dynamic ajoutée'; list.appendChild(emptyDiv); return; }
+  questions.forEach(function(q, i) {
+    var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true; el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + q.label + ' ' + (q.image?'[🖼️ Image]':'') + '</div><span class="q-item-type">' + typeLbl(q.type) + '</span></div>' + '<div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(' + i + ')">✏️</button><button class="btn-icon del" onclick="deleteQuestion(' + i + ')">🗑️</button></div>';
+    el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; }); el.addEventListener('dragend', function(){ el.style.opacity='1'; }); el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; }); el.addEventListener('dragleave', function(){ el.style.background=''; });
+    el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background=''; var from=parseInt(e.dataTransfer.getData('text')),to=i; if(from===to) return; var arr=formData[currentProduit],item=arr.splice(from,1)[0]; arr.splice(to,0,item); renderQuestions(); }); list.appendChild(el);
+  });
 }
 
-function activerConsoleAdmin() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-wrap').classList.add('visible');
-  chargerConfigurationDepuisSheets();
+// ── 🆕 LIBELLÉS ÉCHELLE ET DROPDOWN POUR L'ÉDITEUR LOCAL ──
+function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',dropdown:'Menu déroulant',scale:'Échelle 1-5',radio:'Unique',checkbox:'Multiple'}[t]||t; }
+
+function openAddModal() { editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter'; document.getElementById('m-label').value=''; document.getElementById('m-type').value='text'; document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML=''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open'); }
+function editQuestion(i) { editingIndex=i; var q=formData[currentProduit][i]; tempImageUrl=q.image||""; document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label; document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||''; document.getElementById('m-image-preview').innerHTML=tempImageUrl?"✅ Image liée":""; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open'); }
+function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
+
+// ── 🆕 VISIBILITÉ DU BLOC D'OPTIONS POUR LE SÉLECTEUR MENU DÉROULANT ──
+function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox'||t==='dropdown')?'block':'none'; }
+
+function addOpt(v){ var r=document.createElement('div'); r.className='opt-row'; r.innerHTML='<input type="text" value="' + (v||'') + '">'; document.getElementById('m-opts-list').appendChild(r); }
+
+// ── 🛠️ CONVERTISSEUR IMAGES EN BASE64 POUR LES CONFIGURATIONS D'ILLUSTRATION BE ──
+function handleImageUpload(input) { if (input.files && input.files[0]) { var r = new FileReader(); r.onload = function(e) { tempImageUrl = e.target.result; document.getElementById('m-image-preview').innerHTML = "✅ Image chargée en mémoire locale"; }; r.readAsDataURL(input.files[0]); } }
+
+function saveModal() { var l=document.getElementById('m-label').value.trim(); var t=document.getElementById('m-type').value; var opts=[]; document.querySelectorAll('#m-opts-list input').forEach(function(inp){ if(inp.value.trim()) opts.push(inp.value.trim()); }); var q={id:'q_'+Date.now(), label:l, type:t}; if(opts.length) q.options=opts; if(document.getElementById('m-hint').value.trim()) q.placeholder=document.getElementById('m-hint').value.trim(); if(tempImageUrl) q.image=tempImageUrl; if(editingIndex>=0) formData[currentProduit][editingIndex]=q; else { if(!formData[currentProduit])formData[currentProduit]=[]; formData[currentProduit].push(q); } renderQuestions(); closeModal(); }
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
+
+function showTab(tab, e) { document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')}); document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')}); document.getElementById('section-'+tab).classList.add('active'); if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); } if(tab==='suivi') chargerSuivi(); if(tab==='parametres') chargerPermanente(); }
+function chargerSuivi() { fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){return r.json();}).then(function(res){ allDemandes=res.demandes||[]; populateAdminFilters(allDemandes); appliquerFiltres(); }); }
+
+function populateAdminFilters(demandes) {
+  var selectTech = document.getElementById('tech-filter'); if(selectTech) { var currentTech = selectTech.value; selectTech.innerHTML = '<option value="">Tous les techniciens</option>'; getTechList().forEach(function(t) { var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt); }); }
+  var selectStatus = document.getElementById('status-filter'); if(selectStatus) { var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>'; ['En attente', 'Attribuée', "Manque d'infos"].forEach(function(s) { var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt); }); }
+  var selectComm = document.getElementById('commercial-filter'); if(selectComm) { var currentComm = selectComm.value; selectComm.innerHTML = '<option value="">Tous les commerciaux</option>'; var comms = []; demandes.forEach(function(d) { if(d.commercial && d.commercial.trim() !== '' && comms.indexOf(d.commercial.trim()) === -1) comms.push(d.commercial.trim()); }); comms.sort().forEach(function(c) { var opt = document.createElement('option'); opt.value = c; opt.textContent = c; if(c === currentComm) opt.selected = true; selectComm.appendChild(opt); }); }
 }
 
-function chargerConfigurationDepuisSheets() {
-  toast("⏳ Synchronisation de la configuration...", "ok");
-  fetch(APPS_SCRIPT_URL + '?action=getFormulaire&_=' + Date.now())
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if (res && res.success && res.formData) {
-      configDatabase = res.formData;
-      // Sécurité si un onglet est manquant dans l'objet de base
-      ['infos_generales', 'proplus_lp3', 'proplus_lp3_2n', 'install_ext'].forEach(function(k) {
-        if (!configDatabase[k]) configDatabase[k] = [];
-      });
-      renderListQuestions();
-      toast("⚙️ Configuration chargée avec succès.", "ok");
+function appliquerFiltres() {
+  var query = document.getElementById('filter-input').value.toLowerCase().trim(); var tech = document.getElementById('tech-filter').value.toLowerCase().trim(); var status = document.getElementById('status-filter').value.toLowerCase().trim(); var commercial = document.getElementById('commercial-filter').value.toLowerCase().trim();
+  var filtered = allDemandes.filter(function(d) {
+    var matchesQuery = query === "" || (d.edeal && d.edeal.toLowerCase().includes(query)) || (d.client && d.client.toLowerCase().includes(query));
+    var matchesTech = tech === "" || (d.attribueA && d.attribueA.toLowerCase().trim() === tech);
+    var matchesStatus = status === "" || (d.statut && d.statut.toLowerCase().trim() === status);
+    var matchesComm = commercial === "" || (d.commercial && d.commercial.toLowerCase().trim() === commercial);
+    return matchesQuery && matchesTech && matchesStatus && matchesComm;
+  });
+  renderSuivi(filtered);
+}
+
+function renderSuivi(demandes) {
+  var body=document.getElementById('admin-suivi-body'); var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
+  if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande correspondante</td></tr>'; return; }
+  var techs = getTechList();
+  body.innerHTML=filtrées.map(function(d,i){
+    var optsStatus = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
+    var optsTechs = ['','—'].concat(techs).map(function(t){ return '<option value="' + t + '" ' + (d.attribueA===t?'selected':'') + '>' + (t||'Non attribué') + '</option>'; }).join('');
+    
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
+      '<td><select class="st-select" id="st-' + i + '">' + optsStatus + '</select></td>' +
+      '<td><select class="st-select" style="width:120px;" id="ass-' + i + '">' + optsTechs + '</select></td>' +
+      '<td><input class="assign-input" style="width:140px;" id="com-' + i + '" value="' + d.commentaireBE + '"></td>' +
+      '<td><button class="save-row" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> ' +
+          '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button> ' +
+          '<button class="save-row" style="background:var(--yellow);color:var(--dark);margin-left:4px;font-weight:bold;" onclick="envoyerMailDossier(\'' + d.edeal + '\', ' + i + ')">✉️ Mail</button></td></tr>';
+  }).join('');
+}
+
+function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value})); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); }); }
+function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 30 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err"); } }).catch(function(err){ alert("Erreur : " + err.message); }); }
+function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} lastOpenedDemande = res; renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
+
+function envoyerMailDossier(edeal, index) {
+  var techSelect = document.getElementById('ass-' + index); var currentTech = techSelect ? techSelect.value.trim() : ''; var defaultEmail = '';
+  if (currentTech && currentTech !== '—' && currentTech !== '') { var map = getTechMap(); defaultEmail = map[currentTech] || ''; }
+  var email = prompt("✉️ OUTIL DE TRANSMISSION AUTOMATIQUE DU BE\n\nEntrez l'adresse email du technicien :", defaultEmail);
+  if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail invalide."); return; }
+  var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; toast("⏳ Transfert du mail...", "ok");
+  var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email, body: customBody}));
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Dossier technique envoyé !", "ok"); } else { alert("❌ Erreur : " + res.error); } }).catch(function(err){ alert("Erreur réseau : " + err.message); });
+}
+
+function renderDetail(res) {
+  var html=''; var fd=res.formData||{}; var infos=fd.infos||{}; var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
+  var infoRows = [detailRow('Client',fd.client),detailRow('Commercial',fd.commercial),detailRow('Département',fd.ville),detailRow('Date chantier',fd.dateChantier),detailRow('Profil produit(s)',(fd.produits||[]).join(', '))];
+  if (infos) { Object.keys(infos).forEach(function(label) { var v = infos[label]; infoRows.push(detailRow(label, Array.isArray(v) ? v.join(', ') : v)); }); }
+  infoRows.push(detailRow('Commentaire commercial', fd.commentaire)); html+=detailSection('Informations générales', infoRows.join(''));
+  var pm={proplus_lp3:'Proplus LP3',proplus_lp3_2n:'Proplus LP3 - 2N',install_ext:'Installation ext.'};
+  Object.keys(fd.diagnostic||{}).forEach(function(pid){var pd=fd.diagnostic[pid];var rows=Object.keys(pd).map(function(label){var v=pd[label]; return detailRow(label,Array.isArray(v)?v.join(', '):v);}).join('');if(rows) html+=detailSection(pm[pid]||pid,rows);});
+  
+  html+='<div style="margin-top:14px"><div class="card-title">Fichiers joints</div>';
+  
+  if(res.pdfBase64){
+    var cleanPdfB64 = String(res.pdfBase64).trim();
+    if (cleanPdfB64 === "SUPPRIME_30J" || cleanPdfB64 === "") {
+      html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">' +
+        '❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> ' +
+        '<span style="color:var(--red); font-weight:700; font-size:11px;">(Supprimé car > 30 jours)</span>' +
+        '<button class="save-row" style="background:var(--blue); padding:4px 10px; margin-left:10px;" onclick="actionRegenererPDF(\'' + res.edeal + '\')">🔄 Regénérer le PDF (Reset 30j)</button>' +
+      '</div>';
     } else {
-      toast("⚠️ Base vide, initialisation d'un modèle vierge.", "ok");
+      html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>';
     }
-  }).catch(function(err) {
-    console.error(err);
-    toast("❌ Erreur de liaison réseau backend.", "err");
-  });
-}
-
-function switchSection(secId) {
-  currentSection = secId;
-  document.querySelectorAll('.sidebar .nav-btn').forEach(function(b) { b.classList.remove('active'); });
-  document.querySelector('.sidebar .nav-btn[data-sec="' + secId + '"]').classList.add('active');
-  
-  var titleMap = { infos_generales: "Infos générales", proplus_lp3: "Proplus LP3", proplus_lp3_2n: "Proplus LP3 - 2 Niveaux", install_ext: "Installation extérieure" };
-  document.getElementById('current-section-title').textContent = titleMap[secId] || secId;
-  renderListQuestions();
-}
-
-// ── 🛠️ ALIGNEMENT LIBELLÉS TYPOLOGIE GOOGLE FORMS ──
-function getLabelTypeForm(t) {
-  return {
-    text: '📝 Texte court',
-    textarea: '📄 Paragraphe',
-    dropdown: '🔽 Menu déroulant 🆕',
-    scale: '📊 Échelle linéaire (1-5) 🆕',
-    radio: '🔘 Choix unique',
-    checkbox: '☑️ Choix multiples'
-  }[t] || t;
-}
-
-function renderListQuestions() {
-  var listContainer = document.getElementById('q-admin-list');
-  if (!listContainer) return;
-  listContainer.innerHTML = '';
-  
-  var list = configDatabase[currentSection] || [];
-  if (!list.length) {
-    listContainer.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-light); font-style:italic;">Aucune question spécifique configurée pour cette section.</div>';
-    return;
   }
   
-  list.forEach(function(q, index) {
-    var card = document.createElement('div');
-    card.className = 'q-admin-card';
-    
-    var badgeImg = q.image ? '<span class="q-has-img">🖼️ Schéma lié</span>' : '';
-    
-    card.innerHTML = '<div class="q-info-block">' +
-      '<div class="q-admin-label">' + q.label + ' <span style="font-family:monospace; font-size:11px; color:var(--text-light); font-weight:normal;">[' + q.id + ']</span></div>' +
-      '<div class="q-admin-meta">' +
-        '<span class="q-badge">' + getLabelTypeForm(q.type) + '</span>' +
-        badgeImg +
-      '</div>' +
-    '</div>' +
-    '<div class="action-cluster">' +
-      '<button class="btn btn-outline btn-sm" onclick="trierPositionQuestion(' + index + ', -1)">▲</button>' +
-      '<button class="btn btn-outline btn-sm" onclick="trierPositionQuestion(' + index + ', 1)">▼</button>' +
-      '<button class="btn btn-outline btn-sm" style="color:var(--blue)" onclick="ouvrirModaleQuestion(' + index + ')">✏️ Modifier</button>' +
-      '<button class="btn btn-danger btn-sm" onclick="supprimerQuestionFormulaire(' + index + ')">🗑️</button>' +
-    '</div>';
-    
-    listContainer.appendChild(card);
-  });
-}
-
-function toggleOptionsSection() {
-  var t = document.getElementById('m-type').value;
-  var rowOpts = document.getElementById('m-opts-row');
-  var rowHolder = document.getElementById('m-holder-row');
-  
-  // Affiche le bloc d'options uniquement pour les types à choix multiples ou dropdown
-  if (t === 'radio' || t === 'checkbox' || t === 'dropdown') {
-    rowOpts.style.display = 'block';
-  } else {
-    rowOpts.style.display = 'none';
-  }
-  
-  // Cache le placeholder pour le type scale et les sélections graphiques
-  if (t === 'text' || t === 'textarea') {
-    rowHolder.style.display = 'block';
-  } else {
-    rowHolder.style.display = 'none';
-  }
-}
-
-function ouvrirModaleQuestion(index) {
-  document.getElementById('modal-overlay').classList.add('active');
-  if (index !== null) {
-    document.getElementById('modal-title-text').textContent = "Modifier la question";
-    var q = configDatabase[currentSection][index];
-    document.getElementById('m-index').value = index;
-    document.getElementById('m-id').value = q.id || '';
-    document.getElementById('m-label').value = q.label || '';
-    document.getElementById('m-type').value = q.type || 'text';
-    document.getElementById('m-options').value = (q.options || []).join('\n');
-    document.getElementById('m-image').value = q.image || '';
-    document.getElementById('m-placeholder').value = q.placeholder || '';
-  } else {
-    document.getElementById('modal-title-text').textContent = "Nouvelle Question";
-    document.getElementById('m-index').value = '';
-    document.getElementById('m-id').value = '';
-    document.getElementById('m-label').value = '';
-    document.getElementById('m-type').value = 'text';
-    document.getElementById('m-options').value = '';
-    document.getElementById('m-image').value = '';
-    document.getElementById('m-placeholder').value = '';
-  }
-  toggleOptionsSection();
-}
-
-function fermerModale() {
-  document.getElementById('modal-overlay').classList.remove('active');
-}
-
-function sauvegarderQuestionFormulaire() {
-  var idx = document.getElementById('m-index').value;
-  var qId = document.getElementById('m-id').value.trim().replace(/[^a-zA-Z0-9_]/g, '');
-  var qLabel = document.getElementById('m-label').value.trim();
-  var qType = document.getElementById('m-type').value;
-  var qImg = document.getElementById('m-image').value.trim();
-  var qHolder = document.getElementById('m-placeholder').value.trim();
-  
-  if (!qId || !qLabel) { alert("L'ID et l'Intitulé sont obligatoires."); return; }
-  
-  var rawOptions = document.getElementById('m-options').value.split('\n');
-  var cleanOptions = [];
-  rawOptions.forEach(function(o) { if(o.trim() !== "") cleanOptions.push(o.trim()); });
-  
-  var qObject = { id: qId, label: qLabel, type: qType };
-  if (cleanOptions.length && (qType === 'radio' || qType === 'checkbox' || qType === 'dropdown')) qObject.options = cleanOptions;
-  if (qImg) qObject.image = qImg;
-  if (qHolder && (qType === 'text' || qType === 'textarea')) qObject.placeholder = qHolder;
-  
-  if (idx !== "") {
-    configDatabase[currentSection][idx] = qObject;
-  } else {
-    configDatabase[currentSection].push(qObject);
-  }
-  
-  fermerModale();
-  renderListQuestions();
-  toast("✓ Question validée dans la console locale.", "ok");
-}
-
-function supprimerQuestionFormulaire(index) {
-  if (confirm("Supprimer cette question du formulaire local ?")) {
-    configDatabase[currentSection].splice(index, 1);
-    renderListQuestions();
-    toast("🗑️ Question supprimée de la console locale.", "ok");
-  }
-}
-
-function trierPositionQuestion(index, direction) {
-  var list = configDatabase[currentSection];
-  var target = index + direction;
-  if (target < 0 || target >= list.length) return;
-  var temp = list[index];
-  list[index] = list[target];
-  list[target] = temp;
-  renderListQuestions();
-}
-
-function sauvegarderConfigurationGlobale() {
-  toast("⏳ Écriture sur la base Google Sheets...", "ok");
-  
-  var fd = new FormData();
-  fd.append('action', 'sauvegarderFormulaire');
-  fd.append('data', JSON.stringify(configDatabase));
-  
-  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
-  .then(function(r) { return r.json(); })
-  .then(function(res) {
-    if (res && res.success) {
-      toast("🚀 Configuration synchronisée au BE avec succès !", "ok");
+  (res.fichiers||[]).forEach(function(f){
+    var cleanFileB64 = String(f.b64).trim();
+    if (cleanFileB64 === "SUPPRIME_30J" || cleanFileB64 === "") {
+      html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px;">❌ <s style="color:var(--text-light);">' + f.nom + '</s> <span style="color:var(--text-light); font-size:10px;">(PJ purgée définitivement)</span></div>';
     } else {
-      toast("❌ Rejet serveur lors de la sauvegarde.", "err");
+      html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>';
     }
-  }).catch(function(err) {
-    console.error(err);
-    toast("❌ Erreur de communication réseau.", "err");
   });
+  
+  var optStatut = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>'; }).join('');
+  var optTechs = ['','—'].concat(getTechList()).map(function(t){ return '<option value="' + t + '" ' + (currentSuivi.attribueA === t ? 'selected' : '') + '>' + (t||'Non attribué') + '</option>'; }).join('');
+  html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour du dossier</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div><div><label class="flabel">Technicien BE Référent</label><select class="fselect" id="det-attrib">' + optTechs + '</select></div></div>';
+  html+='<div><label class="flabel">Commentaire BE</label><input class="finput" id="det-comment" placeholder="Commentaire..." value="' + (currentSuivi.commentaireBE || '') + '"></div><div style="margin-top:10px"><button class="btn btn-primary" onclick="saveDetail(\'' + res.edeal + '\')">✓ Sauvegarder</button></div>';
+  document.getElementById('detail-body').innerHTML=html;
 }
 
-function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
+function actionRegenererPDF(edeal) {
+  if(!lastOpenedDemande || !lastOpenedDemande.formData) { alert("Défaut : Contenu JSON introuvable en BDD."); return; }
+  var fData = lastOpenedDemande.formData; var dateStr = new Date().toLocaleDateString('fr-FR');
+  var prodsList = formData.liste_produits || [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
+  var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
+  
+  function row(label, val) { if (!val || val === '') return ''; return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>'; }
+  function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
+  
+  var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
+  var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+  
+  Object.keys(diag).forEach(function(pid) {
+    var pd = diag[pid]; var rows = ''; var pFound = prodsList.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid;
+    Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); });
+    if (rows) sections += section(labelProduit, rows);
+  });
+  
+  var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+  var tagEnd = '</body></html>';
+  var pdfBase64 = btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd)));
+  
+  toast("⏳ Régénération du PDF et réinitialisation de la date...", "ok");
+  var fd = new FormData(); fd.append('action', 'regenererPDF'); fd.append('data', JSON.stringify({edeal: edeal, pdfBase64: pdfBase64}));
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✅ PDF restauré et horodatage relancé !", "ok"); document.getElementById('detail-modal').classList.remove('open'); chargerSuivi(); } else { alert("Erreur Google."); } }).catch(function(err){ alert("Erreur : " + err.message); });
+}
+
+function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
+function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
+function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr; }
+function telecharger(b64,nom,type){ if (!b64 || String(b64).trim() === "SUPPRIME_30J") { alert("⚠️ Fichier non disponible."); return; } try{ if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){ try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){} } var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);}); var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();}catch(err){alert('Erreur : '+err.message);} }
+function saveDetail(edeal){ var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value})); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok'); chargerSuivi(); document.getElementById('detail-modal').classList.remove('open'); }).catch(function(){toast('Erreur réseau','err');}); }
+function toast(msg,type){var el=document.getElementById('toast');if(!el)return;document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
+function chargerPermanente(){ chargerDepuisGitHub(); }
+function exporter(){ var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData, null, 2)); var downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "config_backup.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
+if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
 </script>
 </body>
 </html>
