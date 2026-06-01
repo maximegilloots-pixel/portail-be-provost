@@ -86,7 +86,8 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <div class="app-content" id="app-content">
 <div class="admin-header">
-  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.5-PurgeManual</span></h1></div>
+  <!-- INCREMENTATION DE VERSION VISIBLE -->
+  <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v2.6-DebugPurge</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
     <span class="github-status gh-pending" id="gh-status">GitHub : non configuré</span>
   </div>
@@ -279,33 +280,6 @@ function renderQuestions() {
   });
 }
 function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',radio:'Unique',checkbox:'Multiple'}[t]||t; }
-function openAddModal() {
-  editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter';
-  document.getElementById('m-label').value=''; document.getElementById('m-type').value='text';
-  document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML='';
-  document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open');
-}
-function editQuestion(i) {
-  editingIndex=i; var q=formData[currentProduit][i]; tempImageUrl=q.image||"";
-  document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label;
-  document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||'';
-  document.getElementById('m-image-preview').innerHTML=tempImageUrl?"✅ Image liée":"";
-  document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection();
-  (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open');
-}
-function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
-function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox')?'block':'none'; }
-function addOpt(v){ var r=document.createElement('div'); r.className='opt-row'; r.innerHTML=`<input type="text" value="${v||''}">`; document.getElementById('m-opts-list').appendChild(r); }
-function saveModal() {
-  var l=document.getElementById('m-label').value.trim(); var t=document.getElementById('m-type').value;
-  var opts=[]; document.querySelectorAll('#m-opts-list input').forEach(function(inp){ if(inp.value.trim()) opts.push(inp.value.trim()); });
-  var q={id:'q_'+Date.now(), label:l, type:t}; if(opts.length) q.options=opts;
-  if(document.getElementById('m-hint').value.trim()) q.placeholder=document.getElementById('m-hint').value.trim();
-  if(tempImageUrl) q.image=tempImageUrl;
-  if(editingIndex>=0) formData[currentProduit][editingIndex]=q; else { if(!formData[currentProduit])formData[currentProduit]=[]; formData[currentProduit].push(q); }
-  renderQuestions(); closeModal();
-}
-function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
 
 function showTab(tab, e) {
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
@@ -342,13 +316,15 @@ function renderSuivi(demandes) {
     </tr>`;
   }).join('');
 }
+
+/* 🛠️ FIX DE STRING CONCATENATION DANS SAVELINE */
 function saveLine(i,edeal) {
   var fd=new FormData(); fd.append('action','updateSuivi');
   fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value}));
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); });
 }
 
-// ── ACTION DE LA PURGE MANUELLE VIA LE BOUTON ADMIN ──
+// ── ACTION DE LA PURGE MANUELLE AVEC AFFICHAGE DYNAMIQUE DE L'ERREUR REELLE ──
 function declencherPurgeManuelle() {
   if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 15 jours stockés sur Google Sheets ?")) return;
   var fd = new FormData();
@@ -362,10 +338,11 @@ function declencherPurgeManuelle() {
       alert("✨ BILAN DE LA PURGE DES PIÈCES JOINTES :\n\n" + res.message);
       chargerSuivi();
     } else {
-      toast("Erreur lors de la purge", "err");
+      // 🛠️ FIX DEBUG : Affiche le vrai motif de l'erreur envoyé par le script Google
+      toast("Erreur : " + (res.error || "Action refusée par le serveur"), "err");
     }
   })
-  .catch(function(){ toast("Erreur de connexion réseau", "err"); });
+  .catch(function(err){ toast("Erreur réseau : " + err.message, "err"); });
 }
 
 function ouvrirDemande(edeal) {
@@ -393,7 +370,7 @@ function renderDetail(res) {
 }
 
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
-function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
+function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid #border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
 
 function telecharger(b64,nom,type){
   try{
@@ -411,7 +388,6 @@ function saveDetail(edeal){
   fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok');}).catch(function(){toast('Erreur réseau','err');});
 }
 
-function toast(msg,type){var el=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerDepuisGitHub);
 </script>
 </body>
