@@ -36,7 +36,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
 .steps{display:flex;flex-direction:column;gap:10px}
 .step{display:flex;gap:13px;padding:13px 15px;background:var(--bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
-.step-n{width:24px;height:24px;background:var(--blue);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0}
 .step strong{display:block;font-size:12px;color:var(--dark)}
 .step span{font-size:11px;color:var(--text-light)}
 .wizard{display:flex;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:18px}
@@ -84,10 +83,8 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:transparent;color:var(--
 .btn-primary{background:var(--blue);color:var(--white)}
 .btn-primary:hover{background:var(--blue-dark);box-shadow:0 4px 14px rgba(45,75,140,.28)}
 .btn-yellow{background:var(--yellow);color:var(--dark)}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
-.btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
-.btn-sm{padding:7px 14px;font-size:10px}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer}
+.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase}
 .b-wait{background:var(--yellow-bg);color:#7a5500}
 .b-draft{background:rgba(35,45,70,0.1);color:var(--dark)}
@@ -107,9 +104,6 @@ tbody tr:hover{background:var(--bg)}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.ok{border-left:4px solid var(--green)}
 .toast.err{border-left:4px solid var(--red)}
-.table-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
-.refresh-btn{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid var(--border);border-radius:40px;padding:5px 13px;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;color:var(--text-light);cursor:pointer}
-.tag{display:inline-block;background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:10px;margin:2px}
 .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
 .login-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:360px;box-shadow:var(--shadow-lg);text-align:center}
 .login-logo{font-size:22px;font-weight:900;color:var(--blue);margin-bottom:4px}
@@ -139,7 +133,7 @@ tbody tr:hover{background:var(--bg)}
   <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%">
     <div class="login-card">
       <div class="login-logo">PROVOST</div>
-      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v5.5-AbsoluteContextFix</span></div>
+      <div class="login-sub">Bureau d'Études — Portail Commercial <span style="font-weight:bold; color:var(--red);">v6.0-AntiCorsPostShield</span></div>
       <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
       <div style="display: flex; justify-content: center; margin-bottom: 16px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
       <div class="login-err" id="login-err"></div>
@@ -152,7 +146,7 @@ tbody tr:hover{background:var(--bg)}
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
   <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
-  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v5.5-AbsoluteContextFix</span>
+  <span style="margin-left:auto; align-self:center; font-size:11px; padding-right:15px; color:var(--text-light); font-weight:bold;">v6.0-AntiCorsPostShield</span>
 </nav>
 
 <section class="section active" id="section-comment">
@@ -257,31 +251,18 @@ tbody tr:hover{background:var(--bg)}
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
+// ⚠️ CONFIGURE TON PROPRE APPS_SCRIPT_URL DEPLOYE
 var APPS_SCRIPT_URL = 'https://script.google.com/a/macros/provost.fr/s/AKfycbzgO6wk3Jdu6XBDBCI6Fa5lBJItvQuhm_oM_bmY_XBt98n0DpZ1McWdCyxXwW96l_2k/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
 var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous' };
 
-function jwtDecode(token) {
-  try {
-    var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) { base64 += '='; }
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) { console.error("Erreur décodage jeton Google:", e); return {}; }
-}
-
+function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
 function setupCommercialField(name) { var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; } }
 
-// ── 🛠️ SECURISATION CONTEXTUELLE : Suppression complète de "this" au profit du pointeur direct "el"
 window.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.tabs [data-tab]').forEach(function(el) { el.addEventListener('click', function() { showTab(el.getAttribute('data-tab')); }); });
   var btnStart = document.getElementById('btn-doc-start'); if(btnStart) { btnStart.addEventListener('click', function() { showTab('demande'); }); }
-  document.querySelectorAll('#filter-btn-container [data-filter]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); });
-      el.classList.add('active-filter'); filtrer(el.getAttribute('data-filter'));
-    });
-  });
+  document.querySelectorAll('#filter-btn-container [data-filter]').forEach(function(el) { el.addEventListener('click', function() { document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); }); el.classList.add('active-filter'); filtrer(el.getAttribute('data-filter')); }); });
   var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
   var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(this.files); }); }
   if (sessionStorage.getItem('portail_auth') === '1') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); setupCommercialField(sessionStorage.getItem('user_name')); chargerConfigFormulaire(); }
@@ -296,7 +277,6 @@ var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives'
 function initFormulaire() { var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = ''; PRODUITS.forEach(function(p) { var el = document.createElement('div'); el.className = 'produit-cb'; el.setAttribute('data-id', p.id); el.innerHTML = '<div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>'; el.onclick = function() { toggleProduit(p.id); }; grid.appendChild(el); }); buildInfosGeneralesDynamic(); }
 function toggleProduit(id) { var c = document.querySelector('.produit-cb[data-id="' + id + '"]'); if(c) c.classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); }
 
-// ── 🛠️ ALIGNEMENT TECHNIQUE : Injection des inputs dans leur qDiv parent respectif
 function buildInfosGeneralesDynamic() {
   var container = document.getElementById('infos-generales-dynamic-container'); if(!container) return; container.innerHTML = '';
   var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
@@ -341,7 +321,7 @@ function buildDiagnostic() {
         (q.options||[]).forEach(function(o){
           var div=document.createElement('div'); div.className = 'q-option'; div.setAttribute('data-field', pid+'_'+q.id); div.setAttribute('data-val', o);
           div.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + o + '</span>';
-          div.onclick=function(){ if(q.type==='radio')document.querySelectorAll('.q-option[data-field="' + pid+'_'+q.id + '"]').forEach(function(x){x.classList.remove('selected')}); div.classList.toggle('selected'); };
+          div.onclick=function(){ if(q.type==='radio')document.querySelectorAll('.q-option[data-field="' + pid+'_'+q.id + '"]').forEach(function(x){x.classList.remove('selected')}); this.classList.toggle('selected'); };
           optsDiv.appendChild(div);
         });
         qDiv.appendChild(optsDiv);
@@ -367,9 +347,12 @@ function sauvegarderBrouillon() {
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
+// ── 🛠️ FIX REPRENDRE SECURE : Routeur converti en POST
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  fetch(APPS_SCRIPT_URL + '?action=getDemande&edeal=' + encodeURIComponent(edeal))
+  var fd = new FormData(); fd.append('action', 'getDemande'); fd.append('edeal', edeal);
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r){return r.json();}).then(function(res){
     if(!res.success || !res.formData) return; var fd = res.formData; state.loadedDraft = fd;
     document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || ''; document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || ''; document.getElementById('f-commentaire').value = fd.commentaire || '';
@@ -398,23 +381,25 @@ function envoyerDemande() {
   });
 }
 
-function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
-function renderFiles() { var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = ''; state.selectedFiles.forEach(function(f, i) { list.appendChild(document.createElement('div')).className = 'file-item'; list.lastChild.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>'; }); }
-function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
-function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
-function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); document.getElementById('section-'+tab).classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
-function chargerSuivi() { var sbody = document.getElementById('suivi-body'); if(!sbody) return; sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>'; fetch(APPS_SCRIPT_URL+'?action=getSuivi').then(function(r){ return r.json(); }).then(function(res) { if(res && res.success) { var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous'); } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; } }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU</td></tr>'; }); }
-
-function renderSuivi(demandes) { var body = document.getElementById('suivi-body'); if (!body) return; if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; return; } body.innerHTML = demandes.map(function(d) { var actionBtn = d.statut === 'Brouillon' ? '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>' : '—'; var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg')); return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>'; }).join(''); }
-
-// ── 🛠️ RESTAURATION CAPITALE DE LA FONCTION DE REINITIALISATION DU FORMULAIRE
-function resetForm() {
-  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); });
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); });
-  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1);
+// ── 🛠️ FIX CARROUSEL SUIVI SECURE : Chargement entièrement migré en POST pour tuer le bug CORS de redirection de compte de Google
+function chargerSuivi() {
+  var sbody = document.getElementById('suivi-body'); if(!sbody) return; 
+  sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
+  
+  var fd = new FormData(); fd.append('action', 'getSuivi');
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res) {
+    if(res && res.success) {
+      var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim();
+      state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; });
+      filtrer(state.currentFilter || 'tous');
+    } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; }
+  }).catch(function(err) { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU - INTERCEPTION PARRE-FEU</td></tr>'; });
 }
 
+function resetForm() { ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; renderFiles(); goStep(1); }
 function buildRecap() { var edeal = document.getElementById('f-edeal').value.trim(); var recapObj = document.getElementById('recap-obj'); if (recapObj) recapObj.textContent = edeal; var produitLabels = state.selectedProduits.map(function(pid) { var pFound = PRODUITS.find(function(p){ return p.id===pid; }); return pFound ? pFound.label : pid; }).join(', '); document.getElementById('recap-content').innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;"><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">N° EDEAL</div><div style="font-size:16px;font-weight:900;color:var(--blue)">'+edeal+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Client</div><div style="font-size:13px;font-weight:700;color:var(--dark)">'+document.getElementById('f-client').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Commercial</div><div style="font-size:13px;font-weight:600">'+document.getElementById('f-commercial').value+'</div></div><div><div style="font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Produit(s)</div><div style="font-size:13px;font-weight:600">'+produitLabels+'</div></div></div>'; }
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
