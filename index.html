@@ -23,7 +23,7 @@
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding:20px;min-height:100vh}
 .tabs{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:50px;padding:5px;margin-bottom:25px;width:fit-content;box-shadow:var(--shadow)}
 .tab{display:flex;align-items:center;gap:6px;padding:9px 22px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
-.tab.active{background:var(--blue);color(--white);box-shadow:0 4px 12px rgba(45,75,140,.2)}
+.tab.active{background:var(--blue);color:var(--white);box-shadow:0 4px 12px rgba(45,75,140,.2)}
 .tab:hover:not(.active){background:var(--blue-light);color:var(--blue)}
 .section{display:none}.section.active{display:block;animation:fadeUp .3s ease-out}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -178,11 +178,11 @@ tbody tr:hover{background:var(--blue-lighter)}
       <div class="step"><div class="step-n">2</div><div><strong>Validation BE</strong><span>Une fois envoyé définitivement, le BE prend en charge le dossier.</span></div></div>
     </div>
   </div>
+  <!-- ⚡ BOUTON NOUVELLE DEMANDE : NETTOIE TOUT LE CACHE DÉSORMAIS -->
   <button class="btn btn-primary" id="btn-doc-start">Créer une nouvelle demande</button>
 </section>
 
 <section class="section" id="section-demande">
-  <div class="s-label">Bureau d'Études</div><h2 class="s-title">Saisie de la demande</h2>
   <div class="wizard">
     <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
     <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
@@ -284,7 +284,16 @@ function setupCommercialField(name) { var comm = document.getElementById('f-comm
 
 window.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.tabs .tab').forEach(function(tabBtn) { tabBtn.addEventListener('click', function() { showTab(tabBtn.getAttribute('data-tab')); }); });
-  var btnStart = document.getElementById('btn-doc-start'); if(btnStart) { btnStart.addEventListener('click', function() { showTab('demande'); }); }
+  
+  // ⚡ AMÉLIORATION BRANCHEMENT BOUTON NOUVELLE DEMANDE (PURGE LE CACHE DIRECT)
+  var btnStart = document.getElementById('btn-doc-start'); 
+  if(btnStart) { 
+    btnStart.addEventListener('click', function() { 
+      resetForm(); 
+      showTab('demande'); 
+    }); 
+  }
+  
   document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(btnItem) { btnItem.addEventListener('click', function() { document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); }); btnItem.classList.add('active-filter'); filtrer(btnItem.getAttribute('data-filter')); }); });
   var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
   var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(fInput.files); }); }
@@ -391,9 +400,6 @@ var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'te
 var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
 
-function goStep(n) { document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active'); ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); }); if(n===4) buildRecap(); }
-function goStep2() { if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; } if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; } var container = document.getElementById('diagnostic-container'); if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) { buildDiagnostic(); state.rebuildDiagnosticRequired = false; } goStep(2); }
-
 function buildDiagnostic() {
   var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
@@ -470,7 +476,6 @@ function collectFormData() {
   return data;
 }
 
-// ── ⚡ FONCTION DE RENDU DU RÉCAPITULATIF ÉTAPE 4 RESTAURÉE ──
 function buildRecap() {
   var container = document.getElementById('recap-content'); var objEl = document.getElementById('recap-obj'); if (!container) return;
   var data = collectFormData(); if (objEl) objEl.textContent = data.edeal + " — " + data.client;
@@ -651,6 +656,49 @@ function renderFiles() {
   }); 
 }
 
+// ── 🔒 PURGE INTÉGRALE ET SÉCURISÉE DE TOUS LES CHAMPS CACHÉS OU DYNAMIQUES ──
+function resetForm() { 
+  // 1. Reset des champs statiques (Edeal, client, etc.) et retrait de la couleur verte
+  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ 
+    var el = document.getElementById(id); 
+    if(el) { el.value = ''; el.classList.remove('filled'); } 
+  }); 
+  
+  // 2. Scan et vidage complet de tous les éléments text, textarea ou dropdown issus de la config JSON
+  document.querySelectorAll('#infos-generales-dynamic-container input, #infos-generales-dynamic-container textarea, #infos-generales-dynamic-container select, #diagnostic-container input, #diagnostic-container textarea, #diagnostic-container select').forEach(function(el) {
+    el.value = '';
+    el.classList.remove('filled');
+  });
+
+  // 3. Désélection de toutes les options graphiques cochées
+  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); 
+  
+  // 4. Vidage et masquage complet des inputs libres ouverts par la case "Autre"
+  document.querySelectorAll('.opt-autre-txt').forEach(function(inp) {
+    inp.value = '';
+    inp.style.display = 'none';
+  });
+
+  // 5. Désélection des boutons des échelles linéaires (1-5)
+  document.querySelectorAll('.q-scale-item.selected').forEach(function(s){ s.classList.remove('selected'); });
+
+  // 6. Décochage des cases à cocher de sélection de produits principaux
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
+  
+  // 7. Remise à zéro de l'état global et forçage de reconstruction de l'étape 2
+  state.selectedFiles = []; 
+  state.selectedProduits = []; 
+  state.loadedDraft = null; 
+  state.rebuildDiagnosticRequired = true; 
+  
+  // 8. Suppression des bandeaux d'alerte, vidage du container d'étape 2 et retour étape 1
+  var warnCont = document.getElementById('be-comment-warning-container'); if(warnCont) warnCont.innerHTML = '';
+  var diagCont = document.getElementById('diagnostic-container'); if(diagCont) diagCont.innerHTML = '';
+  
+  renderFiles(); 
+  goStep(1); 
+}
+
 function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+(f.size||0);},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
 function filtrer(statut) { state.currentFilter = statut; var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); list.sort(function(a, b) { return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); }); renderSuivi(list); }
 function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
@@ -679,15 +727,6 @@ function renderSuivi(demandes) {
     var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg'));
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
   }).join('');
-}
-
-function resetForm() { 
-  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); 
-  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); 
-  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
-  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; 
-  var warnCont = document.getElementById('be-comment-warning-container'); if(warnCont) warnCont.innerHTML = '';
-  renderFiles(); goStep(1); 
 }
 
 function genererPDFBase64(fData) {
