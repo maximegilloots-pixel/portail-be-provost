@@ -743,6 +743,12 @@
       "id": "q_1780402656113",
       "label": "ezfez",
       "type": "textarea"
+    },
+    {
+      "id": "q_1780404412783",
+      "label": "xsxsz",
+      "type": "radio",
+      "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780404410235_Capture_d__cran_2026-02-16_143415.png"
     }
   ]
 }
