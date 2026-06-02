@@ -240,7 +240,7 @@ tbody tr:hover{background:var(--blue-lighter)}
   </div>
 </section>
 
-<section class="section" id="section-suivi">
+<nav class="tabs" style="display:none;"></nav> <section class="section" id="section-suivi">
   <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
   <div class="table-hd">
     <div style="display:flex;gap:6px;" id="filter-btn-container">
@@ -295,7 +295,6 @@ function initFormulaire() {
 }
 function toggleProduit(id) { var c = document.querySelector('.produit-cb[data-id="' + id + '"]'); if(c) c.classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); state.rebuildDiagnosticRequired = true; }
 
-// ── 🔒 COMPOSANT CENTRALISÉ DE RENDU POUR LES CHOIX AVEC OPTION "AUTRE" INTÉGRÉE (UNIFIE ÉTAPE 1 ET ÉTAPE 2) ──
 function createUniversalOptionRow(q, o, fid) {
   var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : String(o);
   var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
@@ -376,7 +375,7 @@ function buildInfosGeneralesDynamic() {
 }
 
 var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},{id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},{id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},{id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux...'},{id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},{id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},{id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Caillebotis','Plancher tôlé','Autre :']},{id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},{id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},{id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
-var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
+var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', label:'Type de sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
 
 function buildDiagnostic() {
@@ -414,6 +413,7 @@ function buildDiagnostic() {
           });
           scaleWrapper.appendChild(item);
         });
+        /* 🔒 FIX SÉCURITÉ REVIREMENT CRASH : Suppression de la duplication hors-boucle */
         qDiv.appendChild(scaleWrapper);
       } else {
         var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
