@@ -591,10 +591,23 @@ function chargerSuivi() {
 }
 
 function renderSuivi(demandes) {
-  var body = document.getElementById('suivi-body'); if (!body) return; if (!demandes.length) { body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; return; }
+  var body = document.getElementById('suivi-body'); 
+  if (!body) return; 
+  if (!demandes.length) { 
+    body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; 
+    return; 
+  }
+  
   body.innerHTML = demandes.map(function(d) {
-    var actionBtn = d.statut === 'Brouillon' ? '<div style="display:flex; gap:6px;"><button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button><button class="btn btn-sm btn-outline" style="border-color:var(--red); color:var(--red); padding:5px 12px;" onclick="supprimerBrouillon(\'' + d.edeal + '\')">🗑️ Supprimer</button></div>' : '—';
-    var bClass = d.statut==='Brouillon'?'b-draft':(d.statut==='En attente'?'b-wait':(d.statut==='Attribuée'?'b-attr':'b-urg'));
+    // 1. AJOUT DE LA CONDITION "Manque d'infos"
+    var isEditable = (d.statut === 'Brouillon' || d.statut === "Manque d'infos");
+    
+    // 2. UTILISATION DE LA NOUVELLE CONDITION POUR LES BOUTONS
+    var actionBtn = isEditable ? '<div style="display:flex; gap:6px;"><button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button><button class="btn btn-sm btn-outline" style="border-color:var(--red); color:var(--red); padding:5px 12px;" onclick="supprimerBrouillon(\'' + d.edeal + '\')">🗑️ Supprimer</button></div>' : '—';
+    
+    // Le reste ne change pas (attribution des couleurs des badges)
+    var bClass = d.statut === 'Brouillon' ? 'b-draft' : (d.statut === 'En attente' ? 'b-wait' : (d.statut === 'Attribuée' ? 'b-attr' : 'b-urg'));
+    
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
   }).join('');
 }
