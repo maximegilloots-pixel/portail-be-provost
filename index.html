@@ -116,6 +116,11 @@ tbody tr:hover{background:var(--blue-lighter)}
 .login-bar{width:100%;height:4px;background:var(--yellow);position:absolute;top:0;left:0}
 .app-content{display:none;max-width:1200px;margin:0 auto}
 .app-content.visible{display:block}
+.loading-overlay{position:fixed;inset:0;width:100vw;height:100vh;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
+.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
+.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
+@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
+.btn-filter.active-filter { background: var(--blue) !important; color: #fff !important; font-weight: 700; border-color: var(--blue) !important; }
 
 /* 🖼️ HIGH REFINEMENT FRAMEWORK & OPTION IMAGES */
 .q-img-wrapper { position: relative; margin: 10px 0; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--white); max-width: 100%; width: fit-content; display: block; }
@@ -381,53 +386,33 @@ var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implan
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
 
 function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container'); 
-  if(!container) return; 
-  container.innerHTML = '';
-  
+  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
   state.selectedProduits.forEach(function(pid) {
-    var prod = PRODUITS.find(function(p){ return p.id === pid; }); 
-    var questions = getQuestionsListForProduct(pid);
-    var block = document.createElement('div'); 
-    block.className = 'card'; 
-    block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod ? prod.label : pid) + '</div>';
-    
+    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
+    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
     questions.forEach(function(q) {
-      var qDiv = document.createElement('div'); 
-      qDiv.style.style.marginBottom = '14px'; 
-      qDiv.innerHTML = '<div class="q-title">' + q.label + '</div>';
-      
+      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
       if(q.image) { 
         var fullQImg = (q.image.indexOf('http') === 0 || q.image.indexOf('data:') === 0) ? q.image : CONFIG_URL.replace('config.json', 'images/') + q.image;
         qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + fullQImg + '" class="q-img-render" alt="Illustration"></div>'; 
       }
-      
-      var fid = pid + '_' + q.id;
-      
-      if(q.type === 'text' || q.type === 'textarea') {
-        var inp = document.createElement(q.type === 'text' ? 'input' : 'textarea'); 
-        inp.className = 'q-text-input'; 
-        inp.id = fid;
+      var fid = pid+'_'+q.id;
+      if(q.type==='text' || q.type==='textarea') {
+        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
         if(q.placeholder) inp.placeholder = q.placeholder;
         qDiv.appendChild(inp);
       } else if(q.type === 'dropdown') {
-        var sel = document.createElement('select'); 
-        sel.className = 'fselect'; 
-        sel.id = fid;
+        var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
         sel.innerHTML = '<option value="">Choisir une option...</option>' + (q.options || []).map(function(o){
           var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
           return '<option value="' + optText + '">' + optText + '</option>';
         }).join('');
         qDiv.appendChild(sel);
       } else if(q.type === 'scale') {
-        var scaleWrapper = document.createElement('div'); 
-        scaleWrapper.className = 'q-scale-container';
+        var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
         var options = q.options || ['1', '2', '3', '4', '5'];
         options.forEach(function(num) {
-          var item = document.createElement('div'); 
-          item.className = 'q-scale-item'; 
-          item.setAttribute('data-field', fid); 
-          item.setAttribute('data-val', num);
+          var item = document.createElement('div'); item.className = 'q-scale-item'; item.setAttribute('data-field', fid); item.setAttribute('data-val', num);
           item.innerHTML = '<div class="q-scale-circle">' + num + '</div>';
           item.addEventListener('click', function() {
             document.querySelectorAll('.q-scale-item[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); });
@@ -437,11 +422,8 @@ function buildDiagnostic() {
         });
         qDiv.appendChild(scaleWrapper);
       } else {
-        var optsDiv = document.createElement('div'); 
-        optsDiv.className = 'q-options';
-        (q.options || []).forEach(function(o){ 
-          optsDiv.appendChild(createUniversalOptionRow(q, o, fid)); 
-        });
+        var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
+        (q.options||[]).forEach(function(o){ optsDiv.appendChild(createUniversalOptionRow(q, o, fid)); });
         qDiv.appendChild(optsDiv);
       }
       block.appendChild(qDiv);
@@ -451,19 +433,7 @@ function buildDiagnostic() {
 }
 
 function collectFormData() {
-  var data = { 
-    edeal: document.getElementById('f-edeal').value.trim(), 
-    commercial: document.getElementById('f-commercial').value.trim(), 
-    client: document.getElementById('f-client').value.trim(), 
-    ville: document.getElementById('f-ville').value.trim(), 
-    dateChantier: document.getElementById('f-date').value.trim(), 
-    commentaire: document.getElementById('f-commentaire').value.trim(), 
-    selectedProduits: state.selectedProduits, 
-    produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){ return x.id === pid; }); return p ? p.label : pid; }), 
-    infos: {}, 
-    diagnostic: {} 
-  };
-  
+  var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   
   infoQuestions.forEach(function(q) { 
@@ -487,32 +457,7 @@ function collectFormData() {
     } 
   });
   
-  state.selectedProduits.forEach(function(pid) { 
-    var prodData = {}; 
-    var questions = getQuestionsListForProduct(pid); 
-    questions.forEach(function(q) { 
-      var fid = pid + '_' + q.id; 
-      if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
-        var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : ""; 
-      } else if (q.type === 'scale') {
-        var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected');
-        prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
-      } else { 
-        var opVals = []; 
-        document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ 
-          var val = o.getAttribute('data-val') || ""; 
-          if(o.getAttribute('data-other') === '1') { 
-            var inp = o.querySelector('.opt-autre-txt'); 
-            if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")"; 
-          } 
-          opVals.push(val); 
-        }); 
-        prodData[q.label] = opVals; 
-      } 
-    }); 
-    data.diagnostic[pid] = prodData; 
-  });
-  
+  state.selectedProduits.forEach(function(pid) { var prodData = {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q) { var fid = pid+'_'+q.id; if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : ""; } else if (q.type === 'scale') { var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected'); prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : ""; } else { var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ var val = o.getAttribute('data-val') || ""; if(o.getAttribute('data-other') === '1') { var inp = o.querySelector('.opt-autre-txt'); if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")"; } opVals.push(val); }); prodData[q.label] = opVals; } }); data.diagnostic[pid] = prodData; });
   return data;
 }
 
@@ -656,7 +601,7 @@ function genererPDFBase64(fData) {
     var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
     Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
     
-    var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+    var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo覆{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
     var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
 }
