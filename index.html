@@ -191,7 +191,6 @@ tbody tr:hover{background:var(--blue-lighter)}
     <div class="wz" id="wz4"><span class="wz-n">4</span>Envoi</div>
   </div>
 
-  <div class="fstep active" id="step1">
 
   <div class="fstep active" id="step1">
     <div class="card">
@@ -496,7 +495,6 @@ function sauvegarderBrouillon() {
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement du dossier...", "ok");
   
-  // 1. On cherche la demande dans le tableau local pour connaître son statut et son commentaire BE
   var infoSuivi = state.allDemandes.find(function(x) { return x.edeal === edeal; }) || {};
   
   var fd = new FormData();
@@ -510,7 +508,7 @@ function reprendreBrouillon(edeal) {
     if(!res.success || !res.formData) { toast("⚠️ Demande introuvable", "err"); return; }
     var fd = res.formData; state.loadedDraft = fd;
     
-    // 2. Gestion explicite de l'affichage du commentaire BE si statut "Manque d'infos"
+    // 1. Gestion de la bannière d'alerte BE
     var warningEl = document.getElementById('be-comment-warning');
     var textEl = document.getElementById('be-comment-text');
     if (infoSuivi.statut === "Manque d'infos" && infoSuivi.commentaireBE && infoSuivi.commentaireBE !== "—") {
@@ -522,15 +520,23 @@ function reprendreBrouillon(edeal) {
       if (warningEl) warningEl.style.display = 'none';
     }
 
-    // Remplissage des champs classiques
-    document.getElementById('f-edeal').value = fd.edeal || ''; 
-    document.getElementById('f-client').value = fd.client || ''; 
-    document.getElementById('f-ville').value = fd.ville || ''; 
-    document.getElementById('f-date').value = fd.dateChantier || ''; 
-    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    // 2. Remplissage sécurisé des champs de base (évite les crashs si un ID manque)
+    var champsDeBase = {
+      'f-edeal': fd.edeal,
+      'f-client': fd.client,
+      'f-ville': fd.ville,
+      'f-date': fd.dateChantier,
+      'f-commentaire': fd.commentaire
+    };
     
-    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { 
-      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); 
+    Object.keys(champsDeBase).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.value = champsDeBase[id] || '';
+        if (el.value.trim() !== '') el.classList.add('filled');
+      } else {
+        console.warn("⚠️ Attention : Le champ '" + id + "' est introuvable dans votre code HTML.");
+      }
     });
     
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
@@ -557,7 +563,10 @@ function reprendreBrouillon(edeal) {
     state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
     state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
     
-    buildDiagnostic(); state.rebuildDiagnosticRequired = false;
+    try {
+      buildDiagnostic(); 
+      state.rebuildDiagnosticRequired = false;
+    } catch(e) { console.error("Erreur buildDiagnostic:", e); }
     
     if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
       var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
@@ -576,7 +585,7 @@ function reprendreBrouillon(edeal) {
       });
     });
     
-    // 3. FIX PJ : On injecte les fichiers existants de GitHub/Sheets dans la file d'attente
+    // 3. Récupération des pièces jointes existantes
     state.selectedFiles = []; 
     if (res.fichiers && res.fichiers.length) {
       res.fichiers.forEach(function(f) {
@@ -584,20 +593,25 @@ function reprendreBrouillon(edeal) {
           state.selectedFiles.push({
             name: f.nom,
             size: 0, 
-            isFromServer: true, // Tag crucial pour ne pas les ré-encoder
+            isFromServer: true, 
             b64: f.b64,
             type: f.type || 'application/octet-stream'
           });
         }
       });
     }
-    renderFiles(); 
+    try { renderFiles(); } catch(e) { console.error(e); }
     
-    showTab('demande'); goStep(1); 
+    // 4. Changement d'onglet et affichage du formulaire
+    showTab('demande'); 
+    goStep(1); 
     toast("📋 Dossier chargé.", "ok");
-  }).catch(function(err) { console.error(err); toast("❌ Erreur lors de la reprise", "err"); });
+  })
+  .catch(function(err) { 
+    console.error("Erreur critique reprise :", err); 
+    toast("❌ Erreur lors de la reprise", "err"); 
+  });
 }
-
 function supprimerBrouillon(edeal) {
   var confirmation = confirm("⚠️ Attention : Voulez-vous vraiment supprimer définitivement la pré-demande " + edeal + " ? Cette action est irréversible.");
   if (!confirmation) return;
