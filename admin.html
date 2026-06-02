@@ -217,27 +217,57 @@ function chargerDepuisGitHub() {
   if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
   if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
   
-  console.log("Admin : Tentative de chargement du config.json depuis GitHub...");
+  // Sécurité : si les champs fondamentaux sont vides dans l'onglet paramètres
+  if (!gh.user || !gh.repo) {
+    console.warn("Admin : Configuration GitHub manquante dans l'onglet Paramètres.");
+    formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
+    initChampsProduits(); renderProduitTabs(); renderQuestions();
+    return;
+  }
+
+  console.log("Admin : Connexion à l'API de sécurité GitHub...");
   
-  fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now())
+  var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
+  var headers = { 'Accept': 'application/vnd.github.v3+json' };
+  if (gh.token) { headers['Authorization'] = 'token ' + gh.token; }
+
+  fetch(apiUrl, { headers: headers, cache: 'no-store' })
     .then(function(r) {
       if (!r.ok) {
-        // Détecte si le dépôt est privé, mauvaise URL ou banni
-        throw new Error("Le serveur GitHub a répondu avec un statut " + r.status + ". Vérifiez que le repository est bien PUBLIC.");
+        // Interceptions chirurgicales des raisons de blocage de GitHub
+        if (r.status === 401) {
+          throw new Error("Code 401 (Non autorisé).\nLe Token PAT GitHub copié dans l'onglet Paramètres est invalide, expiré ou comporte une erreur de frappe.");
+        }
+        if (r.status === 404) {
+          throw new Error("Code 404 (Introuvable).\nL'utilisateur '" + gh.user + "' ou le dépôt '" + gh.repo + "' est mal orthographié, ou alors le fichier 'config.json' n'est pas situé à la racine du repository.");
+        }
+        if (r.status === 403) {
+          throw new Error("Code 403 (Accès interdit).\nVotre Token PAT n'a pas les droits cochés pour lire ce dépôt, ou vous avez dépassé la limite de requêtes autorisées par GitHub.");
+        }
+        throw new Error("Réponse serveur GitHub inattendue : Statut " + r.status);
       }
       return r.json();
     })
-    .then(function(cfg) {
-      console.log("Admin : Configuration chargée avec succès !", cfg);
+    .then(function(info) {
+      if (!info.content) {
+        throw new Error("Le fichier config.json a été trouvé mais son contenu semble vide.");
+      }
+      
+      // Décodage de la base64 sécurisée pour les accents français
+      var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
+      var cfg = JSON.parse(decodedContent);
+      
+      console.log("Admin : Synchro réussie !", cfg);
       formData = cfg; 
       initChampsProduits(); 
       renderProduitTabs(); 
       renderQuestions(); 
     })
     .catch(function(err) {
-      // Alerte rouge pour éviter d'écraser le fichier valide par erreur
-      console.error("⚠️ ÉCHEC DU CHARGEMENT DE LA CONFIG CONFIG.JSON :", err);
-      alert("⚠️ ERREUR CRITIQUE : Impossible de charger le fichier config.json depuis GitHub.\nDétail : " + err.message + "\n\nPar sécurité, l'éditeur affiche une structure vide. NE CLIQUEZ PAS sur 'Sauvegarder' tant que ce problème n'est pas résolu, sous peine d'effacer votre configuration existante !");
+      console.error("⚠️ CRASH DU CHARGEMENT DIRECT :", err);
+      
+      // La fameuse alerte qui va briser le silence du bug :
+      alert("⚠️ ÉCHEC DE SYNCHRONISATION TECHNIQUE :\n\n" + err.message + "\n\nPar sécurité, l'écran reste blanc pour ne pas corrompre vos données.");
       
       formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
       initChampsProduits(); 
