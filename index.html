@@ -591,6 +591,44 @@ function genererPDFBase64(fData) {
   });
 }
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
+function buildRecap() {
+  var container = document.getElementById('recap-content');
+  var obj = document.getElementById('recap-obj');
+  if (!container) return;
+  var fData = collectFormData();
+  var html = '';
+
+  function row(label, val) {
+    if (!val || val === '') return '';
+    return '<div style="display:flex;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">' +
+      '<div style="width:40%;font-weight:600;color:var(--blue);flex-shrink:0">' + label + '</div>' +
+      '<div style="flex:1;color:var(--dark)">' + (Array.isArray(val) ? val.join(', ') : val) + '</div></div>';
+  }
+
+  html += row('N° EDEAL', fData.edeal);
+  html += row('Client', fData.client);
+  html += row('Commercial', fData.commercial);
+  html += row('Département / Ville', fData.ville);
+  html += row('Date chantier', fData.dateChantier);
+  html += row('Produit(s)', fData.produits ? fData.produits.join(', ') : '');
+  html += row('Commentaire', fData.commentaire);
+
+  Object.keys(fData.infos || {}).forEach(function(label) {
+    html += row(label, fData.infos[label]);
+  });
+
+  Object.keys(fData.diagnostic || {}).forEach(function(pid) {
+    var pd = fData.diagnostic[pid];
+    var prod = PRODUITS.find(function(p) { return p.id === pid; });
+    var labelProduit = prod ? prod.label : pid;
+    html += '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;text-transform:uppercase">' + labelProduit + '</div>';
+    Object.keys(pd).forEach(function(label) { html += row(label, pd[label]); });
+  });
+
+  container.innerHTML = html;
+  if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
+}
+
 </script>
 </body>
 </html>
