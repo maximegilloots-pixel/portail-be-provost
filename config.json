@@ -749,6 +749,21 @@
       "label": "xsxsz",
       "type": "radio",
       "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780404410235_Capture_d__cran_2026-02-16_143415.png"
+    },
+    {
+      "id": "q_1780405445286",
+      "label": "qsdsqd",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "ngfn",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780405430465_Capture_d__cran_2026-02-24_084135.png"
+        },
+        {
+          "text": "dsd",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780405438898_Capture_d__cran_2026-02-13_143220.png"
+        }
+      ]
     }
   ]
 }
