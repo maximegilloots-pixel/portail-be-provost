@@ -650,6 +650,10 @@
     {
       "id": "prod_1780412206778",
       "label": "propro"
+    },
+    {
+      "id": "prod_1780415505492",
+      "label": "test section"
     }
   ],
   "prod_1779436061922": [
@@ -686,6 +690,23 @@
       "id": "q_1780412224081",
       "label": "sdsd",
       "type": "scale"
+    }
+  ],
+  "prod_1780415505492": [
+    {
+      "id": "q_1780415524037",
+      "label": "",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "dezdze",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780415514103_Capture_d__cran_2026-02-13_143220.png"
+        },
+        {
+          "text": "fezf",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780415518867_Capture_d__cran_2026-02-16_143653.png"
+        }
+      ]
     }
   ]
 }
