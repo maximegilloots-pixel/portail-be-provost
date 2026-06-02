@@ -683,6 +683,12 @@
         }
       ],
       "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780415660897_Capture_d__cran_2026-03-16_161120.png"
+    },
+    {
+      "id": "q_1780418417447",
+      "label": "zcze",
+      "type": "textarea",
+      "placeholder": "zexc"
     }
   ]
 }
