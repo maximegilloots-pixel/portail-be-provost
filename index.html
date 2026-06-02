@@ -176,21 +176,22 @@ tbody tr:hover{background:var(--blue-lighter)}
 </section>
 
 <section class="section" id="section-demande">
-  <div class="s-label">Bureau d'Études</div><h2 class="s-title">Saisie de la demande</h2>
+  <div class="s-label">Bureau d'Études</div>
+  <h2 class="s-title">Saisie de la demande</h2>
   
-  <!-- 🚨 BANNIÈRE ALERTE RETOUR BE (À AJOUTER ICI) -->
   <div id="be-comment-warning" style="display:none; background:rgba(192,57,43,0.1); border:1.5px solid var(--red); color:var(--red); padding:14px; border-radius:var(--radius); margin-bottom:16px; font-size:13px;">
     <strong style="display:block; margin-bottom:4px; font-size:14px;">⚠️ RETOUR DU BUREAU D'ÉTUDES :</strong>
     <span id="be-comment-text" style="font-weight:600;"></span>
   </div>
 
   <div class="wizard">
-  <div class="wizard">
     <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
     <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
     <div class="wz" id="wz3"><span class="wz-n">3</span>Pièces jointes</div>
     <div class="wz" id="wz4"><span class="wz-n">4</span>Envoi</div>
   </div>
+
+  <div class="fstep active" id="step1">
 
   <div class="fstep active" id="step1">
     <div class="card">
