@@ -663,59 +663,6 @@
   ],
   "infos_generales": [
     {
-      "id": "contraintes",
-      "label": "Contraintes normatives",
-      "type": "checkbox",
-      "options": [
-        "Intervention cabinet de contrôle",
-        "Sprinklage",
-        "Autre :"
-      ]
-    },
-    {
-      "id": "acces",
-      "label": "Accès pour montage",
-      "type": "radio",
-      "options": [
-        "Sans contraintes particulières",
-        "Contraint (photo)"
-      ]
-    },
-    {
-      "id": "zone",
-      "label": "Zone de montage",
-      "type": "radio",
-      "options": [
-        "Zone dégagée",
-        "Zone encombrée (photo)"
-      ]
-    },
-    {
-      "id": "elements",
-      "label": "Éléments souhaités",
-      "type": "radio",
-      "options": [
-        "Dossier complet",
-        "Dossier allégé"
-      ]
-    },
-    {
-      "id": "plan",
-      "label": "Plan obligatoire",
-      "type": "checkbox",
-      "options": [
-        "OK"
-      ]
-    },
-    {
-      "id": "photos",
-      "label": "Photos & Vidéos",
-      "type": "checkbox",
-      "options": [
-        "OK"
-      ]
-    },
-    {
       "id": "q_1780409367245",
       "label": "test",
       "type": "textarea",
