@@ -697,6 +697,24 @@
           "image": "https://continentalrack.fr/wp-content/uploads/2022/09/barriere-double-coulissante-e1706090431548.jpg"
         }
       ]
+    },
+    {
+      "id": "q_1780380424022",
+      "label": "test images",
+      "type": "radio",
+      "options": [
+        {
+          "text": "option 1",
+          "image": "IMG20231108113254.jpg",
+          "isOther": false
+        },
+        {
+          "text": "option 2",
+          "image": "IMG20231213150926.jpg",
+          "isOther": false
+        }
+      ],
+      "image": "img_1779444518703_IMG_45761.jpg"
     }
   ]
 }
