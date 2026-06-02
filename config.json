@@ -672,6 +672,22 @@
       "label": "test",
       "type": "textarea",
       "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780409363979_Capture_d__cran_2026-02-16_143337.png"
+    },
+    {
+      "id": "q_1780410961074",
+      "label": "fcydr",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "iuiuhi",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780410915256_Antoine_COUCOU.png"
+        },
+        {
+          "text": "oijo",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780410919803_Charaf_Version_Max_2.png"
+        }
+      ],
+      "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780410923565_DF.png"
     }
   ]
 }
