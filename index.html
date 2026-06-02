@@ -240,7 +240,9 @@ tbody tr:hover{background:var(--blue-lighter)}
   </div>
 </section>
 
-<nav class="tabs" style="display:none;"></nav> <section class="section" id="section-suivi">
+<nav class="tabs" style="display:none;"></nav>
+
+<section class="section" id="section-suivi">
   <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
   <div class="table-hd">
     <div style="display:flex;gap:6px;" id="filter-btn-container">
@@ -413,7 +415,7 @@ function buildDiagnostic() {
           });
           scaleWrapper.appendChild(item);
         });
-        /* 🔒 FIX SÉCURITÉ REVIREMENT CRASH : Suppression de la duplication hors-boucle */
+        /* 🔒 CORRECTION CHIRURGICALE FINALE SUCCESS : Nettoyage et injection conforme à l'arbre DOM */
         qDiv.appendChild(scaleWrapper);
       } else {
         var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
@@ -436,7 +438,7 @@ function collectFormData() {
       var el = document.getElementById(fid); data.infos[q.label] = el ? el.value.trim() : ""; 
     } else if (q.type === 'scale') {
       var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected');
-      data.infos[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
+      data.infos[q.label] = selectedScale ? selectedScale.getAttribute('data-val'] : "";
     } else { 
       var vals = []; 
       document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ 
