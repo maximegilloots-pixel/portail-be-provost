@@ -381,33 +381,53 @@ var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implan
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
 
 function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
+  var container = document.getElementById('diagnostic-container'); 
+  if(!container) return; 
+  container.innerHTML = '';
+  
   state.selectedProduits.forEach(function(pid) {
-    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
-    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
+    var prod = PRODUITS.find(function(p){ return p.id === pid; }); 
+    var questions = getQuestionsListForProduct(pid);
+    var block = document.createElement('div'); 
+    block.className = 'card'; 
+    block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod ? prod.label : pid) + '</div>';
+    
     questions.forEach(function(q) {
-      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
+      var qDiv = document.createElement('div'); 
+      qDiv.style.style.marginBottom = '14px'; 
+      qDiv.innerHTML = '<div class="q-title">' + q.label + '</div>';
+      
       if(q.image) { 
         var fullQImg = (q.image.indexOf('http') === 0 || q.image.indexOf('data:') === 0) ? q.image : CONFIG_URL.replace('config.json', 'images/') + q.image;
         qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + fullQImg + '" class="q-img-render" alt="Illustration"></div>'; 
       }
-      var fid = pid+'_'+q.id;
-      if(q.type==='text' || q.type==='textarea') {
-        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
+      
+      var fid = pid + '_' + q.id;
+      
+      if(q.type === 'text' || q.type === 'textarea') {
+        var inp = document.createElement(q.type === 'text' ? 'input' : 'textarea'); 
+        inp.className = 'q-text-input'; 
+        inp.id = fid;
         if(q.placeholder) inp.placeholder = q.placeholder;
         qDiv.appendChild(inp);
       } else if(q.type === 'dropdown') {
-        var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
+        var sel = document.createElement('select'); 
+        sel.className = 'fselect'; 
+        sel.id = fid;
         sel.innerHTML = '<option value="">Choisir une option...</option>' + (q.options || []).map(function(o){
           var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
           return '<option value="' + optText + '">' + optText + '</option>';
         }).join('');
         qDiv.appendChild(sel);
       } else if(q.type === 'scale') {
-        var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
+        var scaleWrapper = document.createElement('div'); 
+        scaleWrapper.className = 'q-scale-container';
         var options = q.options || ['1', '2', '3', '4', '5'];
         options.forEach(function(num) {
-          var item = document.createElement('div'); item.className = 'q-scale-item'; item.setAttribute('data-field', fid); item.setAttribute('data-val', num);
+          var item = document.createElement('div'); 
+          item.className = 'q-scale-item'; 
+          item.setAttribute('data-field', fid); 
+          item.setAttribute('data-val', num);
           item.innerHTML = '<div class="q-scale-circle">' + num + '</div>';
           item.addEventListener('click', function() {
             document.querySelectorAll('.q-scale-item[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); });
@@ -417,8 +437,11 @@ function buildDiagnostic() {
         });
         qDiv.appendChild(scaleWrapper);
       } else {
-        var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
-        (q.options||[]).forEach(function(o){ optsDiv.appendChild(createUniversalOptionRow(q, o, fid)); });
+        var optsDiv = document.createElement('div'); 
+        optsDiv.className = 'q-options';
+        (q.options || []).forEach(function(o){ 
+          optsDiv.appendChild(createUniversalOptionRow(q, o, fid)); 
+        });
         qDiv.appendChild(optsDiv);
       }
       block.appendChild(qDiv);
@@ -428,7 +451,19 @@ function buildDiagnostic() {
 }
 
 function collectFormData() {
-  var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
+  var data = { 
+    edeal: document.getElementById('f-edeal').value.trim(), 
+    commercial: document.getElementById('f-commercial').value.trim(), 
+    client: document.getElementById('f-client').value.trim(), 
+    ville: document.getElementById('f-ville').value.trim(), 
+    dateChantier: document.getElementById('f-date').value.trim(), 
+    commentaire: document.getElementById('f-commentaire').value.trim(), 
+    selectedProduits: state.selectedProduits, 
+    produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){ return x.id === pid; }); return p ? p.label : pid; }), 
+    infos: {}, 
+    diagnostic: {} 
+  };
+  
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   
   infoQuestions.forEach(function(q) { 
@@ -452,7 +487,32 @@ function collectFormData() {
     } 
   });
   
-  state.selectedProduits.forEach(function(pid) { var prodData = {}; var questions = getQuestionsListForProduct(pid); questions.forEach(function(q) { var fid = pid+'_'+q.id; if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : ""; } else if (q.type === 'scale') { var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected'); prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : ""; } else { var opVals = []; document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ var val = o.getAttribute('data-val') || ""; if(o.getAttribute('data-other') === '1') { var inp = o.querySelector('.opt-autre-txt'); if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")"; } opVals.push(val); }); prodData[q.label] = opVals; } }); data.diagnostic[pid] = prodData; });
+  state.selectedProduits.forEach(function(pid) { 
+    var prodData = {}; 
+    var questions = getQuestionsListForProduct(pid); 
+    questions.forEach(function(q) { 
+      var fid = pid + '_' + q.id; 
+      if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+        var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : ""; 
+      } else if (q.type === 'scale') {
+        var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected');
+        prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
+      } else { 
+        var opVals = []; 
+        document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ 
+          var val = o.getAttribute('data-val') || ""; 
+          if(o.getAttribute('data-other') === '1') { 
+            var inp = o.querySelector('.opt-autre-txt'); 
+            if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")"; 
+          } 
+          opVals.push(val); 
+        }); 
+        prodData[q.label] = opVals; 
+      } 
+    }); 
+    data.diagnostic[pid] = prodData; 
+  });
+  
   return data;
 }
 
