@@ -73,8 +73,10 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .q-option.selected .opt-sq::after{content:'✓';color:var(--white);font-size:11px;font-weight:900}
 .q-text-input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--dark);outline:none;transition:var(--tr)}
 .q-text-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,75,140,.1)}
-.q-text-input.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
-.finput.filled{border-color:var(--green);background:rgba(42,125,82,0.04)}
+.q-text-input.filled, .finput.filled, .fselect.filled, .ftextarea.filled {
+  border-color: var(--green) !important;
+  background: rgba(42, 125, 82, 0.04) !important;
+}
 .dropzone{border:2px dashed var(--blue-mid);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;background:var(--blue-lighter);transition:var(--tr)}
 .dropzone:hover{background:var(--blue-light);border-color:var(--blue)}
 .dz-title{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:4px}
@@ -287,6 +289,27 @@ window.addEventListener('DOMContentLoaded', function() {
   var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
   var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(fInput.files); }); }
   if (sessionStorage.getItem('portail_auth') === '1') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); setupCommercialField(sessionStorage.getItem('user_name')); chargerConfigFormulaire(); }
+// 🟢 ESPION GLOBAL : Passe les champs en vert dès qu'ils contiennent du texte
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('finput') || e.target.classList.contains('q-text-input') || e.target.classList.contains('ftextarea')) {
+      if (e.target.value.trim() !== '') {
+        e.target.classList.add('filled');
+      } else {
+        e.target.classList.remove('filled');
+      }
+    }
+  });
+
+  // 🟢 Idem pour les menus déroulants (dropdowns) lors d'un changement de sélection
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('fselect') || e.target.classList.contains('q-text-input')) {
+      if (e.target.value !== '') {
+        e.target.classList.add('filled');
+      } else {
+        e.target.classList.remove('filled');
+      }
+    }
+  });
 });
 
 function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name); sessionStorage.setItem('google_token', response.credential); setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire(); } else { document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block'; } }
