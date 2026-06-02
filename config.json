@@ -699,7 +699,7 @@
       ]
     },
     {
-      "id": "q_1780380424022",
+      "id": "q_1780380605309",
       "label": "test images",
       "type": "radio",
       "options": [
@@ -712,6 +712,11 @@
           "text": "option 2",
           "image": "IMG20231213150926.jpg",
           "isOther": false
+        },
+        {
+          "text": "Autre :",
+          "image": "",
+          "isOther": true
         }
       ],
       "image": "img_1779444518703_IMG_45761.jpg"
