@@ -118,6 +118,12 @@ tbody tr:hover{background:var(--blue-lighter)}
 .app-content{display:none;max-width:1200px;margin:0 auto}
 .app-content.visible{display:block}
 
+.loading-overlay{position:fixed;inset:0;width:100vw;height:100vh;background:rgba(255,255,255,0.96);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
+.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
+.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
+@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
+.btn-filter.active-filter { background: var(--blue) !important; color: #fff !important; font-weight: 700; border-color: var(--blue) !important; }
+
 /* 🖼️ HIGH REFINEMENT FRAMEWORK & OPTION IMAGES */
 .q-img-wrapper { position: relative; margin: 10px 0; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--white); max-width: 100%; width: fit-content; display: block; }
 .q-img-render { display: block; max-width: 100%; max-height: 280px; height: auto; object-fit: contain; -webkit-optimize-contrast; image-rendering: auto; }
@@ -141,8 +147,8 @@ tbody tr:hover{background:var(--blue-lighter)}
 <body>
 
 <div class="loading-overlay" id="loading-overlay">
-  <div style="font-size:16px; font-weight:900; color:var(--dark); letter-spacing:-0.5px;">🚀 Transfert de la demande au BE...</div>
-  <div style="font-size:12px; color:var(--text-light); margin-top:3px;">Veuillez patienter, synchronisation de la base Google Sheets.</div>
+  <div id="loading-title" style="font-size:16px; font-weight:900; color:var(--dark); letter-spacing:-0.5px;">🚀 Transfert de la demande au BE...</div>
+  <div id="loading-sub" style="font-size:12px; color:var(--text-light); margin-top:3px;">Veuillez patienter, synchronisation de la base Google Sheets.</div>
   <div class="progress-bar-container"><div class="progress-bar-fill"></div></div>
 </div>
 
@@ -278,15 +284,7 @@ function setupCommercialField(name) { var comm = document.getElementById('f-comm
 
 window.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.tabs .tab').forEach(function(tabBtn) { tabBtn.addEventListener('click', function() { showTab(tabBtn.getAttribute('data-tab')); }); });
-  
-  var btnStart = document.getElementById('btn-doc-start'); 
-  if(btnStart) { 
-    btnStart.addEventListener('click', function() { 
-      resetForm(); 
-      showTab('demande'); 
-    }); 
-  }
-  
+  var btnStart = document.getElementById('btn-doc-start'); if(btnStart) { btnStart.addEventListener('click', function() { resetForm(); showTab('demande'); }); }
   document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(btnItem) { btnItem.addEventListener('click', function() { document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); }); btnItem.classList.add('active-filter'); filtrer(btnItem.getAttribute('data-filter')); }); });
   var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
   var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(fInput.files); }); }
@@ -508,11 +506,27 @@ function buildRecap() {
   html += '</div>'; container.innerHTML = html;
 }
 
+// ── ⚡ AUTOMATISATION DIRECTE ET RESET DE L'ANIMATION DE CHARGEMENT ──
+function showLoading(title, subtitle) {
+  var overlay = document.getElementById('loading-overlay'); if (!overlay) return;
+  document.getElementById('loading-title').textContent = title;
+  document.getElementById('loading-sub').textContent = subtitle;
+  var fillBar = overlay.querySelector('.progress-bar-fill');
+  if (fillBar) {
+    fillBar.style.animation = 'none';
+    fillBar.offsetHeight; /* Déclenche un reflow pour forcer le navigateur à remettre l'animation à 0% */
+    fillBar.style.animation = null;
+  }
+  overlay.style.display = 'flex';
+}
+function hideLoading() { var overlay = document.getElementById('loading-overlay'); if (overlay) overlay.style.display = 'none'; }
+
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim(); if(!edeal){ afficherToast("Le N° EDEAL est obligatoire.", "err"); return; } if(state.selectedFiles.length > 0) { alert("⚠️ Les PJ ne sont pas supportées en brouillon."); return; }
-  var fData = collectFormData(); fData.isBrouillon = true; document.getElementById('loading-overlay').style.display = 'flex';
+  var fData = collectFormData(); fData.isBrouillon = true; 
+  showLoading('💾 Enregistrement de la pré-demande...', 'Mise à jour de la base de données Google Sheets...');
   var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData));
-  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ afficherToast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { afficherToast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; afficherToast("Erreur réseau","err"); });
+  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { hideLoading(); if(res.success){ afficherToast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { afficherToast("Échec", "err"); } }).catch(function(){ hideLoading(); afficherToast("Erreur réseau","err"); });
 }
 
 function reprendreBrouillon(edeal) {
@@ -623,7 +637,8 @@ function supprimerBrouillon(edeal) {
 }
 
 function envoyerDemande() {
-  var fData = collectFormData(); fData.isBrouillon = false; document.getElementById('loading-overlay').style.display = 'flex';
+  var fData = collectFormData(); fData.isBrouillon = false; 
+  showLoading('🚀 Transfert de la demande au BE...', 'Veuillez patienter, synchronisation de la base Google Sheets et liaison des PJ...');
   var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
   var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
   
@@ -634,7 +649,7 @@ function envoyerDemande() {
       newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
       serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
       
-      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){ return r.json(); }).then(function(res){ document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ afficherToast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); } else { alert("⚠️ Rejet Sheets."); } }).catch(function(err){ document.getElementById('loading-overlay').style.display = 'none'; alert("Erreur : " + err.message); });
+      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){ return r.json(); }).then(function(res){ hideLoading(); if(res.success){ afficherToast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); } else { alert("⚠️ Rejet Sheets."); } }).catch(function(err){ hideLoading(); alert("Erreur : " + err.message); });
     });
   });
 }
