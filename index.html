@@ -413,17 +413,61 @@ function buildInfosGeneralesDynamic() {
       (q.options||[]).forEach(function(o){
         var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
         var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
-        var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', optText);
+        var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', optText); div.setAttribute('data-initial-val', optText);
+        
         div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
         if (optImg) {
           div.classList.add('has-img');
           div.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
         }
-        div.addEventListener('click', function() {
-          if(q.type==='radio') { document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')}); }
-          div.classList.toggle('selected');
-        });
         optsDiv.appendChild(div);
+        
+        var otherInput = null;
+        if (optText.toLowerCase().indexOf('autre') !== -1) {
+          otherInput = document.createElement('input');
+          otherInput.type = 'text';
+          otherInput.className = 'q-text-input other-input-field';
+          otherInput.setAttribute('data-field', fid);
+          otherInput.placeholder = 'Veuillez préciser...';
+          otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
+          
+          otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
+          otherInput.addEventListener('input', function() {
+            if (otherInput.value.trim() !== '') {
+              div.setAttribute('data-val', optText + ' ' + otherInput.value.trim());
+              otherInput.classList.add('filled');
+            } else {
+              div.setAttribute('data-val', optText);
+              otherInput.classList.remove('filled');
+            }
+          });
+          optsDiv.appendChild(otherInput);
+        }
+        
+        div.addEventListener('click', function() {
+          if(q.type==='radio') { 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
+              x.classList.remove('selected');
+              x.setAttribute('data-val', x.getAttribute('data-initial-val'));
+            }); 
+            document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){
+              x.style.display = 'none'; x.value = ''; x.classList.remove('filled');
+            });
+          }
+          
+          div.classList.toggle('selected');
+          
+          if (otherInput) {
+            if (div.classList.contains('selected')) {
+              otherInput.style.display = 'block';
+              otherInput.focus();
+            } else {
+              otherInput.style.display = 'none';
+              otherInput.value = '';
+              div.setAttribute('data-val', optText);
+            }
+          }
+        });
       });
       qDiv.appendChild(optsDiv);
     }
@@ -475,17 +519,60 @@ function buildDiagnostic() {
         (q.options||[]).forEach(function(o){
           var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
           var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
-          var optDiv = document.createElement('div'); optDiv.className = 'q-option'; optDiv.setAttribute('data-field', fid); optDiv.setAttribute('data-val', optText);
+          var optDiv = document.createElement('div'); optDiv.className = 'q-option'; optDiv.setAttribute('data-field', fid); optDiv.setAttribute('data-val', optText); optDiv.setAttribute('data-initial-val', optText);
           optDiv.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
           if (optImg) {
             optDiv.classList.add('has-img');
             optDiv.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
           }
-          optDiv.addEventListener('click', function() {
-            if(q.type==='radio') { document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')}); }
-            optDiv.classList.toggle('selected');
-          });
           optsDiv.appendChild(optDiv);
+          
+          var otherInput = null;
+          if (optText.toLowerCase().indexOf('autre') !== -1) {
+            otherInput = document.createElement('input');
+            otherInput.type = 'text';
+            otherInput.className = 'q-text-input other-input-field';
+            otherInput.setAttribute('data-field', fid);
+            otherInput.placeholder = 'Veuillez préciser...';
+            otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
+            
+            otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
+            otherInput.addEventListener('input', function() {
+              if (otherInput.value.trim() !== '') {
+                optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim());
+                otherInput.classList.add('filled');
+              } else {
+                optDiv.setAttribute('data-val', optText);
+                otherInput.classList.remove('filled');
+              }
+            });
+            optsDiv.appendChild(otherInput);
+          }
+          
+          optDiv.addEventListener('click', function() {
+            if(q.type==='radio') { 
+              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
+                x.classList.remove('selected');
+                x.setAttribute('data-val', x.getAttribute('data-initial-val'));
+              }); 
+              document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){
+                x.style.display = 'none'; x.value = ''; x.classList.remove('filled');
+              });
+            }
+            
+            optDiv.classList.toggle('selected');
+            
+            if (otherInput) {
+              if (optDiv.classList.contains('selected')) {
+                otherInput.style.display = 'block';
+                otherInput.focus();
+              } else {
+                otherInput.style.display = 'none';
+                otherInput.value = '';
+                optDiv.setAttribute('data-val', optText);
+              }
+            }
+          });
         });
         qDiv.appendChild(optsDiv);
       }
@@ -568,7 +655,7 @@ function reprendreBrouillon(edeal) {
       if (warningEl) warningEl.style.display = 'none';
     }
 
-    // 2. Remplissage sécurisé des champs de base (évite les crashs si un ID manque)
+    // 2. Remplissage des champs de base
     var champsDeBase = {
       'f-edeal': fd.edeal,
       'f-client': fd.client,
@@ -582,8 +669,6 @@ function reprendreBrouillon(edeal) {
       if (el) {
         el.value = champsDeBase[id] || '';
         if (el.value.trim() !== '') el.classList.add('filled');
-      } else {
-        console.warn("⚠️ Attention : Le champ '" + id + "' est introuvable dans votre code HTML.");
       }
     });
     
@@ -601,7 +686,23 @@ function reprendreBrouillon(edeal) {
           if(scaleEl) scaleEl.classList.add('selected');
         } else { 
           (Array.isArray(val)?val:[val]).forEach(function(v){ 
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
           }); 
         } 
       });
@@ -627,30 +728,38 @@ function reprendreBrouillon(edeal) {
           if(scaleEl) scaleEl.classList.add('selected');
         } else { 
           (Array.isArray(val)?val:[val]).forEach(function(v){ 
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
           }); 
         }
       });
     });
     
-    // 3. Récupération des pièces jointes existantes
     state.selectedFiles = []; 
     if (res.fichiers && res.fichiers.length) {
       res.fichiers.forEach(function(f) {
         if (f.b64 && f.b64.trim() !== "" && f.b64 !== "SUPPRIME_30J") {
-          state.selectedFiles.push({
-            name: f.nom,
-            size: 0, 
-            isFromServer: true, 
-            b64: f.b64,
-            type: f.type || 'application/octet-stream'
-          });
+          state.selectedFiles.push({ name: f.nom, size: 0, isFromServer: true, b64: f.b64, type: f.type || 'application/octet-stream' });
         }
       });
     }
     try { renderFiles(); } catch(e) { console.error(e); }
     
-    // 4. Changement d'onglet et affichage du formulaire
     showTab('demande'); 
     goStep(1); 
     toast("📋 Dossier chargé.", "ok");
@@ -801,11 +910,24 @@ function resetForm() {
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
-    function row(label, val) { if (!val || val === '') return ''; return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.08);padding:1px 6px;border-radius:3px">' + String(val) + '</div></div>'; }
+    
+    function row(label, val) { 
+      var txtValeur = val;
+      if (Array.isArray(val)) {
+        txtValeur = val.length > 0 ? val.join(', ') : '';
+      }
+      if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') {
+        txtValeur = '— (Non renseigné)';
+      }
+      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.04);padding:1px 6px;border-radius:3px">' + String(txtValeur) + '</div></div>'; 
+    }
+    
     function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
-    var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
+    
+    var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += row(lbl, v); });
     var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
-    Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
+    
+    Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { rows += row(label, pd[label]); }); if (rows) sections += section(labelProduit, rows); });
     
     var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
     var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
