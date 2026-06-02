@@ -116,24 +116,21 @@ tbody tr:hover{background:var(--blue-lighter)}
 .login-bar{width:100%;height:4px;background:var(--yellow);position:absolute;top:0;left:0}
 .app-content{display:none;max-width:1200px;margin:0 auto}
 .app-content.visible{display:block}
-.loading-overlay{position:fixed;inset:0;width:100vw;height:100vh;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
-.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
-.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
-@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
-.btn-filter.active-filter { background: var(--blue) !important; color: #fff !important; font-weight: 700; border-color: var(--blue) !important; }
 
-/* 🖼️ FRAMEWORK LIQUIDATION NETTETÉ IMAGES TECHNIQUES & APPRECIATION DES OPTIONS VIA IMAGES */
-.q-img-wrapper { position: relative; margin: 14px 0; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--white); max-width: 100%; width: fit-content; display: block; }
-.q-img-wrapper:hover { box-shadow: var(--shadow-lg); border-color: var(--blue-mid); }
-.q-img-render { display: block; max-width: 100%; max-height: 350px; height: auto; object-fit: contain; -webkit-optimize-contrast; image-rendering: auto; }
+/* 🖼️ FRAMEWORK PHOTO EN CONFORMITÉ GOOGLE FORMS ET ADAPTATION TEXTE "AUTRE" */
+.q-img-wrapper { position: relative; margin: 10px 0; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--white); max-width: 100%; width: fit-content; display: block; }
+.q-img-render { display: block; max-width: 100%; max-height: 280px; height: auto; object-fit: contain; -webkit-optimize-contrast; image-rendering: auto; }
 .q-scale-container { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 14px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 8px; }
 .q-scale-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
 .q-scale-circle { width: 32px; height: 32px; border: 1px solid var(--border); background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text); transition: var(--tr); }
 .q-scale-item.selected .q-scale-circle { background: var(--blue); border-color: var(--blue); color: var(--white); box-shadow: 0 4px 10px rgba(45,75,140,0.25); }
 
-.q-option.has-img { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-.q-opt-img-wrapper { width: 100%; max-height: 140px; overflow: hidden; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; }
-.q-opt-img { width: 100%; height: auto; max-height: 130px; object-fit: contain; }
+.q-option.has-img { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; }
+.q-opt-img-wrapper { margin-top: 6px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); max-width: 180px; background: var(--white); display: block; }
+.q-opt-img { display: block; max-width: 100%; max-height: 140px; height: auto; object-fit: contain; -webkit-optimize-contrast; image-rendering: auto; }
+.opt-autre-container { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 6px; }
+.opt-autre-txt { flex: 1; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; outline: none; }
+.opt-autre-txt:focus { border-color: var(--blue); }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -303,7 +300,10 @@ function buildInfosGeneralesDynamic() {
   var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
-    if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
+    if(q.image) { 
+      var fullQImg = (q.image.indexOf('http') === 0 || q.image.indexOf('data:') === 0) ? q.image : CONFIG_URL.replace('config.json', 'images/') + q.image;
+      qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + fullQImg + '" class="q-img-render" alt="Illustration"></div>'; 
+    }
     var fid = 'info_' + q.id;
     if(q.type==='text' || q.type==='textarea') {
       var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
@@ -334,15 +334,35 @@ function buildInfosGeneralesDynamic() {
       (q.options||[]).forEach(function(o){
         var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
         var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
+        var isOther = (typeof o === 'object' && o !== null) ? !!o.isOther : (optText.toLowerCase().trim().indexOf('autre') === 0);
+        
         var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', optText);
-        div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
+        if(isOther) div.setAttribute('data-other', '1');
+        
+        var innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
         if (optImg) {
+          var fullOptImg = (optImg.indexOf('http') === 0 || optImg.indexOf('data:') === 0) ? optImg : CONFIG_URL.replace('config.json', 'images/') + optImg;
           div.classList.add('has-img');
-          div.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
+          innerHTML += '<div class="q-opt-img-wrapper"><img src="' + fullOptImg + '" class="q-opt-img" alt="Illustration"></div>';
         }
+        if (isOther) {
+          innerHTML += '<div class="opt-autre-container"><input type="text" class="opt-autre-txt" placeholder="Précisez..." style="display:none;" onclick="event.stopPropagation();"></div>';
+        }
+        div.innerHTML = innerHTML;
+        
         div.addEventListener('click', function() {
-          if(q.type==='radio') { document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')}); }
+          if(q.type==='radio') { 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
+              x.classList.remove('selected');
+              var txt = x.querySelector('.opt-autre-txt'); if(txt) txt.style.display = 'none';
+            }); 
+          }
           div.classList.toggle('selected');
+          var currentInp = div.querySelector('.opt-autre-txt');
+          if(currentInp) {
+            currentInp.style.display = div.classList.contains('selected') ? 'block' : 'none';
+            if(div.classList.contains('selected')) currentInp.focus();
+          }
         });
         optsDiv.appendChild(div);
       });
@@ -365,7 +385,10 @@ function buildDiagnostic() {
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
-      if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
+      if(q.image) { 
+        var fullQImg = (q.image.indexOf('http') === 0 || q.image.indexOf('data:') === 0) ? q.image : CONFIG_URL.replace('config.json', 'images/') + q.image;
+        qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + fullQImg + '" class="q-img-render" alt="Illustration"></div>'; 
+      }
       var fid = pid+'_'+q.id;
       if(q.type==='text' || q.type==='textarea') {
         var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
@@ -390,21 +413,40 @@ function buildDiagnostic() {
           });
           scaleWrapper.appendChild(item);
         });
-        qDiv.appendChild(scaleWrapper);
+        scaleWrapper.appendChild(item);
       } else {
         var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
         (q.options||[]).forEach(function(o){
           var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
           var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
+          var isOther = (typeof o === 'object' && o !== null) ? !!o.isOther : (optText.toLowerCase().trim().indexOf('autre') === 0);
+          
           var optDiv = document.createElement('div'); optDiv.className = 'q-option'; optDiv.setAttribute('data-field', fid); optDiv.setAttribute('data-val', optText);
+          if(isOther) optDiv.setAttribute('data-other', '1');
+          
           optDiv.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
           if (optImg) {
+            var fullOptImg = (optImg.indexOf('http') === 0 || optImg.indexOf('data:') === 0) ? optImg : CONFIG_URL.replace('config.json', 'images/') + optImg;
             optDiv.classList.add('has-img');
-            optDiv.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
+            optDiv.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + fullOptImg + '" class="q-opt-img" alt="Illustration option"></div>';
           }
+          if (isOther) {
+            optDiv.innerHTML += '<div class="opt-autre-container"><input type="text" class="opt-autre-txt" placeholder="Précisez..." style="display:none;" onclick="event.stopPropagation();"></div>';
+          }
+          
           optDiv.addEventListener('click', function() {
-            if(q.type==='radio') { document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){x.classList.remove('selected')}); }
+            if(q.type==='radio') { 
+              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
+                x.classList.remove('selected');
+                var txt = x.querySelector('.opt-autre-txt'); if(txt) txt.style.display = 'none';
+              }); 
+            }
             optDiv.classList.toggle('selected');
+            var currentInp = optDiv.querySelector('.opt-autre-txt');
+            if(currentInp) {
+              currentInp.style.display = optDiv.classList.contains('selected') ? 'block' : 'none';
+              if(optDiv.classList.contains('selected')) currentInp.focus();
+            }
           });
           optsDiv.appendChild(optDiv);
         });
@@ -429,7 +471,14 @@ function collectFormData() {
       data.infos[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
     } else { 
       var vals = []; 
-      document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.getAttribute('data-val') || ""); }); 
+      document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ 
+        var val = o.getAttribute('data-val') || "";
+        if(o.getAttribute('data-other') === '1') {
+          var inp = o.querySelector('.opt-autre-txt');
+          if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")";
+        }
+        vals.push(val); 
+      }); 
       data.infos[q.label] = vals; 
     } 
   });
@@ -445,7 +494,14 @@ function collectFormData() {
         prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
       } else { 
         var opVals = []; 
-        document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.getAttribute('data-val') || ""); }); 
+        document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ 
+          var val = o.getAttribute('data-val') || "";
+          if(o.getAttribute('data-other') === '1') {
+            var inp = o.querySelector('.opt-autre-txt');
+            if(inp && inp.value.trim() !== "") val = val + " (" + inp.value.trim() + ")";
+          }
+          opVals.push(val); 
+        }); 
         prodData[q.label] = opVals; 
       } 
     }); 
@@ -463,9 +519,7 @@ function sauvegarderBrouillon() {
 
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement de la pré-demande...", "ok");
-  var fd = new FormData();
-  fd.append('action', 'getDemande');
-  fd.append('edeal', edeal);
+  var fd = new FormData(); fd.append('action', 'getDemande'); fd.append('edeal', edeal);
   
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r){ return r.json(); })
@@ -488,7 +542,14 @@ function reprendreBrouillon(edeal) {
           if(scaleEl) scaleEl.classList.add('selected');
         } else { 
           (Array.isArray(val)?val:[val]).forEach(function(v){ 
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+            var cleanV = v; if(v.indexOf(' (') !== -1) cleanV = v.split(' (')[0];
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              if(optEl.getAttribute('data-val') === cleanV) {
+                optEl.classList.add('selected');
+                var txt = optEl.querySelector('.opt-autre-txt');
+                if(txt && v.indexOf(' (') !== -1) { txt.value = v.split(' (')[1].replace(')', ''); txt.style.display = 'block'; }
+              }
+            }); 
           }); 
         } 
       });
@@ -508,7 +569,14 @@ function reprendreBrouillon(edeal) {
           if(scaleEl) scaleEl.classList.add('selected');
         } else { 
           (Array.isArray(val)?val:[val]).forEach(function(v){ 
-            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ if(optEl.getAttribute('data-val') === v) optEl.classList.add('selected'); }); 
+            var cleanV = v; if(v.indexOf(' (') !== -1) cleanV = v.split(' (')[0];
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              if(optEl.getAttribute('data-val') === cleanV) {
+                optEl.classList.add('selected');
+                var txt = optEl.querySelector('.opt-autre-txt');
+                if(txt && v.indexOf(' (') !== -1) { txt.value = v.split(' (')[1].replace(')', ''); txt.style.display = 'block'; }
+              }
+            }); 
           }); 
         }
       });
@@ -521,9 +589,7 @@ function supprimerBrouillon(edeal) {
   var confirmation = confirm("⚠️ Attention : Voulez-vous vraiment supprimer définitivement la pré-demande " + edeal + " ? Cette action est irréversible.");
   if (!confirmation) return;
   toast("⏳ Suppression du brouillon...", "ok");
-  var fd = new FormData();
-  fd.append('action', 'supprimerBrouillon');
-  fd.append('edeal', edeal);
+  var fd = new FormData(); fd.append('action', 'supprimerBrouillon'); fd.append('edeal', edeal);
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r) { return r.json(); })
   .then(function(res) {
