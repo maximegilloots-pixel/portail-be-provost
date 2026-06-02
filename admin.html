@@ -230,13 +230,51 @@ function editQuestion(i) { editingIndex=i; var q=formData[currentProduit][i]; te
 function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
 function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox'||t==='dropdown')?'block':'none'; }
 
-function addOpt(v){
-  var r = document.createElement('div'); r.className = 'opt-row'; r.style.display = 'flex'; r.style.gap = '6px'; r.style.alignItems = 'center'; r.style.marginBottom = '5px';
+function addOpt(v) {
+  var r = document.createElement('div'); r.className = 'opt-row'; r.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:5px;';
   var txtVal = (typeof v === 'object' && v !== null) ? (v.text || '') : (v || '');
   var imgVal = (typeof v === 'object' && v !== null) ? (v.image || '') : '';
+  var uid = 'opt_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+
   r.innerHTML = '<input type="text" class="opt-txt-input" value="' + txtVal + '" placeholder="Option texte" style="flex:2;">' +
-                '<input type="text" class="opt-img-input" value="' + imgVal + '" placeholder="URL Image (Optionnel)" style="flex:3; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:\'Be Vietnam Pro\',sans-serif; font-size:12px; outline:none;">';
+    '<input type="text" class="opt-img-input" id="img_' + uid + '" value="' + imgVal + '" placeholder="URL image" style="flex:2; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:\'Be Vietnam Pro\',sans-serif; font-size:12px; outline:none;">' +
+    '<label style="cursor:pointer;padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;background:var(--white);">📁 <input type="file" accept="image/*" style="display:none;" onchange="uploadOptImage(this, \'img_' + uid + '\')"></label>';
+
   document.getElementById('m-opts-list').appendChild(r);
+}
+
+function uploadOptImage(input, targetId) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var gh = getGHConfig();
+  if (!gh.token) { alert("Token GitHub manquant."); return; }
+
+  var r = new FileReader();
+  r.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    var nomFichier = 'images/opt_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + nomFichier;
+
+    document.getElementById(targetId).value = "⏳ Upload...";
+
+    fetch(apiUrl, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + gh.token },
+      body: JSON.stringify({ message: 'Upload automatique image option: ' + nomFichier, content: base64 })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.content && res.content.download_url) {
+        var url = 'https://raw.githubusercontent.com/' + gh.user + '/' + gh.repo + '/main/' + nomFichier;
+        document.getElementById(targetId).value = url;
+      } else {
+        document.getElementById(targetId).value = "";
+        alert("❌ Erreur upload image option");
+      }
+    })
+    .catch(function() { document.getElementById(targetId).value = ""; alert("❌ Erreur réseau"); });
+  };
+  r.readAsDataURL(file);
 }
 
 function handleImageUpload(input) {
