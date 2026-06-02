@@ -23,7 +23,7 @@
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;padding:20px;min-height:100vh}
 .tabs{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:50px;padding:5px;margin-bottom:25px;width:fit-content;box-shadow:var(--shadow)}
 .tab{display:flex;align-items:center;gap:6px;padding:9px 22px;border-radius:40px;border:none;background:transparent;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;color:var(--text-light);cursor:pointer;transition:var(--tr)}
-.tab.active{background:var(--blue);color:var(--white);box-shadow:0 4px 12px rgba(45,75,140,.2)}
+.tab.active{background:var(--blue);color(--white);box-shadow:0 4px 12px rgba(45,75,140,.2)}
 .tab:hover:not(.active){background:var(--blue-light);color:var(--blue)}
 .section{display:none}.section.active{display:block;animation:fadeUp .3s ease-out}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -117,6 +117,11 @@ tbody tr:hover{background:var(--blue-lighter)}
 .login-bar{width:100%;height:4px;background:var(--yellow);position:absolute;top:0;left:0}
 .app-content{display:none;max-width:1200px;margin:0 auto}
 .app-content.visible{display:block}
+.loading-overlay{position:fixed;inset:0;width:100vw;height:100vh;background:rgba(255,255,255,0.92);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;font-family:'Be Vietnam Pro',sans-serif}
+.progress-bar-container{width:280px;height:6px;background:#e4e8f0;border-radius:10px;overflow:hidden;margin-top:14px}
+.progress-bar-fill{width:0%;height:100%;background:var(--blue);animation:fakeLoading 12s cubic-bezier(0.05, 0.85, 0.1, 1) forwards}
+@keyframes fakeLoading{0%{width:0%}15%{width:35%}50%{width:68%}80%{width:88%}98%{width:97%}100%{width:99%}}
+.btn-filter.active-filter { background: var(--blue) !important; color: #fff !important; font-weight: 700; border-color: var(--blue) !important; }
 
 /* 🖼️ HIGH REFINEMENT FRAMEWORK & OPTION IMAGES */
 .q-img-wrapper { position: relative; margin: 10px 0; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); background: var(--white); max-width: 100%; width: fit-content; display: block; }
@@ -132,6 +137,9 @@ tbody tr:hover{background:var(--blue-lighter)}
 .opt-autre-container { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 6px; }
 .opt-autre-txt { flex: 1; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; outline: none; }
 .opt-autre-txt:focus { border-color: var(--blue); }
+
+.recap-p { margin-bottom: 6px; font-size: 13px; color: var(--dark); line-height: 1.5; }
+.recap-p strong { color: var(--blue-dark); font-weight: 700; }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -182,7 +190,6 @@ tbody tr:hover{background:var(--blue-lighter)}
     <div class="wz" id="wz4"><span class="wz-n">4</span>Envoi</div>
   </div>
 
-  <!-- 🚨 BANDEAU D'AVERTISSEMENT MANQUE D'INFOS -->
   <div id="be-comment-warning-container"></div>
 
   <div class="fstep active" id="step1">
@@ -463,6 +470,43 @@ function collectFormData() {
   return data;
 }
 
+// ── ⚡ FONCTION DE RENDU DU RÉCAPITULATIF ÉTAPE 4 RESTAURÉE ──
+function buildRecap() {
+  var container = document.getElementById('recap-content'); var objEl = document.getElementById('recap-obj'); if (!container) return;
+  var data = collectFormData(); if (objEl) objEl.textContent = data.edeal + " — " + data.client;
+  var html = '<div style="display:flex; flex-direction:column; gap:14px;">';
+  html += '<div class="card" style="margin-bottom:0; padding:16px;"><div class="card-title" style="margin-bottom:8px;">Demande Client</div>';
+  html += '<div class="recap-p"><strong>N° EDEAL :</strong> ' + (data.edeal || '—') + '</div>';
+  html += '<div class="recap-p"><strong>Client :</strong> ' + (data.client || '—') + '</div>';
+  html += '<div class="recap-p"><strong>Commercial :</strong> ' + (data.commercial || '—') + '</div>';
+  html += '<div class="recap-p"><strong>Département / Ville :</strong> ' + (data.ville || '—') + '</div>';
+  html += '<div class="recap-p"><strong>Date chantier souhaitée :</strong> ' + (data.dateChantier || '—') + '</div>';
+  html += '<div class="recap-p"><strong>Produit(s) :</strong> ' + (data.produits.join(', ') || '—') + '</div>';
+  if (data.commentaire) html += '<div class="recap-p"><strong>Commentaire commercial :</strong> ' + data.commentaire + '</div>';
+  html += '</div>';
+  if (Object.keys(data.infos).length > 0) {
+    html += '<div class="card" style="margin-bottom:0; padding:16px;"><div class="card-title" style="margin-bottom:8px;">Données Complémentaires</div>';
+    Object.keys(data.infos).forEach(function(k) { var v = data.infos[k]; if (Array.isArray(v)) v = v.join(', '); if (v) html += '<div class="recap-p"><strong>' + k + ' :</strong> ' + v + '</div>'; });
+    html += '</div>';
+  }
+  if (Object.keys(data.diagnostic).length > 0) {
+    Object.keys(data.diagnostic).forEach(function(pid) {
+      var prod = PRODUITS.find(function(p){ return p.id === pid; }); var label = prod ? prod.label : pid; var diagData = data.diagnostic[pid];
+      if (Object.keys(diagData).length > 0) {
+        html += '<div class="card" style="margin-bottom:0; padding:16px;"><div class="card-title" style="margin-bottom:8px;">Spécifications : ' + label + '</div>';
+        Object.keys(diagData).forEach(function(k) { var v = diagData[k]; if (Array.isArray(v)) v = v.join(', '); if (v) html += '<div class="recap-p"><strong>' + k + ' :</strong> ' + v + '</div>'; });
+        html += '</div>';
+      }
+    });
+  }
+  if (state.selectedFiles.length > 0) {
+    html += '<div class="card" style="margin-bottom:0; padding:16px;"><div class="card-title" style="margin-bottom:8px;">Pièces jointes cumulées (' + state.selectedFiles.length + ')</div><ul style="padding-left:18px; font-size:12px; color:var(--text); line-height:1.5;">';
+    state.selectedFiles.forEach(function(f) { var lbl = f.isFromServer ? ' <span style="color:var(--green); font-weight:bold;">(Conservé en BDD)</span>' : ' <span style="color:var(--blue); font-weight:bold;">(Nouveau)</span>'; html += '<li>' + f.name + lbl + '</li>'; });
+    html += '</ul></div>';
+  }
+  html += '</div>'; container.innerHTML = html;
+}
+
 function sauvegarderBrouillon() {
   var edeal = document.getElementById('f-edeal').value.trim(); if(!edeal){ toast("Le N° EDEAL est obligatoire.", "err"); return; } if(state.selectedFiles.length > 0) { alert("⚠️ Les PJ ne sont pas supportées en brouillon."); return; }
   var fData = collectFormData(); fData.isBrouillon = true; document.getElementById('loading-overlay').style.display = 'flex';
@@ -470,7 +514,6 @@ function sauvegarderBrouillon() {
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
 
-// ── ⚡ REPRISE INTELLIGENTE DU DOSSIER (BROUILLONS + MANQUE D'INFOS AVEC CONSERVATION DES PJ) ──
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement du dossier...", "ok");
   var fd = new FormData(); fd.append('action', 'getDemande'); fd.append('edeal', edeal);
@@ -536,7 +579,6 @@ function reprendreBrouillon(edeal) {
       });
     });
 
-    // 📥 RESTAURATION DES PIÈCES JOINTES SERVEUR SANS LES ÉCRASER
     state.selectedFiles = [];
     if (res.fichiers && res.fichiers.length) {
       res.fichiers.forEach(function(f) {
@@ -548,7 +590,6 @@ function reprendreBrouillon(edeal) {
     }
     renderFiles();
 
-    // ⚠️ GESTION GRAPHIQUE DU BANDEAU DE RETOUR COMMENTAIRE BE
     var currentDemandeInfo = state.allDemandes.find(function(x){ return x.edeal === edeal; }) || {};
     var beComment = currentDemandeInfo.commentaireBE || "";
     var warnCont = document.getElementById('be-comment-warning-container');
@@ -577,7 +618,7 @@ function supprimerBrouillon(edeal) {
       toast("🗑️ Brouillon supprimé avec succès.", "ok");
       chargerSuivi();
     } else { toast("⚠️ Impossible de supprimer le brouillon.", "err"); }
-  }).catch(function(err) { console.error(err); toast("❌ Erreur réseau lors de la suppression.", "err"); });
+  }).catch(function(err) { console.error(err); toast("❌ Erreur réseau lors de l'exécution.", "err"); });
 }
 
 function envoyerDemande() {
@@ -589,10 +630,7 @@ function envoyerDemande() {
     var promises = localFiles.map(function(file) { return new Promise(function(resolve) { var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file); }); });
     Promise.all(promises).then(function(newFiles) {
       var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64); 
-      
-      // 1. Liaison des nouveaux fichiers
       newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
-      // 2. Ré-injection et maintien des fichiers existants du serveur
       serverFiles.forEach(function(f) { fd.append('file_' + f.name + '|' + f.type, f.b64); });
       
       fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){ return r.json(); }).then(function(res){ document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); } else { alert("⚠️ Rejet Sheets."); } }).catch(function(err){ document.getElementById('loading-overlay').style.display = 'none'; alert("Erreur : " + err.message); });
