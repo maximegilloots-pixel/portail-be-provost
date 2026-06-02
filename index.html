@@ -796,49 +796,12 @@ function buildRecap() {
   var fData = collectFormData();
   var html = '';
 
-  // 🔄 FONCTION DE LIGNE CORRIGÉE POUR L'ÉCRAN
   function row(label, val) {
-    var txtValeur = val;
-    
-    // Si c'est un tableau (comme les cases à cocher), on extrait le texte
-    if (Array.isArray(val)) {
-      txtValeur = val.length > 0 ? val.join(', ') : '';
-    }
-    
-    // Au lieu de masquer la ligne si c'est vide, on injecte un texte grisé "Non renseigné"
-    if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') {
-      txtValeur = '<span style="color:var(--text-light); font-style:italic;">— (Non renseigné)</span>';
-    }
-
+    if (!val || val === '') return '';
     return '<div style="display:flex;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">' +
       '<div style="width:40%;font-weight:600;color:var(--blue);flex-shrink:0">' + label + '</div>' +
-      '<div style="flex:1;color:var(--dark)">' + txtValeur + '</div></div>';
+      '<div style="flex:1;color:var(--dark)">' + (Array.isArray(val) ? val.join(', ') : val) + '</div></div>';
   }
-
-  // Le reste de la fonction reste identique
-  html += row('N° EDEAL', fData.edeal);
-  html += row('Client', fData.client);
-  html += row('Commercial', fData.commercial);
-  html += row('Département / Ville', fData.ville);
-  html += row('Date chantier', fData.dateChantier);
-  html += row('Produit(s)', fData.produits ? fData.produits.join(', ') : '');
-  html += row('Commentaire', fData.commentaire);
-
-  Object.keys(fData.infos || {}).forEach(function(label) {
-    html += row(label, fData.infos[label]);
-  });
-
-  Object.keys(fData.diagnostic || {}).forEach(function(pid) {
-    var pd = fData.diagnostic[pid];
-    var prod = PRODUITS.find(function(p) { return p.id === pid; });
-    var labelProduit = prod ? prod.label : pid;
-    html += '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;text-transform:uppercase">' + labelProduit + '</div>';
-    Object.keys(pd).forEach(function(label) { html += row(label, pd[label]); });
-  });
-
-  container.innerHTML = html;
-  if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
-}
 
   html += row('N° EDEAL', fData.edeal);
   html += row('Client', fData.client);
