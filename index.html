@@ -840,30 +840,6 @@ function buildRecap() {
   if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
 }
 
-  html += row('N° EDEAL', fData.edeal);
-  html += row('Client', fData.client);
-  html += row('Commercial', fData.commercial);
-  html += row('Département / Ville', fData.ville);
-  html += row('Date chantier', fData.dateChantier);
-  html += row('Produit(s)', fData.produits ? fData.produits.join(', ') : '');
-  html += row('Commentaire', fData.commentaire);
-
-  Object.keys(fData.infos || {}).forEach(function(label) {
-    html += row(label, fData.infos[label]);
-  });
-
-  Object.keys(fData.diagnostic || {}).forEach(function(pid) {
-    var pd = fData.diagnostic[pid];
-    var prod = PRODUITS.find(function(p) { return p.id === pid; });
-    var labelProduit = prod ? prod.label : pid;
-    html += '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;text-transform:uppercase">' + labelProduit + '</div>';
-    Object.keys(pd).forEach(function(label) { html += row(label, pd[label]); });
-  });
-
-  container.innerHTML = html;
-  if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
-}
-
 </script>
 </body>
 </html>
