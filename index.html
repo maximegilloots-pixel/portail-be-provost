@@ -177,6 +177,14 @@ tbody tr:hover{background:var(--blue-lighter)}
 
 <section class="section" id="section-demande">
   <div class="s-label">Bureau d'Études</div><h2 class="s-title">Saisie de la demande</h2>
+  
+  <!-- 🚨 BANNIÈRE ALERTE RETOUR BE (À AJOUTER ICI) -->
+  <div id="be-comment-warning" style="display:none; background:rgba(192,57,43,0.1); border:1.5px solid var(--red); color:var(--red); padding:14px; border-radius:var(--radius); margin-bottom:16px; font-size:13px;">
+    <strong style="display:block; margin-bottom:4px; font-size:14px;">⚠️ RETOUR DU BUREAU D'ÉTUDES :</strong>
+    <span id="be-comment-text" style="font-weight:600;"></span>
+  </div>
+
+  <div class="wizard">
   <div class="wizard">
     <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
     <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
@@ -485,7 +493,11 @@ function sauvegarderBrouillon() {
 }
 
 function reprendreBrouillon(edeal) {
-  toast("⏳ Chargement de la pré-demande...", "ok");
+  toast("⏳ Chargement du dossier...", "ok");
+  
+  // 1. On cherche la demande dans le tableau local pour connaître son statut et son commentaire BE
+  var infoSuivi = state.allDemandes.find(function(x) { return x.edeal === edeal; }) || {};
+  
   var fd = new FormData();
   fd.append('action', 'getDemande');
   fd.append('edeal', edeal);
@@ -494,10 +506,32 @@ function reprendreBrouillon(edeal) {
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r){ return r.json(); })
   .then(function(res){
-    if(!res.success || !res.formData) { toast("⚠️ Brouillon introuvable", "err"); return; }
+    if(!res.success || !res.formData) { toast("⚠️ Demande introuvable", "err"); return; }
     var fd = res.formData; state.loadedDraft = fd;
-    document.getElementById('f-edeal').value = fd.edeal || ''; document.getElementById('f-client').value = fd.client || ''; document.getElementById('f-ville').value = fd.ville || ''; document.getElementById('f-date').value = fd.dateChantier || ''; document.getElementById('f-commentaire').value = fd.commentaire || '';
-    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); });
+    
+    // 2. Gestion explicite de l'affichage du commentaire BE si statut "Manque d'infos"
+    var warningEl = document.getElementById('be-comment-warning');
+    var textEl = document.getElementById('be-comment-text');
+    if (infoSuivi.statut === "Manque d'infos" && infoSuivi.commentaireBE && infoSuivi.commentaireBE !== "—") {
+      if (warningEl && textEl) {
+        textEl.textContent = infoSuivi.commentaireBE;
+        warningEl.style.display = 'block';
+      }
+    } else {
+      if (warningEl) warningEl.style.display = 'none';
+    }
+
+    // Remplissage des champs classiques
+    document.getElementById('f-edeal').value = fd.edeal || ''; 
+    document.getElementById('f-client').value = fd.client || ''; 
+    document.getElementById('f-ville').value = fd.ville || ''; 
+    document.getElementById('f-date').value = fd.dateChantier || ''; 
+    document.getElementById('f-commentaire').value = fd.commentaire || '';
+    
+    ['f-edeal', 'f-client', 'f-ville', 'f-date', 'f-commentaire'].forEach(function(id) { 
+      var txtEl = document.getElementById(id); if(txtEl && txtEl.value.trim()!=='') txtEl.classList.add('filled'); 
+    });
+    
     document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
     document.querySelectorAll('.q-scale-item').forEach(function(el){el.classList.remove('selected')});
     
@@ -517,8 +551,11 @@ function reprendreBrouillon(edeal) {
         } 
       });
     }
+    
     document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
-    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
     buildDiagnostic(); state.rebuildDiagnosticRequired = false;
     
     if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
@@ -537,7 +574,26 @@ function reprendreBrouillon(edeal) {
         }
       });
     });
-    state.selectedFiles = []; renderFiles(); showTab('demande'); goStep(1); toast("📋 Pré-demande chargée.", "ok");
+    
+    // 3. FIX PJ : On injecte les fichiers existants de GitHub/Sheets dans la file d'attente
+    state.selectedFiles = []; 
+    if (res.fichiers && res.fichiers.length) {
+      res.fichiers.forEach(function(f) {
+        if (f.b64 && f.b64.trim() !== "" && f.b64 !== "SUPPRIME_30J") {
+          state.selectedFiles.push({
+            name: f.nom,
+            size: 0, 
+            isFromServer: true, // Tag crucial pour ne pas les ré-encoder
+            b64: f.b64,
+            type: f.type || 'application/octet-stream'
+          });
+        }
+      });
+    }
+    renderFiles(); 
+    
+    showTab('demande'); goStep(1); 
+    toast("📋 Dossier chargé.", "ok");
   }).catch(function(err) { console.error(err); toast("❌ Erreur lors de la reprise", "err"); });
 }
 
@@ -560,16 +616,73 @@ function supprimerBrouillon(edeal) {
 }
 
 function envoyerDemande() {
-  var fData = collectFormData(); fData.isBrouillon = false; document.getElementById('loading-overlay').style.display = 'flex'; var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  var fData = collectFormData(); 
+  fData.isBrouillon = false; // Sort définitivement du statut Brouillon/Manque d'infos
+  
+  // Si c'était un dossier retourné pour manque d'infos, on passe l'instruction de rafraîchir la date
+  var infoSuivi = state.allDemandes.find(function(x){ return x.edeal === fData.edeal; }) || {};
+  if (infoSuivi.statut === "Manque d'infos") {
+    fData.actualiserDateDepot = true; // Flag interceptable par ton Apps Script backend
+    fData.statutPrecedent = "Manque d'infos";
+  }
+
+  document.getElementById('loading-overlay').style.display = 'flex'; 
+  
+  // Tri des pièces jointes : les nouvelles à encoder vs celles du serveur à conserver
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
+
   genererPDFBase64(fData).then(function(pdfBase64) {
-    var promises = localFiles.map(function(file) { return new Promise(function(resolve) { var r = new FileReader(); r.onload = function(e) { resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); }; r.readAsDataURL(file); }); });
+    var promises = localFiles.map(function(file) { 
+      return new Promise(function(resolve) { 
+        var r = new FileReader(); 
+        r.onload = function(e) { 
+          resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); 
+        }; 
+        r.readAsDataURL(file); 
+      }); 
+    });
+    
     Promise.all(promises).then(function(newFiles) {
-      var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('pdfBase64', pdfBase64); fd.append('token', sessionStorage.getItem('google_token') || ''); newFiles.forEach(function(f) { fd.append('file_' + f.nom + '|' + f.type, f.b64); });
-      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){ return r.json(); }).then(function(res){ document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast('Demande envoyée avec succès au BE ! ✓', 'ok'); resetForm(); showTab('suivi'); } else { alert("⚠️ Rejet Sheets."); } }).catch(function(err){ document.getElementById('loading-overlay').style.display = 'none'; alert("Erreur : " + err.message); });
+      var fd = new FormData(); 
+      fd.append('action', 'deposerDemande'); 
+      fd.append('data', JSON.stringify(fData)); 
+      fd.append('pdfBase64', pdfBase64); 
+      fd.append('token', sessionStorage.getItem('google_token') || ''); 
+      
+      // A. Envoi des NOUVEAUX fichiers ajoutés par le commercial
+      newFiles.forEach(function(f) { 
+        fd.append('file_' + f.nom + '|' + f.type, f.b64); 
+      });
+      
+      // B. Ré-envoi des fichiers EXISTANTS pour empêcher l'Apps Script de les écraser/supprimer
+      serverFiles.forEach(function(f) {
+        fd.append('file_' + f.name + '|' + f.type, f.b64);
+      });
+      
+      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd})
+      .then(function(r){ return r.json(); })
+      .then(function(res){ 
+        document.getElementById('loading-overlay').style.display = 'none'; 
+        if(res.success){ 
+          // Masquage de la bannière
+          var warningEl = document.getElementById('be-comment-warning');
+          if (warningEl) warningEl.style.display = 'none';
+          
+          toast('Dossier complété et renvoyé au BE ! ✓', 'ok'); 
+          resetForm(); 
+          showTab('suivi'); 
+        } else { 
+          alert("⚠️ Rejet Sheets."); 
+        } 
+      })
+      .catch(function(err){ 
+        document.getElementById('loading-overlay').style.display = 'none'; 
+        alert("Erreur : " + err.message); 
+      });
     });
   });
 }
-
 function parseShortDateToTime(s) { if(!s || s === '—') return 0; try { var parts = s.split(' '); var dParts = parts[0].split('/'); if(dParts.length < 3) return 0; var tParts = parts[1] ? parts[1].split(':') : [0,0]; return new Date(parseInt(dParts[2]), parseInt(dParts[1]) - 1, parseInt(dParts[0]), parseInt(tParts[0]), parseInt(tParts[1])).getTime(); } catch(e) { return 0; } }
 function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr; }
 function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
@@ -611,8 +724,17 @@ function renderSuivi(demandes) {
     return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
   }).join('');
 }
-function resetForm() { ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); }
-
+function resetForm() { 
+  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); 
+  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); 
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
+  
+  // 🧼 Nettoyage de la bannière BE
+  var warningEl = document.getElementById('be-comment-warning');
+  if (warningEl) warningEl.style.display = 'none';
+  
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); 
+}
 function genererPDFBase64(fData) {
   return new Promise(function(resolve) {
     var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
