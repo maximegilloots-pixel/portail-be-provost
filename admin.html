@@ -210,9 +210,91 @@ var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives'
 function initChampsProduits() { if (!formData.liste_produits) { formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; } else { formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); } if (!formData.infos_generales || !formData.infos_generales.length) { formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); } if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) { formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); } }
 function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
 function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
-function chargerDepuisGitHub() { var gh = getGHConfig(); majStatusGH(); if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; } fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now()).then(function(r){return r.json();}).then(function(cfg){ formData = cfg; initChampsProduits(); renderProduitTabs(); renderQuestions(); }).catch(function(){ formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; initChampsProduits(); renderProduitTabs(); renderQuestions(); }); }
-function sauvegarder() { var gh = getGHConfig(); var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; fetch(apiUrl, {headers:{'Authorization':'token '+gh.token}}).then(function(r){return r.json();}).then(function(info){ fetch(apiUrl, { method: 'PUT', headers: {'Authorization':'token '+gh.token}, body: JSON.stringify({ message: 'Mise a jour', content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), sha: info.sha||'' }) }).then(function(){ toast('✓ Publié !', 'ok'); }); }); }
+function chargerDepuisGitHub() {
+  var gh = getGHConfig(); 
+  majStatusGH(); 
+  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} 
+  if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
+  if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
+  
+  console.log("Admin : Tentative de chargement du config.json depuis GitHub...");
+  
+  fetch('https://raw.githubusercontent.com/'+gh.user+'/'+gh.repo+'/main/config.json?v='+Date.now())
+    .then(function(r) {
+      if (!r.ok) {
+        // Détecte si le dépôt est privé, mauvaise URL ou banni
+        throw new Error("Le serveur GitHub a répondu avec un statut " + r.status + ". Vérifiez que le repository est bien PUBLIC.");
+      }
+      return r.json();
+    })
+    .then(function(cfg) {
+      console.log("Admin : Configuration chargée avec succès !", cfg);
+      formData = cfg; 
+      initChampsProduits(); 
+      renderProduitTabs(); 
+      renderQuestions(); 
+    })
+    .catch(function(err) {
+      // Alerte rouge pour éviter d'écraser le fichier valide par erreur
+      console.error("⚠️ ÉCHEC DU CHARGEMENT DE LA CONFIG CONFIG.JSON :", err);
+      alert("⚠️ ERREUR CRITIQUE : Impossible de charger le fichier config.json depuis GitHub.\nDétail : " + err.message + "\n\nPar sécurité, l'éditeur affiche une structure vide. NE CLIQUEZ PAS sur 'Sauvegarder' tant que ce problème n'est pas résolu, sous peine d'effacer votre configuration existante !");
+      
+      formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
+      initChampsProduits(); 
+      renderProduitTabs(); 
+      renderQuestions(); 
+    }); 
+}
 
+function sauvegarder() { 
+  var gh = getGHConfig(); 
+  if (!gh.token || !gh.user || !gh.repo) {
+    alert("❌ Action impossible : Les paramètres de configuration GitHub (Utilisateur, Repository ou Token PAT) sont manquants dans l'onglet Paramètres.");
+    return;
+  }
+
+  var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; 
+  toast('⏳ Connexion à GitHub...', 'ok');
+  
+  // Étape 1 : Récupérer le SHA actuel du fichier (obligatoire pour GitHub)
+  fetch(apiUrl, { headers: {'Authorization':'token '+gh.token} })
+    .then(function(r) {
+      if (!r.ok) {
+        throw new Error("Impossible de récupérer les métadonnées (SHA) du fichier sur GitHub (Statut " + r.status + "). Votre Token PAT est-il toujours valide ?");
+      }
+      return r.json();
+    })
+    .then(function(info) { 
+      toast('⏳ Écriture du fichier...', 'ok');
+      // Étape 2 : Envoyer la mise à jour
+      return fetch(apiUrl, { 
+        method: 'PUT', 
+        headers: {
+          'Authorization':'token '+gh.token,
+          'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({ 
+          message: 'Mise à jour des questions via Admin BE (v5.2)', 
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), 
+          sha: info.sha || '' 
+        }) 
+      });
+    })
+    .then(function(r2) {
+      if (!r2.ok) {
+        throw new Error("GitHub a refusé l'écriture du fichier (Statut " + r2.status + "). Vérifiez les permissions de votre Token PAT.");
+      }
+      return r2.json();
+    })
+    .then(function() { 
+      toast('✓ Publié !', 'ok'); 
+      alert("🎉 Succès ! La nouvelle configuration a été publiée sur GitHub.\nElle sera active instantanément sur le portail des commerciaux.");
+    })
+    .catch(function(err) {
+      console.error("⚠️ ÉCHEC DE LA PUBLICATION SUR GITHUB :", err);
+      alert("❌ ÉCHEC DE LA SAUVEGARDE :\n" + err.message);
+    });
+}
 function renderQuestions() {
   var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
   if (currentProduit === 'infos_generales') { var lockedEl = document.createElement('div'); lockedEl.className = 'info-box'; lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires'; list.appendChild(lockedEl); }
