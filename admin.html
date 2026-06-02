@@ -207,7 +207,87 @@ function sauvegarderConfig() { localStorage.setItem('gh_user', document.getEleme
 function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); if(el) { el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; } }
 
 var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
-function initChampsProduits() { if (!formData.liste_produits) { formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; } else { formData.liste_produits = formData.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); } if (!formData.infos_generales || !formData.infos_generales.length) { formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); } if (!formData.proplus_lp3_2n || !formData.proplus_lp3_2n.length) { formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); } }
+function initChampsProduits() { 
+  // Sécurisation de la liste des produits
+  if (!formData.liste_produits || !Array.isArray(formData.liste_produits)) { 
+    formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; 
+  } else { 
+    formData.liste_produits = formData.liste_produits.filter(function(p){ return p && p.id !== 'infos_generales'; }); 
+  } 
+  
+  // 🛡️ SÉCURITÉ STRICTE : On vérifie explicitement si c'est un vrai TABLEAU et s'il contient des données
+  // Si le format sur GitHub est corrompu (string, objet...), on le réinitialise proprement avec les valeurs par défaut
+  if (!formData.infos_generales || !Array.isArray(formData.infos_generales) || formData.infos_generales.length === 0) { 
+    console.warn("Admin : Structure 'infos_generales' invalide ou vide sur GitHub. Restauration des champs par défaut.");
+    formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); 
+  } 
+  
+  if (!formData.proplus_lp3_2n || !Array.isArray(formData.proplus_lp3_2n) || formData.proplus_lp3_2n.length === 0) { 
+    formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); 
+  } 
+}
+
+function renderQuestions() {
+  var list = document.getElementById('q-list-container'); 
+  if (!list) return;
+  list.innerHTML = ''; 
+  
+  var questions = formData[currentProduit];
+  
+  // Si la section demandée n'est pas un tableau valide, on la redresse en tableau vide pour éviter le crash
+  if (!questions || !Array.isArray(questions)) {
+    questions = [];
+  }
+
+  // Affichage de la boîte d'information verrouillée pour l'étape 1
+  if (currentProduit === 'infos_generales') { 
+    var lockedEl = document.createElement('div'); 
+    lockedEl.className = 'info-box'; 
+    lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires'; 
+    list.appendChild(lockedEl); 
+  }
+  
+  if(!questions.length){ 
+    var emptyDiv = document.createElement('div'); 
+    emptyDiv.style.padding = '10px'; 
+    emptyDiv.style.fontStyle = 'italic'; 
+    emptyDiv.textContent = 'Aucune question complémentaire dynamique ajoutée dans cette rubrique.'; 
+    list.appendChild(emptyDiv); 
+    return; 
+  }
+  
+  // 🛡️ Protection de la boucle de rendu avec un bloc try/catch
+  try {
+    questions.forEach(function(q, i) {
+      if (!q || typeof q !== 'object') return; // Ignore l'élément s'il est corrompu (ex: une chaîne de texte perdue)
+      
+      var labelText = q.label || "Question sans libellé";
+      var typeText = typeLbl(q.type || "text");
+      var hasImage = q.image ? ' [🖼️ Image]' : '';
+      
+      var el = document.createElement('div'); 
+      el.className = 'q-item'; 
+      el.draggable = true; 
+      el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + labelText + hasImage + '</div><span class="q-item-type">' + typeText + '</span></div>' + '<div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(' + i + ')">✏️</button><button class="btn-icon del" onclick="deleteQuestion(' + i + ')">🗑️</button></div>';
+      
+      el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; }); 
+      el.addEventListener('dragend', function(){ el.style.opacity='1'; }); 
+      el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; }); 
+      el.addEventListener('dragleave', function(){ el.style.background=''; });
+      el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background=''; var from=parseInt(e.dataTransfer.getData('text')),to=i; if(from===to) return; var arr=formData[currentProduit],item=arr.splice(from,1)[0]; arr.splice(to,0,item); renderQuestions(); }); 
+      
+      list.appendChild(el);
+    });
+  } catch (err) {
+    console.error("Erreur critique lors du rendu des questions :", err);
+    var errDiv = document.createElement('div');
+    errDiv.style.color = 'var(--red)';
+    errDiv.style.padding = '10px';
+    errDiv.innerHTML = '⚠️ <b>Erreur de formatage :</b> Les données de cette rubrique contenues dans le fichier config.json sont corrompues et empêchent l\'affichage.';
+    list.appendChild(errDiv);
+  }
+}
+  
 function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
 function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
 function chargerDepuisGitHub() {
@@ -325,16 +405,7 @@ function sauvegarder() {
       alert("❌ ÉCHEC DE LA SAUVEGARDE :\n" + err.message);
     });
 }
-function renderQuestions() {
-  var list = document.getElementById('q-list-container'); list.innerHTML = ''; var questions = formData[currentProduit] || [];
-  if (currentProduit === 'infos_generales') { var lockedEl = document.createElement('div'); lockedEl.className = 'info-box'; lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires'; list.appendChild(lockedEl); }
-  if(!questions.length){ var emptyDiv = document.createElement('div'); emptyDiv.style.padding = '10px'; emptyDiv.style.fontStyle = 'italic'; emptyDiv.textContent = 'Aucune question complémentaire dynamic ajoutée'; list.appendChild(emptyDiv); return; }
-  questions.forEach(function(q, i) {
-    var el = document.createElement('div'); el.className = 'q-item'; el.draggable = true; el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + q.label + ' ' + (q.image?'[🖼️ Image]':'') + '</div><span class="q-item-type">' + typeLbl(q.type) + '</span></div>' + '<div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(' + i + ')">✏️</button><button class="btn-icon del" onclick="deleteQuestion(' + i + ')">🗑️</button></div>';
-    el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; }); el.addEventListener('dragend', function(){ el.style.opacity='1'; }); el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; }); el.addEventListener('dragleave', function(){ el.style.background=''; });
-    el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background=''; var from=parseInt(e.dataTransfer.getData('text')),to=i; if(from===to) return; var arr=formData[currentProduit],item=arr.splice(from,1)[0]; arr.splice(to,0,item); renderQuestions(); }); list.appendChild(el);
-  });
-}
+
 
 function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',dropdown:'Menu déroulant',scale:'Échelle 1-5',radio:'Unique',checkbox:'Multiple'}[t]||t; }
 function openAddModal() { editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter'; document.getElementById('m-label').value=''; document.getElementById('m-type').value='text'; document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML=''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open'); }
