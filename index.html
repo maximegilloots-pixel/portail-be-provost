@@ -291,28 +291,53 @@ window.addEventListener('DOMContentLoaded', function() {
 
 function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name); sessionStorage.setItem('google_token', response.credential); setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire(); } else { document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block'; } }
 function chargerConfigFormulaire() {
-  console.log("Tentative de chargement du config.json...");
-  fetch(CONFIG_URL + '?v=' + Date.now())
-    .then(function(r) { 
+  // 1. Récupération dynamique des paramètres configurés dans l'admin
+  var ghUser = localStorage.getItem('gh_user') || 'maximegilloots-pixel';
+  var ghRepo = localStorage.getItem('gh_repo') || 'portail-be-provost';
+  var ghToken = localStorage.getItem('gh_token') || '';
+
+  console.log("Portail : Tentative de synchronisation avec " + ghUser + "/" + ghRepo);
+
+  // 2. On utilise l'API GitHub officielle (Zéro cache et compatible dépôts privés)
+  var apiUrl = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/config.json';
+  var headers = {};
+  if (ghToken) { headers['Authorization'] = 'token ' + ghToken; }
+
+  fetch(apiUrl, { headers: headers, cache: 'no-store' })
+    .then(function(r) {
       if (!r.ok) {
-        // Permet de détecter les erreurs 404 (fichier introuvable ou repo privé)
-        throw new Error("Serveur GitHub a répondu avec un statut " + r.status);
+        throw new Error("Erreur API GitHub (Statut " + r.status + ")");
       }
-      return r.json(); 
+      return r.json();
     })
-    .then(function(cfg) {
-      console.log("Configuration chargée avec succès :", cfg);
+    .then(function(info) {
+      // Décodage propre du contenu Base64 envoyé par l'API
+      var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
+      var cfg = JSON.parse(decodedContent);
+      
       RawConfig = cfg; 
       if (cfg && cfg.liste_produits) {
         PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); 
       }
-      initFormulaire(); 
+      initFormulaire();
+      console.log("🎉 Portail : Formulaire synchronisé instantanément avec GitHub !");
     })
     .catch(function(err) {
-      // TRÈS IMPORTANT : Permet de voir enfin l'erreur dans la console F12
-      console.error("⚠️ ÉCHEC DU CHARGEMENT CONFIG:", err);
-      alert("Erreur config.json : " + err.message + "\nLe formulaire se chargera avec les valeurs par défaut.");
-      initFormulaire(); 
+      console.warn("⚠️ Mode dégradé : Échec API GitHub, tentative via le lien public brut...", err);
+      
+      // PLAN B : Si l'API échoue (ex: pas de token), on tente le lien Raw classique
+      var backupUrl = 'https://raw.githubusercontent.com/' + ghUser + '/' + ghRepo + '/main/config.json?v=' + Date.now();
+      fetch(backupUrl)
+        .then(function(r2){ return r2.json(); })
+        .then(function(cfg) {
+          RawConfig = cfg;
+          if (cfg && cfg.liste_produits) PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
+          initFormulaire();
+        })
+        .catch(function() {
+          // PLAN C : Si tout est bloqué, on charge les 3 produits de base en dur pour ne pas bloquer l'écran
+          initFormulaire();
+        });
     });
 }
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
