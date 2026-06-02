@@ -282,8 +282,31 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name); sessionStorage.setItem('google_token', response.credential); setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire(); } else { document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block'; } }
-function chargerConfigFormulaire() { fetch(CONFIG_URL + '?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(cfg) { RawConfig = cfg; if (cfg && cfg.liste_produits) PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); initFormulaire(); }).catch(function(err) { initFormulaire(); }); }
-
+function chargerConfigFormulaire() {
+  console.log("Tentative de chargement du config.json...");
+  fetch(CONFIG_URL + '?v=' + Date.now())
+    .then(function(r) { 
+      if (!r.ok) {
+        // Permet de détecter les erreurs 404 (fichier introuvable ou repo privé)
+        throw new Error("Serveur GitHub a répondu avec un statut " + r.status);
+      }
+      return r.json(); 
+    })
+    .then(function(cfg) {
+      console.log("Configuration chargée avec succès :", cfg);
+      RawConfig = cfg; 
+      if (cfg && cfg.liste_produits) {
+        PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); 
+      }
+      initFormulaire(); 
+    })
+    .catch(function(err) {
+      // TRÈS IMPORTANT : Permet de voir enfin l'erreur dans la console F12
+      console.error("⚠️ ÉCHEC DU CHARGEMENT CONFIG:", err);
+      alert("Erreur config.json : " + err.message + "\nLe formulaire se chargera avec les valeurs par défaut.");
+      initFormulaire(); 
+    });
+}
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
 var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
 
