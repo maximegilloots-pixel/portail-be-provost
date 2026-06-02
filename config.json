@@ -698,43 +698,32 @@
       "placeholder": "BLABLA"
     },
     {
-      "id": "q_1780392686617",
+      "id": "q_1780406068305",
       "label": "TEST5",
       "type": "radio",
       "options": [
-        {
-          "text": "OPT1",
-          "image": "",
-          "isOther": false
-        },
-        {
-          "text": "OPT2",
-          "image": "",
-          "isOther": false
-        }
+        "OPT1",
+        "OPT2"
       ],
       "placeholder": "BLABLA",
       "image": "q_1780392631951_capture_d__cran_2026_02_16_143422.png"
     },
     {
-      "id": "q_1780392682039",
+      "id": "q_1780406096275",
       "label": "TEST6",
       "type": "checkbox",
       "options": [
         {
           "text": "OPT1",
-          "image": "opt_1780392662469_capture_d__cran_2026_02_24_083950.png",
-          "isOther": false
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780406083400_Capture_d__cran_2026-03-10_083513.png"
         },
         {
           "text": "OPT2",
-          "image": "opt_1780392665388_capture_d__cran_2026_03_03_105612.png",
-          "isOther": false
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780406087039_Capture_d__cran_2026-03-16_161120.png"
         },
         {
           "text": "OPT3",
-          "image": "opt_1780392668578_capture_d__cran_2026_03_20_115846.png",
-          "isOther": false
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780406091422_Capture_d__cran_2026-03-20_103723.png"
         }
       ],
       "image": "q_1780392675059_capture_d__cran_2026_02_16_143540.png"
