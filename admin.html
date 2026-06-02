@@ -29,7 +29,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .btn-icon.del:hover{border-color:var(--red);color:var(--red)}
 .modal-bg{position:fixed;inset:0;background:rgba(35,45,70,.4);z-index:1000;display:none;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:var(--white);border-radius:12px;padding:24px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(35,45,70,.2)}
+.modal{background:var(--white);border-radius:12px;padding:24px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(35,45,70,.2)}
 .modal-title{font-size:15px;font-weight:900;color:var(--dark);margin-bottom:18px}
 .frow{margin-bottom:12px}
 .flabel{display:block;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
@@ -87,7 +87,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="admin-header">
   <div><h1>⚙️ Administration — Portail BE <span style="font-size:11px; color:var(--yellow); font-weight:bold; padding-left:10px;">v5.2-ChoiceImages</span></h1></div>
   <div style="display:flex;align-items:center;gap:12px">
-    <span class="github-status gh-ok" id="gh-status">GitHub : Connecté</span>
+    <span class="github-status gh-ok" id="gh-status">GitHub : Connected</span>
   </div>
 </div>
 
@@ -171,12 +171,12 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
         <option value="textarea">Zone texte</option>
         <option value="dropdown">Menu déroulant 🆕</option>
         <option value="scale">Échelle linéaire (1-5) 🆕</option>
-        <option value="radio">Choix unique</option>
-        <option value="checkbox">Choix multiple</option>
+        <option value="radio">Choix unique (Bouton Radio)</option>
+        <option value="checkbox">Choix multiples (Cases à cocher)</option>
       </select>
     </div>
     <div id="m-opts-section"><label class="flabel">Options</label><div class="opts-list" id="m-opts-list"></div><button class="add-opt" onclick="addOpt()">+ Option</button></div>
-    <div class="frow"><label class="flabel">Illustration Image (Optionnelle)</label><input type="file" id="m-image-file" accept="image/*" class="finput" onchange="handleImageUpload(this)"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
+    <div class="frow"><label class="flabel">Illustration Image Générale Question (Optionnelle - Nom du fichier dans /images)</label><input class="finput" id="m-image" placeholder="ex : schema_lp3.png"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
     <div class="frow"><label class="flabel">Aide / Placeholder</label><input class="finput" id="m-hint"></div>
     <div class="btn-row"><button class="btn btn-primary" onclick="saveModal()">Enregistrer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>
   </div>
@@ -224,9 +224,9 @@ function renderQuestions() {
   });
 }
 
-function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',dropdown:'Menu déroulant',scale:'Échelle 1-5',radio:'Unique',checkbox:'Multiple'}[t]||t; }
-function openAddModal() { editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter'; document.getElementById('m-label').value=''; document.getElementById('m-type').value='text'; document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML=''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open'); }
-function editQuestion(i) { editingIndex=i; var q=formData[currentProduit][i]; tempImageUrl=q.image||""; document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label; document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||''; document.getElementById('m-image-preview').innerHTML=tempImageUrl?"✅ Image liée":""; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open'); }
+function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',dropdown:'Menu déroulant',scale:'Échelle 1-5',radio:'Choix unique',checkbox:'Choix multiple'}[t]||t; }
+function openAddModal() { editingIndex=-1; document.getElementById('modal-title').textContent='Ajouter'; document.getElementById('m-label').value=''; document.getElementById('m-type').value='text'; document.getElementById('m-hint').value=''; document.getElementById('m-image').value=''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open'); }
+function editQuestion(i) { editingIndex=i; var q=formData[currentProduit][i]; document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label; document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||''; document.getElementById('m-image').value=q.image||''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open'); }
 function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
 function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox'||t==='dropdown')?'block':'none'; }
 
@@ -234,23 +234,27 @@ function addOpt(v){
   var r = document.createElement('div'); r.className = 'opt-row'; r.style.display = 'flex'; r.style.gap = '6px'; r.style.alignItems = 'center'; r.style.marginBottom = '5px';
   var txtVal = (typeof v === 'object' && v !== null) ? (v.text || '') : (v || '');
   var imgVal = (typeof v === 'object' && v !== null) ? (v.image || '') : '';
-  r.innerHTML = '<input type="text" class="opt-txt-input" value="' + txtVal + '" placeholder="Option texte" style="flex:2;">' +
-                '<input type="text" class="opt-img-input" value="' + imgVal + '" placeholder="URL Image (Optionnel)" style="flex:3; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:\'Be Vietnam Pro\',sans-serif; font-size:12px; outline:none;">';
+  var isOther = (typeof v === 'object' && v !== null) ? !!v.isOther : (txtVal.toLowerCase().trim().indexOf('autre') === 0);
+  
+  r.innerHTML = '<input type="text" class="opt-txt-input" value="' + txtVal + '" placeholder="Texte choix (ex: Option 1)" style="flex:2; padding:6px 8px; border:1px solid var(--border); border-radius:6px;">' +
+                '<input type="text" class="opt-img-input" value="' + imgVal + '" placeholder="Fichier image (ex: option1.png)" style="flex:2; padding:6px 8px; border:1px solid var(--border); border-radius:6px;">' +
+                '<label style="display:flex; align-items:center; gap:3px; font-size:11px; white-space:nowrap;"><input type="checkbox" class="opt-other-check" ' + (isOther ? 'checked' : '') + '> Case Autre</label>' +
+                '<button type="button" onclick="this.parentElement.remove()" style="background:none; border:none; color:var(--red); font-weight:bold; cursor:pointer;">×</button>';
   document.getElementById('m-opts-list').appendChild(r);
 }
-
-function handleImageUpload(input) { if (input.files && input.files[0]) { var r = new FileReader(); r.onload = function(e) { tempImageUrl = e.target.result; document.getElementById('m-image-preview').innerHTML = "✅ Image chargée en mémoire locale"; }; r.readAsDataURL(input.files[0]); } }
 
 function saveModal() {
   var l=document.getElementById('m-label').value.trim(); var t=document.getElementById('m-type').value; var opts=[];
   document.querySelectorAll('#m-opts-list .opt-row').forEach(function(row){
     var txt = row.querySelector('.opt-txt-input').value.trim();
     var img = row.querySelector('.opt-img-input').value.trim();
-    if(txt) { if(img) opts.push({text: txt, image: img}); else opts.push(txt); }
+    var isOther = row.querySelector('.opt-other-check').checked;
+    if(txt) { opts.push({text: txt, image: img, isOther: isOther}); }
   });
   var q={id:'q_'+Date.now(), label:l, type:t}; if(opts.length) q.options=opts;
   if(document.getElementById('m-hint').value.trim()) q.placeholder=document.getElementById('m-hint').value.trim();
-  if(tempImageUrl) q.image=tempImageUrl; if(editingIndex>=0) formData[currentProduit][editingIndex]=q;
+  if(document.getElementById('m-image').value.trim()) q.image=document.getElementById('m-image').value.trim();
+  if(editingIndex>=0) formData[currentProduit][editingIndex]=q;
   else { if(!formData[currentProduit])formData[currentProduit]=[]; formData[currentProduit].push(q); } renderQuestions(); closeModal();
 }
 function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
