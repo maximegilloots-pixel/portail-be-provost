@@ -670,7 +670,17 @@
       ]
     }
   ],
-  "infos_generales": [],
+  "infos_generales": [
+    {
+      "id": "q_1780415261642",
+      "label": "",
+      "type": "dropdown",
+      "options": [
+        "rgre",
+        "greg"
+      ]
+    }
+  ],
   "prod_1780412206778": [
     {
       "id": "q_1780412224081",
