@@ -894,14 +894,14 @@ function genererPDFBase64(fData) {
     var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
     
     function row(label, val) { 
-      var txtValeur = val;
-      if (Array.isArray(val)) {
-        txtValeur = val.length > 0 ? val.join(', ') : '';
-      }
+      var txtValeur = val; if (Array.isArray(val)) { txtValeur = val.length > 0 ? val.join(', ') : ''; }
+      
+      // 🛡️ SÉCURITÉ PDF : Si la question n'a pas de réponse, on renvoie une chaîne vide pour ne pas encombrer le doc du BE
       if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') {
-        txtValeur = '— (Non renseigné)';
+        return '';
       }
-      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.04);padding:1px 6px;border-radius:3px">' + String(txtValeur) + '</div></div>'; 
+      
+      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.04);padding:1px 6px;border-radius:3px;white-space:pre-wrap;">' + String(txtValeur) + '</div></div>'; 
     }
     
     function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
@@ -923,26 +923,29 @@ function buildRecap() {
   var fData = collectFormData();
   var html = '';
 
-  // 🔄 FONCTION DE LIGNE CORRIGÉE POUR L'ÉCRAN
   function row(label, val) {
     var txtValeur = val;
+    var isEmpty = false;
     
-    // Si c'est un tableau (comme les cases à cocher), on extrait le texte
     if (Array.isArray(val)) {
       txtValeur = val.length > 0 ? val.join(', ') : '';
     }
     
-    // Au lieu de masquer la ligne si c'est vide, on injecte un texte grisé "Non renseigné"
     if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') {
-      txtValeur = '<span style="color:var(--text-light); font-style:italic;">— (Non renseigné)</span>';
+      txtValeur = '— (Non renseigné)';
+      isEmpty = true;
     }
+
+    // 🎨 COULEUR ADAPTATIVE : Orange ambré si vide, sinon couleur sombre normale du portail
+    var styleValeur = isEmpty 
+      ? 'color: #e67e22; font-style: italic; font-weight: 600;' 
+      : 'color: var(--dark);';
 
     return '<div style="display:flex;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">' +
       '<div style="width:40%;font-weight:600;color:var(--blue);flex-shrink:0">' + label + '</div>' +
-      '<div style="flex:1;color:var(--dark)">' + txtValeur + '</div></div>';
+      '<div style="flex:1; white-space:pre-wrap; ' + styleValeur + '">' + txtValeur + '</div></div>';
   }
 
-  // Le reste de la fonction reste identique
   html += row('N° EDEAL', fData.edeal);
   html += row('Client', fData.client);
   html += row('Commercial', fData.commercial);
