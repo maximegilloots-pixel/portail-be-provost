@@ -382,6 +382,12 @@ function buildInfosGeneralesDynamic() {
   var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
+    
+    // 💡 INJECTION DU SOUS-TITRE D'AIDE EN ITALIQUE
+    if (q.placeholder && q.placeholder.trim() !== '') {
+      qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px;">' + q.placeholder + '</div>';
+    }
+    
     if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
     var fid = 'info_' + q.id;
     if(q.type==='text' || q.type==='textarea') {
@@ -488,6 +494,12 @@ function buildDiagnostic() {
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
+      
+      // 💡 INJECTION DU SOUS-TITRE D'AIDE EN ITALIQUE
+      if (q.placeholder && q.placeholder.trim() !== '') {
+        qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px;">' + q.placeholder + '</div>';
+      }
+      
       if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
       var fid = pid+'_'+q.id;
       if(q.type==='text' || q.type==='textarea') {
@@ -529,49 +541,21 @@ function buildDiagnostic() {
           
           var otherInput = null;
           if (optText.toLowerCase().indexOf('autre') !== -1) {
-            otherInput = document.createElement('input');
-            otherInput.type = 'text';
-            otherInput.className = 'q-text-input other-input-field';
-            otherInput.setAttribute('data-field', fid);
-            otherInput.placeholder = 'Veuillez préciser...';
-            otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
-            
+            otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
             otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
             otherInput.addEventListener('input', function() {
-              if (otherInput.value.trim() !== '') {
-                optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim());
-                otherInput.classList.add('filled');
-              } else {
-                optDiv.setAttribute('data-val', optText);
-                otherInput.classList.remove('filled');
-              }
+              if (otherInput.value.trim() !== '') { optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim()); otherInput.classList.add('filled'); } else { optDiv.setAttribute('data-val', optText); otherInput.classList.remove('filled'); }
             });
             optsDiv.appendChild(otherInput);
           }
           
           optDiv.addEventListener('click', function() {
             if(q.type==='radio') { 
-              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
-                x.classList.remove('selected');
-                x.setAttribute('data-val', x.getAttribute('data-initial-val'));
-              }); 
-              document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){
-                x.style.display = 'none'; x.value = ''; x.classList.remove('filled');
-              });
+              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); x.setAttribute('data-val', x.getAttribute('data-initial-val')); }); 
+              document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){ x.style.display = 'none'; x.value = ''; x.classList.remove('filled'); });
             }
-            
             optDiv.classList.toggle('selected');
-            
-            if (otherInput) {
-              if (optDiv.classList.contains('selected')) {
-                otherInput.style.display = 'block';
-                otherInput.focus();
-              } else {
-                otherInput.style.display = 'none';
-                otherInput.value = '';
-                optDiv.setAttribute('data-val', optText);
-              }
-            }
+            if (otherInput) { if (optDiv.classList.contains('selected')) { otherInput.style.display = 'block'; otherInput.focus(); } else { otherInput.style.display = 'none'; otherInput.value = ''; optDiv.setAttribute('data-val', optText); } }
           });
         });
         qDiv.appendChild(optsDiv);
@@ -581,7 +565,6 @@ function buildDiagnostic() {
     container.appendChild(block);
   });
 }
-
 function collectFormData() {
   var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
