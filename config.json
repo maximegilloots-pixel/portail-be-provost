@@ -603,10 +603,9 @@
       "placeholder": "Ajouter des descentes d'eau pluviale permet de garantir une évacuation efficace de l'eau de pluie, évitant ainsi l'accumulation sur la toiture, les infiltrations et les risques de dégradation des matériaux. Cela aide également à prévenir les problèmes d'humidité et à préserver l'intégrité structurelle de la construction."
     },
     {
-      "id": "qe_sol",
+      "id": "q_1780475361704",
       "label": "Type de sol",
-      "type": "checkbox",
-      "multi": true,
+      "type": "radio",
       "options": [
         "Béton",
         "Bitume",
@@ -615,9 +614,9 @@
       ]
     },
     {
-      "id": "q_1780471305952",
+      "id": "q_1780475356032",
       "label": "Type d'ancrages",
-      "type": "checkbox",
+      "type": "radio",
       "options": [
         "Vis béton",
         "Ancrages Inox",
