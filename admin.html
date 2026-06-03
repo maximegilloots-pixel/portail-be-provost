@@ -337,72 +337,44 @@ function renderQuestions() {
   }
 }
   
-function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
-function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
-function chargerDepuisGitHub() {
-  var gh = getGHConfig(); 
-  majStatusGH(); 
-  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} 
-  if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
-  if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
+function renderProduitTabs() {
+  var container = document.getElementById('produit-tabs-container'); if (!container) return;
+  container.innerHTML = '';
   
-  // Sécurité : si les champs fondamentaux sont vides dans l'onglet paramètres
-  if (!gh.user || !gh.repo) {
-    console.warn("Admin : Configuration GitHub manquante dans l'onglet Paramètres.");
-    formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-    initChampsProduits(); renderProduitTabs(); renderQuestions();
-    return;
-  }
-
-  console.log("Admin : Connexion à l'API de sécurité GitHub...");
+  // Onglet fixe pour l'étape 1
+  var btnGen = document.createElement('button');
+  btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '');
+  btnGen.textContent = 'Infos Générales (Étape 1)';
+  btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); };
+  container.appendChild(btnGen);
   
-  var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
-  var headers = { 'Accept': 'application/vnd.github.v3+json' };
-  if (gh.token) { headers['Authorization'] = 'token ' + gh.token; }
-
-  fetch(apiUrl, { headers: headers, cache: 'no-store' })
-    .then(function(r) {
-      if (!r.ok) {
-        // Interceptions chirurgicales des raisons de blocage de GitHub
-        if (r.status === 401) {
-          throw new Error("Code 401 (Non autorisé).\nLe Token PAT GitHub copié dans l'onglet Paramètres est invalide, expiré ou comporte une erreur de frappe.");
-        }
-        if (r.status === 404) {
-          throw new Error("Code 404 (Introuvable).\nL'utilisateur '" + gh.user + "' ou le dépôt '" + gh.repo + "' est mal orthographié, ou alors le fichier 'config.json' n'est pas situé à la racine du repository.");
-        }
-        if (r.status === 403) {
-          throw new Error("Code 403 (Accès interdit).\nVotre Token PAT n'a pas les droits cochés pour lire ce dépôt, ou vous avez dépassé la limite de requêtes autorisées par GitHub.");
-        }
-        throw new Error("Réponse serveur GitHub inattendue : Statut " + r.status);
-      }
-      return r.json();
-    })
-    .then(function(info) {
-      if (!info.content) {
-        throw new Error("Le fichier config.json a été trouvé mais son contenu semble vide.");
-      }
-      
-      // Décodage de la base64 sécurisée pour les accents français
-      var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
-      var cfg = JSON.parse(decodedContent);
-      
-      console.log("Admin : Synchro réussie !", cfg);
-      formData = cfg; 
-      initChampsProduits(); 
-      renderProduitTabs(); 
-      renderQuestions(); 
-    })
-    .catch(function(err) {
-      console.error("⚠️ CRASH DU CHARGEMENT DIRECT :", err);
-      
-      // La fameuse alerte qui va briser le silence du bug :
-      alert("⚠️ ÉCHEC DE SYNCHRONISATION TECHNIQUE :\n\n" + err.message + "\n\nPar sécurité, l'écran reste blanc pour ne pas corrompre vos données.");
-      
-      formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-      initChampsProduits(); 
-      renderProduitTabs(); 
-      renderQuestions(); 
-    }); 
+  // Boucle sur les produits de l'Étape 2
+  (formData.liste_produits || []).forEach(function(p) {
+    var isActive = (currentProduit === p.id);
+    
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:inline-flex; align-items:center; gap:6px; margin-right:4px; margin-bottom:4px; padding:2px 4px 2px 12px; border:1.5px solid var(--border); border-radius:40px; transition:var(--tr);';
+    wrapper.style.background = isActive ? 'var(--blue)' : 'var(--white)';
+    
+    var txtSpan = document.createElement('span');
+    txtSpan.style.cssText = 'font-family:\'Be Vietnam Pro\',sans-serif; font-size:11px; font-weight:700; cursor:pointer;';
+    txtSpan.style.color = isActive ? '#fff' : 'var(--text-light)';
+    txtSpan.textContent = p.label;
+    txtSpan.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
+    wrapper.appendChild(txtSpan);
+    
+    // Le fameux bouton de duplication !
+    if (isActive) {
+      var btnClone = document.createElement('button');
+      btnClone.textContent = '👯';
+      btnClone.title = 'Dupliquer cette section';
+      btnClone.style.cssText = 'background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:50%; width:18px; height:18px; font-size:9px; cursor:pointer; font-weight:900;';
+      btnClone.onclick = function() { dupliquerSection(p.id); };
+      wrapper.appendChild(btnClone);
+    }
+    
+    container.appendChild(wrapper);
+  });
 }
 
 function sauvegarder() { 
@@ -692,6 +664,36 @@ function toast(msg,type){var el=document.getElementById('toast');if(!el)return;d
 function chargerPermanente(){ chargerDepuisGitHub(); }
 function exporter(){ var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData, null, 2)); var downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "config_backup.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
+
+  
+// 👯 DUPLICATION UNITAIRE D'UNE RUBRIQUE PRODUIT
+function dupliquerSection(oldId) {
+  if (!formData || !formData.liste_produits) { alert("⚠️ Configuration non chargée."); return; }
+  
+  var originalProd = formData.liste_produits.find(function(p) { return p.id === oldId; });
+  if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
+  
+  var newLabel = prompt("Nom de la nouvelle section dupliquée :", originalProd.label + " - copie");
+  if (!newLabel) return; // Si tu annules, on arrête tout
+  
+  var newId = oldId + "_" + Date.now();
+  
+  formData.liste_produits.push({ id: newId, label: newLabel });
+  
+  // Copie parfaite des questions sans lier les deux tableaux entre eux
+  if (formData[oldId]) {
+    formData[newId] = JSON.parse(JSON.stringify(formData[oldId]));
+  } else {
+    formData[newId] = [];
+  }
+  
+  toast("🎉 Section dupliquée !", "ok");
+  
+  // On bascule directement sur la nouvelle section pour pouvoir la modifier
+  currentProduit = newId;
+  renderProduitTabs();
+  renderQuestions();
+}
 </script>
 </body>
 </html>
