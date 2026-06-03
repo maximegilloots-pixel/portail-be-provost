@@ -858,7 +858,20 @@
       ]
     }
   ],
-  "infos_generales": [],
+  "infos_generales": [
+    {
+      "id": "q_1780488389919",
+      "label": "Éléments souhaités",
+      "type": "radio",
+      "options": [
+        "Dossier complet (Plan + MR + Synthèse)",
+        "Dossier allégé (Plan + MR)",
+        "Plan uniquement (complément d'un devis OAD Web)",
+        "Budget uniquement"
+      ],
+      "placeholder": "Ce choix aura un impact sur le temps de réponse du technicien affecté"
+    }
+  ],
   "prod_1780412206778": [
     {
       "id": "q_1780412224081",
