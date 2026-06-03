@@ -490,10 +490,11 @@
       ]
     },
     {
-      "id": "q_1780470827349",
+      "id": "q_1780471011143",
       "label": "Si toiture, indiquer la longueur de débord souhaitée",
       "type": "text",
-      "placeholder": "Pour information, en standard longueur de débord maxi : \n- Abri LP3 = 1500 mm\n- PL3 = 1500 mm\n- CTP3 = 4000 mm (Si bras de 400mm)\n/ 2400 mm (Si bras de 2000 mm)"
+      "placeholder": "Pour information, en standard longueur de débord maxi : \n- Abri LP3 = 1500 mm\n- PL3 = 1500 mm\n- CTP3 = 4000 mm (Si bras de 400mm)\n/ 2400 mm (Si bras de 2000 mm)",
+      "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780471009312_unnamed.png"
     },
     {
       "id": "q_1780470947101",
@@ -509,13 +510,14 @@
       "placeholder": "Une finition blanche pour la toiture d’un rack extérieur présente plusieurs avantages par rapport au galvanisé, notamment en matière de gestion de la réverbération lumineuse et thermique. Contrairement au galva, qui peut provoquer d’importants reflets et accumuler la chaleur, une surface blanche réfléchit la lumière de manière diffuse et limite l’éblouissement. Cette caractéristique est particulièrement importante dans des environnements sensibles comme les abords d’aéroports, de routes ou de zones résidentielles, où la réverbération excessive peut être une nuisance. Pour ces raisons, certaines communes peuvent imposer ou recommander une finition blanche afin de préserver le confort visuel et thermique des infrastructures environnantes.\n\nToutefois, une toiture blanche nécessite un entretien plus régulier pour conserver son pouvoir réfléchissant, tandis que le galva offre une meilleure résistance aux intempéries et à la corrosion, bien qu’il perde progressivement son efficacité réfléchissante avec le temps. \n\nL’ajout de bacs anti-condensation peut également être un atout, car ils réduisent l’apparition de gouttelettes d’eau sous la toiture, limitant ainsi les risques de corrosion et d’humidité sur les équipements situés en dessous (Notamment pour les abris fermés à gros volume ou les autoportants)\n\nL’intégration de panneaux en polycarbonate translucide entouré de bacs acier peints permet d’apporter un éclairage naturel en maintenant un bon niveau de luminosité sous la structure."
     },
     {
-      "id": "qe_pente",
+      "id": "q_1780471022049",
       "label": "Si toiture — indiquer la pente",
       "type": "radio",
       "options": [
         "Penté haut",
         "Penté bas"
-      ]
+      ],
+      "placeholder": "Une toiture avec pente haute offre une meilleure évacuation des eaux de pluie, réduit les risques d’infiltration et facilite l’entretien. En revanche, une toiture avec pente basse peut être privilégiée pour des raisons esthétiques, de réduction de hauteur ou d’intégration architecturale, mais elle nécessite une gestion plus rigoureuse de l’étanchéité et de l’évacuation des eaux."
     },
     {
       "id": "qe_bardage",
@@ -531,10 +533,9 @@
       ]
     },
     {
-      "id": "qe_bardage_fin",
-      "label": "Si bardage — finition",
+      "id": "q_1780471043857",
+      "label": "Si bardage, finition élément de bardage",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Blanc RAL 9010",
         "Galva Z",
@@ -542,22 +543,51 @@
       ]
     },
     {
-      "id": "qe_finition_el",
+      "id": "q_1780471266498",
       "label": "Éléments de finition",
       "type": "checkbox",
-      "multi": true,
       "options": [
-        "Angle droit / Tôle finition angle",
-        "Bande de rive / Cornière de rive",
-        "U de finition de bardage",
-        "U de finition de toiture",
-        "Bandeau de finition",
-        "Faitière",
-        "Faitière contre mur",
-        "Bande de faitage",
-        "Profil bas de bardage",
-        "Tôle de finition de toiture",
-        "Bavette de rejet d'eau",
+        {
+          "text": "Angle droit / Tôle finition angle (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471069825_1.png"
+        },
+        {
+          "text": "Bande de rive / Cornière de rive (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471089038_2.png"
+        },
+        {
+          "text": "U de finition de bardage (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471109116_3.png"
+        },
+        {
+          "text": "U de finition de toiture (Uniquement PL3, CTP3 et Autoportant)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471128384_4.png"
+        },
+        {
+          "text": "Bandeau de finition (Uniquement abri LP3)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471145808_5.png"
+        },
+        {
+          "text": "Faitière (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471158372_6.png"
+        },
+        {
+          "text": "Faitière contre mur (haute en rouge ou basse en bleu) (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471174843_7.png"
+        },
+        {
+          "text": "Bande de faitage (Toutes installations)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471186606_8.png"
+        },
+        {
+          "text": "Profil bas de bardage (Uniquement Autoportant et Abri)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471236846_9.png"
+        },
+        "Tôle de finition de toiture, nécessite de connaitre le type de bardage client (Toutes installations)",
+        {
+          "text": "Bavette de rejet d'eau (en rouge), habillage d'ouverture (Uniquement Autoportant et Abri)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780471261365_10.png"
+        },
         "Autre :"
       ]
     },
