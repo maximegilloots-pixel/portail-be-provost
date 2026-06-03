@@ -335,8 +335,9 @@ function renderProduitTabs() {
     html += '<div style="display:inline-flex; align-items:center; background:' + (isActive ? 'var(--blue)' : 'var(--white)') + '; border:1.5px solid var(--border); border-radius:40px; padding:2px 4px 2px 14px; gap:8px; margin-right:6px; margin-bottom:6px; transition:var(--tr);">';
     html += '<span style="font-weight:700; font-size:11px; cursor:pointer; color:' + (isActive ? '#fff' : 'var(--text-light)') + ';" onclick="currentProduit=\'' + p.id + '\'; renderProduitTabs(); renderQuestions();">' + p.label + '</span>';
     
-    // Si l'onglet est actif, on affiche les raccourcis de duplication et suppression rapide
+    // Si l'onglet est actif, on affiche les boutons d'action rapide : Renommer, Dupliquer, Supprimer
     if (isActive) {
+      html += '<button onclick="renommerSection(\'' + p.id + '\')" title="Renommer cette section" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">📝</button>';
       html += '<button onclick="dupliquerSection(\'' + p.id + '\')" title="Dupliquer cette section" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">👯</button>';
       html += '<button onclick="supprimerSection(\'' + p.id + '\')" title="Supprimer cette section" style="background:rgba(192,57,43,0.2); border:none; color:#ff9494; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">🗑️</button>';
     }
@@ -785,7 +786,28 @@ function reinitialiserConfiguration() {
   renderQuestions();
   toast("🔄 Modèle d'origine rechargé. Cliquez sur 'Publier' pour écraser GitHub !", "ok");
 }
-
+// 📝 FONCTION POUR RENOMMER UNE SECTION PRODUIT
+function renommerSection(id) {
+  if (!formData || !formData.liste_produits) return; [cite: 35]
+  
+  // 1. Trouver la section dans le registre des produits
+  var prod = formData.liste_produits.find(function(p) { return p.id === id; }); [cite: 35]
+  if (!prod) return;
+  
+  // 2. Ouvrir une boîte de dialogue pré-remplie avec le nom actuel
+  var nouveauNom = prompt("🏷️ Modification du libellé\n\nEntrez le nouveau nom pour la section \"" + prod.label + "\" :", prod.label);
+  
+  // Si l'utilisateur clique sur Annuler ou laisse vide, on stoppe
+  if (!nouveauNom || nouveauNom.trim() === "") return;
+  
+  // 3. Appliquer le nouveau nom nettoyé
+  prod.label = nouveauNom.trim();
+  
+  toast("✓ Section renommée !", "ok"); [cite: 32]
+  
+  // 4. Rafraîchir instantanément l'affichage des onglets
+  renderProduitTabs();
+}
 </script>
 </body>
 </html>
