@@ -319,7 +319,31 @@ function renderQuestions() {
   }
 }
   
-function renderProduitTabs() { var container = document.getElementById('produit-tabs-container'); if (!container) return; container.innerHTML = ''; var btnGen = document.createElement('button'); btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : ''); btnGen.textContent = 'Infos Générales (Étape 1)'; btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen); (formData.liste_produits || []).forEach(function(p) { var btn = document.createElement('button'); btn.className = 'produit-btn' + (currentProduit === p.id ? ' active' : ''); btn.textContent = p.label; btn.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; container.appendChild(btn); }); }
+function renderProduitTabs() {
+  var container = document.getElementById('produit-tabs-container'); if (!container) return;
+  
+  // Onglet fixe pour l'étape 1
+  var html = '<button class="produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '') + '" onclick="currentProduit=\'infos_generales\'; renderProduitTabs(); renderQuestions();">Infos Générales (Étape 1)</button>';
+  
+  // Boucle sur les produits de l'Étape 2
+  (formData.liste_produits || []).forEach(function(p) {
+    var isActive = (currentProduit === p.id);
+    
+    // Rendu en ligne flex pour aligner proprement le texte et les boutons d'action
+    html += '<div style="display:inline-flex; align-items:center; background:' + (isActive ? 'var(--blue)' : 'var(--white)') + '; border:1.5px solid var(--border); border-radius:40px; padding:2px 4px 2px 14px; gap:8px; margin-right:6px; margin-bottom:6px; transition:var(--tr);">';
+    html += '<span style="font-weight:700; font-size:11px; cursor:pointer; color:' + (isActive ? '#fff' : 'var(--text-light)') + ';" onclick="currentProduit=\'' + p.id + '\'; renderProduitTabs(); renderQuestions();">' + p.label + '</span>';
+    
+    // Si l'onglet est actif, on glisse les boutons de duplication et suppression rapide à l'intérieur
+    if (isActive) {
+      html += '<button onclick="dupliquerSection(\'' + p.id + '\')" title="Dupliquer cette section" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">卓越 👯</button>';
+      html += '<button onclick="supprimerSection(\'' + p.id + '\')" title="Supprimer cette section" style="background:rgba(192,57,43,0.2); border:none; color:#ff9494; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">🗑️</button>';
+    }
+    
+    html += '</div>';
+  });
+  
+  container.innerHTML = html;
+}
 function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
 function chargerDepuisGitHub() {
   var gh = getGHConfig(); 
@@ -674,6 +698,69 @@ function toast(msg,type){var el=document.getElementById('toast');if(!el)return;d
 function chargerPermanente(){ chargerDepuisGitHub(); }
 function exporter(){ var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData, null, 2)); var downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "config_backup.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
+// 👯 FONCTION DE DUPLICATION D'UNE SECTION PRODUIT (CORRIGÉE FORM_DATA)
+function dupliquerSection(oldId) {
+  if (!formData || !formData.liste_produits) {
+    alert("⚠️ Erreur : Configuration non chargée.");
+    return;
+  }
+  
+  // 1. Trouver la section d'origine
+  var originalProd = formData.liste_produits.find(function(p) { return p.id === oldId; });
+  if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
+  
+  // 2. Générer un ID unique et le nouveau nom avec " - copie"
+  var newId = oldId + "_" + Date.now();
+  var newLabel = originalProd.label + " - copie";
+  
+  // 3. Ajouter le nouveau produit dans la liste des rubriques
+  formData.liste_produits.push({
+    id: newId,
+    label: newLabel
+  });
+  
+  // 4. Dupliquer l'intégralité de son tableau de questions
+  if (formData[oldId]) {
+    formData[newId] = JSON.parse(JSON.stringify(formData[oldId]));
+  } else {
+    formData[newId] = [];
+  }
+  
+  alert("🎉 Section dupliquée avec succès !\nNouveau nom : " + newLabel);
+  
+  // 5. Basculer sur la nouvelle section et rafraîchir l'affichage
+  currentProduit = newId;
+  renderProduitTabs();
+  renderQuestions();
+}
+
+// 🗑️ FONCTION DE SUPPRESSION D'UNE SECTION PRODUIT (CORRIGÉE FORM_DATA)
+function supprimerSection(id) {
+  if (!formData || !formData.liste_produits) return;
+  
+  // 1. Trouver la section
+  var prod = formData.liste_produits.find(function(p) { return p.id === id; });
+  if (!prod) return;
+  
+  // 2. Demander une confirmation de sécurité
+  var confirmation = confirm("⚠️ ATTENTION DANGER ⚠️\n\nVoulez-vous vraiment supprimer définitivement la section \"" + prod.label + "\" ?\nCela effacera également TOUTES les questions associées à ce produit.");
+  if (!confirmation) return;
+  
+  // 3. Retirer de la liste des produits
+  formData.liste_produits = formData.liste_produits.filter(function(p) { return p.id !== id; });
+  
+  // 4. Supprimer le bloc de questions associé
+  if (formData[id]) {
+    delete formData[id];
+  }
+  
+  alert("🗑️ Section \"" + prod.label + "\" supprimée de la configuration.");
+  
+  // 5. Rebasculer par défaut sur les Infos Générales et rafraîchir
+  currentProduit = 'infos_generales';
+  renderProduitTabs();
+  renderQuestions();
+}
 </script>
 </body>
 </html>
