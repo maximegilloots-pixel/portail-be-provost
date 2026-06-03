@@ -150,9 +150,61 @@ tbody tr:hover{background:var(--blue-lighter)}
 .q-scale-circle { width: 32px; height: 32px; border: 1px solid var(--border); background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text); transition: var(--tr); }
 .q-scale-item.selected .q-scale-circle { background: var(--blue); border-color: var(--blue); color: var(--white); box-shadow: 0 4px 10px rgba(45,75,140,0.25); }
 
-.q-option.has-img { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-.q-opt-img-wrapper { width: 100%; max-height: 140px; overflow: hidden; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; }
-.q-opt-img { width: 100%; height: auto; max-height: 130px; object-fit: contain; }
+/* 🖼️ DESIGN DE L'INFO-BULLE TECHNIQUE OPTIMISÉE */
+.q-tooltip-container {
+  position: relative;
+  margin-left: auto; /* Pousse l'icône tout à droite de la ligne */
+  display: inline-flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.q-tooltip-icon {
+  font-size: 13px;
+  background: var(--blue-light);
+  color: var(--blue);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: help;
+  transition: var(--tr);
+}
+
+.q-tooltip-container:hover .q-tooltip-icon {
+  background: var(--blue);
+  color: var(--white);
+}
+
+/* Conteneur de l'image cachée par défaut */
+.q-tooltip-content {
+  position: absolute;
+  bottom: 125%; /* S'ouvre au-dessus de l'option */
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  max-width: 480px; /* Largeur max confortable pour les schémas */
+  width: max-content;
+  z-index: 9999;
+  animation: fadeUp 0.2s ease-out;
+}
+
+/* Affichage au survol */
+.q-tooltip-container:hover .q-tooltip-content {
+  display: block;
+}
+
+/* Image taille réelle non rognée */
+.q-tooltip-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain; /* Garantit aucun recadrage / respect des proportions strictes */
+  border-radius: var(--radius-sm);
+}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -400,7 +452,6 @@ function buildInfosGeneralesDynamic() {
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
     
-    // 🌟 FIX ICI : Ajout de white-space: pre-wrap; pour que les consignes d'aide de l'admin gardent leurs paragraphes et tirets
     if (q.placeholder && q.placeholder.trim() !== '') {
       qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px; white-space: pre-wrap;">' + q.placeholder + '</div>';
     }
@@ -438,10 +489,18 @@ function buildInfosGeneralesDynamic() {
         var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', optText); div.setAttribute('data-initial-val', optText);
         
         div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
+        
+        // 🌟 NOUVEAU : Injection de l'info-bulle si image présente
         if (optImg) {
-          div.classList.add('has-img');
-          div.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
+          var tooltipContainer = document.createElement('div');
+          tooltipContainer.className = 'q-tooltip-container';
+          tooltipContainer.innerHTML = '<span class="q-tooltip-icon">🖼️ Voir le schéma</span><div class="q-tooltip-content"><img src="' + optImg + '" class="q-tooltip-img" alt="Illustration"></div>';
+          
+          // Sécurité anti-clic : évite de cocher/décocher la case en survolant ou cliquant l'image
+          tooltipContainer.addEventListener('click', function(e) { e.stopPropagation(); });
+          div.appendChild(tooltipContainer);
         }
+        
         optsDiv.appendChild(div);
         
         var otherInput = null;
@@ -503,83 +562,7 @@ var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'te
 var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
 
-function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
-  state.selectedProduits.forEach(function(pid) {
-    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
-    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
-    questions.forEach(function(q) {
-      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
-      
-      // 🌟 FIX ICI : Ajout de white-space: pre-wrap; pour que les consignes d'aide des sections produits gardent aussi leurs paragraphes
-      if (q.placeholder && q.placeholder.trim() !== '') {
-        qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px; white-space: pre-wrap;">' + q.placeholder + '</div>';
-      }
-      
-      if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
-      var fid = pid+'_'+q.id;
-      if(q.type==='text' || q.type==='textarea') {
-        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
-        qDiv.appendChild(inp);
-      } else if(q.type === 'dropdown') {
-        var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
-        sel.innerHTML = '<option value="">Choisir une option...</option>' + (q.options || []).map(function(o){
-          var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
-          return '<option value="' + optText + '">' + optText + '</option>';
-        }).join('');
-        qDiv.appendChild(sel);
-      } else if(q.type === 'scale') {
-        var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
-        var options = q.options || ['1', '2', '3', '4', '5'];
-        options.forEach(function(num) {
-          var item = document.createElement('div'); item.className = 'q-scale-item'; item.setAttribute('data-field', fid); item.setAttribute('data-val', num);
-          item.innerHTML = '<div class="q-scale-circle">' + num + '</div>';
-          item.addEventListener('click', function() {
-            document.querySelectorAll('.q-scale-item[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); });
-            item.classList.add('selected');
-          });
-          scaleWrapper.appendChild(item);
-        });
-        qDiv.appendChild(scaleWrapper);
-      } else {
-        var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
-        (q.options||[]).forEach(function(o){
-          var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
-          var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
-          var optDiv = document.createElement('div'); optDiv.className = 'q-option'; optDiv.setAttribute('data-field', fid); optDiv.setAttribute('data-val', optText); optDiv.setAttribute('data-initial-val', optText);
-          optDiv.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
-          if (optImg) {
-            optDiv.classList.add('has-img');
-            optDiv.innerHTML += '<div class="q-opt-img-wrapper"><img src="' + optImg + '" class="q-opt-img" alt="Illustration option"></div>';
-          }
-          optsDiv.appendChild(optDiv);
-          
-          var otherInput = null;
-          if (optText.toLowerCase().indexOf('autre') !== -1) {
-            otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
-            otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
-            otherInput.addEventListener('input', function() {
-              if (otherInput.value.trim() !== '') { optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim()); otherInput.classList.add('filled'); } else { optDiv.setAttribute('data-val', optText); otherInput.classList.remove('filled'); }
-            });
-            optsDiv.appendChild(otherInput);
-          }
-          
-          optDiv.addEventListener('click', function() {
-            if(q.type==='radio') { 
-              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); x.setAttribute('data-val', x.getAttribute('data-initial-val')); }); 
-              document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){ x.style.display = 'none'; x.value = ''; x.classList.remove('filled'); });
-            }
-            optDiv.classList.toggle('selected');
-            if (otherInput) { if (optDiv.classList.contains('selected')) { otherInput.style.display = 'block'; otherInput.focus(); } else { otherInput.style.display = 'none'; otherInput.value = ''; optDiv.setAttribute('data-val', optText); } }
-          });
-        });
-        qDiv.appendChild(optsDiv);
-      }
-      block.appendChild(qDiv);
-    });
-    container.appendChild(block);
-  });
-}
+function buildDiagn
   
 function collectFormData() {
   var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
