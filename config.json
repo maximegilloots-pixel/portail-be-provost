@@ -656,10 +656,6 @@
     {
       "id": "prod_1780412206778",
       "label": "propro"
-    },
-    {
-      "id": "prod_1780415505492",
-      "label": "test section"
     }
   ],
   "prod_1779436061922": [
@@ -868,30 +864,6 @@
       "id": "q_1780412224081",
       "label": "sdsd",
       "type": "scale"
-    }
-  ],
-  "prod_1780415505492": [
-    {
-      "id": "q_1780415859561",
-      "label": "sqcsqc",
-      "type": "radio",
-      "options": [
-        {
-          "text": "sqcsqcsq",
-          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780415648899_Capture_d__cran_2026-02-25_114002.png"
-        },
-        {
-          "text": "qscsq",
-          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780415856104_Capture_d__cran_2026-02-25_123925.png"
-        }
-      ],
-      "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/1780415660897_Capture_d__cran_2026-03-16_161120.png"
-    },
-    {
-      "id": "q_1780418417447",
-      "label": "zcze",
-      "type": "textarea",
-      "placeholder": "zexc"
     }
   ]
 }
