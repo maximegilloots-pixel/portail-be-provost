@@ -32,8 +32,18 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .s-title{font-size:24px;font-weight:900;color:var(--dark);letter-spacing:-0.5px;margin-bottom:6px;line-height:1.2}
 .s-desc{font-size:13px;color:var(--text-light);margin-bottom:22px}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
-.card-title{font-size:12px;font-weight:700;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
-.card-title::before{content:'';width:3px;height:14px;background:var(--yellow);border-radius:2px;flex-shrink:0}
+/* 🔵 Titres des questions de l'Étape 1 (Infos générales) */
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-dark) !important; /* Passage en bleu marine */
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
 .steps{display:flex;flex-direction:column;gap:12px}
 .step{display:flex;gap:14px;padding:16px;background:var(--bg);border-radius:var(--radius);border-left:4px solid var(--blue)}
 .step strong{display:block;font-size:13px;color:var(--dark);margin-bottom:2px}
@@ -61,7 +71,14 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .produit-cb.checked .cb-check{display:block}
 .produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-produit-header{font-size:14px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;border-bottom:2px solid var(--blue-light);padding-bottom:6px}
-.q-title{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:8px}
+/* 🔵 Titres des questions de l'Étape 2 (Diagnostic Produits) */
+.q-title {
+  font-size: 14px; /* Légèrement agrandi pour bien détacher la question */
+  font-weight: 700;
+  color: var(--blue-dark) !important; /* Passage en bleu marine */
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+}
 .q-options{display:flex;flex-direction:column;gap:6px}
 .q-option{display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text);user-select:none;transition:var(--tr)}
 .opt-dot,.opt-sq{width:15px;height:15px;border:2px solid var(--border);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:var(--tr)}
