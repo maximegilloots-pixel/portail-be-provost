@@ -797,6 +797,59 @@
           "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472535524_unnamed.jpg"
         }
       ]
+    },
+    {
+      "id": "q_1780473011492",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Filet de protection",
+        "Cadre grillagé (fonds)",
+        "Côté grillagé",
+        "Butée 80 x 40 (chaque niveau de longeron)",
+        "Butée 80 x 40 (chaque niveau de longeron + sol)",
+        "Butée podium",
+        {
+          "text": "Séparateur horizontal simple",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780473001212_17.png"
+        },
+        {
+          "text": "Séparateur vertical",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780473004719_18.png"
+        },
+        {
+          "text": "Séparateur d'appui",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780473007812_19.png"
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_1780473119154",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Longeron Galva à chaud + échelle Galva Z (Standard extérieur))",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_1780473163594",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_1780473222910",
+      "label": "Commentaires",
+      "type": "textarea"
     }
   ],
   "prod_1779440938626": [
