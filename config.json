@@ -463,10 +463,10 @@
   ],
   "install_ext": [
     {
-      "id": "qe_adresse",
+      "id": "q_1780468187522",
       "label": "Adresse exacte de l'implantation",
       "type": "text",
-      "placeholder": "Adresse complète du site"
+      "placeholder": "Cette information est essentielle pour évaluer avec précision les contraintes de neige et de vent affectant l’implantation."
     },
     {
       "id": "qe_salin",
