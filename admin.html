@@ -177,7 +177,10 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     </div>
     <div id="m-opts-section"><label class="flabel">Options</label><div class="opts-list" id="m-opts-list"></div><button class="add-opt" onclick="addOpt()">+ Option</button></div>
     <div class="frow"><label class="flabel">Illustration Image (Optionnelle)</label><input type="file" id="m-image-file" accept="image/*" class="finput" onchange="handleImageUpload(this)"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
-    <div class="frow"><label class="flabel">Aide / Placeholder</label><input class="finput" id="m-hint"></div>
+    <div class="frow">
+      <label class="flabel">Aide / Placeholder</label>
+      <textarea class="ftextarea" id="m-hint" placeholder="Consignes d'aide pour le commercial (sauts de lignes et tirets autorisés)..." style="min-height: 80px; resize: vertical;"></textarea>
+    </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="saveModal()">Enregistrer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>
   </div>
 </div>
