@@ -338,17 +338,18 @@ function renderQuestions() {
 }
   
 function renderProduitTabs() {
-  var container = document.getElementById('produit-tabs-container'); if (!container) return;
+  var container = document.getElementById('produit-tabs-container'); 
+  if (!container) return;
   container.innerHTML = '';
   
-  // Onglet fixe pour l'étape 1
+  // 1. Onglet fixe pour l'étape 1
   var btnGen = document.createElement('button');
   btnGen.className = 'produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '');
   btnGen.textContent = 'Infos Générales (Étape 1)';
   btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); };
   container.appendChild(btnGen);
   
-  // Boucle sur les produits de l'Étape 2
+  // 2. Boucle sur les produits de l'Étape 2
   (formData.liste_produits || []).forEach(function(p) {
     var isActive = (currentProduit === p.id);
     
@@ -363,7 +364,7 @@ function renderProduitTabs() {
     txtSpan.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); };
     wrapper.appendChild(txtSpan);
     
-    // Le fameux bouton de duplication !
+    // Le bouton de duplication qui s'affiche sur l'onglet actif !
     if (isActive) {
       var btnClone = document.createElement('button');
       btnClone.textContent = '👯';
@@ -674,13 +675,14 @@ function dupliquerSection(oldId) {
   if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
   
   var newLabel = prompt("Nom de la nouvelle section dupliquée :", originalProd.label + " - copie");
-  if (!newLabel) return; // Si tu annules, on arrête tout
+  if (!newLabel) return; // Si tu annules ou laisses vide, on annule l'opération
   
   var newId = oldId + "_" + Date.now();
   
+  // Ajout du nouveau produit dans la liste des onglets
   formData.liste_produits.push({ id: newId, label: newLabel });
   
-  // Copie parfaite des questions sans lier les deux tableaux entre eux
+  // Copie parfaite des questions pour ne pas avoir à tout refaire
   if (formData[oldId]) {
     formData[newId] = JSON.parse(JSON.stringify(formData[oldId]));
   } else {
@@ -689,7 +691,7 @@ function dupliquerSection(oldId) {
   
   toast("🎉 Section dupliquée !", "ok");
   
-  // On bascule directement sur la nouvelle section pour pouvoir la modifier
+  // Bascule automatiquement sur le nouvel onglet pour vérifier
   currentProduit = newId;
   renderProduitTabs();
   renderQuestions();
