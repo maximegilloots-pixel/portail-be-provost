@@ -490,23 +490,23 @@
       ]
     },
     {
-      "id": "qe_toiture_lg",
-      "label": "Si toiture — longueur de débord",
+      "id": "q_1780470827349",
+      "label": "Si toiture, indiquer la longueur de débord souhaitée",
       "type": "text",
-      "placeholder": "En standard : longueur de débord 500 mm"
+      "placeholder": "Pour information, en standard longueur de débord maxi : \n- Abri LP3 = 1500 mm\n- PL3 = 1500 mm\n- CTP3 = 4000 mm (Si bras de 400mm)\n/ 2400 mm (Si bras de 2000 mm)"
     },
     {
-      "id": "qe_toiture_fin",
-      "label": "Si toiture — finition",
+      "id": "q_1780470947101",
+      "label": "Si toiture, finition élément de toiture",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Blanc RAL 9010",
         "Galva Z",
         "Bacs anti condensation",
         "Panneaux polycarbonate",
         "Autre :"
-      ]
+      ],
+      "placeholder": "Une finition blanche pour la toiture d’un rack extérieur présente plusieurs avantages par rapport au galvanisé, notamment en matière de gestion de la réverbération lumineuse et thermique. Contrairement au galva, qui peut provoquer d’importants reflets et accumuler la chaleur, une surface blanche réfléchit la lumière de manière diffuse et limite l’éblouissement. Cette caractéristique est particulièrement importante dans des environnements sensibles comme les abords d’aéroports, de routes ou de zones résidentielles, où la réverbération excessive peut être une nuisance. Pour ces raisons, certaines communes peuvent imposer ou recommander une finition blanche afin de préserver le confort visuel et thermique des infrastructures environnantes.\n\nToutefois, une toiture blanche nécessite un entretien plus régulier pour conserver son pouvoir réfléchissant, tandis que le galva offre une meilleure résistance aux intempéries et à la corrosion, bien qu’il perde progressivement son efficacité réfléchissante avec le temps. \n\nL’ajout de bacs anti-condensation peut également être un atout, car ils réduisent l’apparition de gouttelettes d’eau sous la toiture, limitant ainsi les risques de corrosion et d’humidité sur les équipements situés en dessous (Notamment pour les abris fermés à gros volume ou les autoportants)\n\nL’intégration de panneaux en polycarbonate translucide entouré de bacs acier peints permet d’apporter un éclairage naturel en maintenant un bon niveau de luminosité sous la structure."
     },
     {
       "id": "qe_pente",
