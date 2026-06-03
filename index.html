@@ -383,7 +383,7 @@ function buildInfosGeneralesDynamic() {
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
     
-    // 💡 INJECTION DU SOUS-TITRE D'AIDE EN ITALIQUE
+    // Injection du sous-titre d'aide en italique sous la question
     if (q.placeholder && q.placeholder.trim() !== '') {
       qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px;">' + q.placeholder + '</div>';
     }
@@ -392,7 +392,7 @@ function buildInfosGeneralesDynamic() {
     var fid = 'info_' + q.id;
     if(q.type==='text' || q.type==='textarea') {
       var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
-      if(q.placeholder) inp.placeholder = q.placeholder;
+      // ❌ Ligne "inp.placeholder" supprimée ici pour éliminer le doublon visuel
       qDiv.appendChild(inp);
     } else if(q.type === 'dropdown') {
       var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
@@ -480,7 +480,7 @@ function buildInfosGeneralesDynamic() {
     container.appendChild(qDiv);
   });
 }
-
+  
 function goStep(n) { document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active'); ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); }); if(n===4) buildRecap(); }
 function goStep2() { if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; } if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; } var container = document.getElementById('diagnostic-container'); if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) { buildDiagnostic(); state.rebuildDiagnosticRequired = false; } goStep(2); }
 var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},{id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},{id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},{id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux...'},{id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},{id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},{id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Caillebotis','Plancher tôlé','Autre :']},{id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},{id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},{id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
@@ -495,7 +495,7 @@ function buildDiagnostic() {
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
       
-      // 💡 INJECTION DU SOUS-TITRE D'AIDE EN ITALIQUE
+      // Injection du sous-titre d'aide en italique sous la question
       if (q.placeholder && q.placeholder.trim() !== '') {
         qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px;">' + q.placeholder + '</div>';
       }
@@ -504,7 +504,7 @@ function buildDiagnostic() {
       var fid = pid+'_'+q.id;
       if(q.type==='text' || q.type==='textarea') {
         var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
-        if(q.placeholder) inp.placeholder = q.placeholder;
+        // ❌ Ligne "inp.placeholder" supprimée ici pour éliminer le doublon visuel
         qDiv.appendChild(inp);
       } else if(q.type === 'dropdown') {
         var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
@@ -565,6 +565,7 @@ function buildDiagnostic() {
     container.appendChild(block);
   });
 }
+  
 function collectFormData() {
   var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
   var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
