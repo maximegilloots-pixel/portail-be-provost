@@ -383,16 +383,15 @@ function buildInfosGeneralesDynamic() {
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
     
-    // Injection du sous-titre d'aide en italique sous la question
+    // 🌟 FIX ICI : Ajout de white-space: pre-wrap; pour que les consignes d'aide de l'admin gardent leurs paragraphes et tirets
     if (q.placeholder && q.placeholder.trim() !== '') {
-      qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px;">' + q.placeholder + '</div>';
+      qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px; white-space: pre-wrap;">' + q.placeholder + '</div>';
     }
     
     if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
     var fid = 'info_' + q.id;
     if(q.type==='text' || q.type==='textarea') {
       var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
-      // ❌ Ligne "inp.placeholder" supprimée ici pour éliminer le doublon visuel
       qDiv.appendChild(inp);
     } else if(q.type === 'dropdown') {
       var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
@@ -495,16 +494,15 @@ function buildDiagnostic() {
     questions.forEach(function(q) {
       var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
       
-      // Injection du sous-titre d'aide en italique sous la question
+      // 🌟 FIX ICI : Ajout de white-space: pre-wrap; pour que les consignes d'aide des sections produits gardent aussi leurs paragraphes
       if (q.placeholder && q.placeholder.trim() !== '') {
-        qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px;">' + q.placeholder + '</div>';
+        qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px; white-space: pre-wrap;">' + q.placeholder + '</div>';
       }
       
       if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
       var fid = pid+'_'+q.id;
       if(q.type==='text' || q.type==='textarea') {
         var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
-        // ❌ Ligne "inp.placeholder" supprimée ici pour éliminer le doublon visuel
         qDiv.appendChild(inp);
       } else if(q.type === 'dropdown') {
         var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
