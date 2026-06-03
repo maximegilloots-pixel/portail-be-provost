@@ -53,7 +53,6 @@
       "id": "q_recouvrement",
       "label": "Type de recouvrement",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Agglo P4 BRUT",
         "Agglo P4 Sous Face Blanche",
@@ -76,7 +75,6 @@
       "id": "q_contrevent",
       "label": "Type de contreventement",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Jambe de force",
         "Croix de St André",
@@ -87,7 +85,6 @@
       "id": "q_sol",
       "label": "Type de sol",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Béton",
         "Bitume",
@@ -99,7 +96,6 @@
       "id": "q_escalier",
       "label": "Type d'escalier",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "34°, largeur 1000 mm (Principal)",
         "45°, largeur 800 mm (Secondaire)",
@@ -113,7 +109,6 @@
       "id": "q_gardecorps",
       "label": "Garde-corps",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Industriel (NF E85-015, plateforme de stockage)",
         "Industriel (NF 14-122, plateforme de travail)",
@@ -125,7 +120,6 @@
       "id": "q_ouverture",
       "label": "Type d'ouverture",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Barrière écluse basculante (Ouverture permanente)",
         "Barrière écluse pliante (Pour hauteur utile < 1800 mm)",
@@ -143,7 +137,6 @@
       "id": "q_barre_basc",
       "label": "Barrière écluse Basculante — Dimensions",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "T1 (Ht charge: 1650) - L 1700",
         "T1 (Ht charge: 1650) - L 2100",
@@ -163,7 +156,6 @@
       "id": "q_barre_pli",
       "label": "Barrière écluse Pliante — Dimensions",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "T1 (Ht charge: 1800) - L 1700",
         "T1 (Ht charge: 1800) - L 2100",
@@ -192,7 +184,6 @@
       "id": "q_protec_poteau",
       "label": "Protections poteau",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Non",
         "HT 400",
@@ -205,7 +196,6 @@
       "id": "q_accessoires",
       "label": "Accessoires complémentaires",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Cornières de chant",
         "Tôle de liaison / franchissement",
@@ -284,7 +274,6 @@
       "id": "q_recouvrement",
       "label": "Type de recouvrement",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Agglo P4 BRUT",
         "Agglo P4 Sous Face Blanche",
@@ -307,7 +296,6 @@
       "id": "q_contrevent",
       "label": "Type de contreventement",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Jambe de force",
         "Croix de St André",
@@ -318,7 +306,6 @@
       "id": "q_sol",
       "label": "Type de sol",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Béton",
         "Bitume",
@@ -330,7 +317,6 @@
       "id": "q_escalier",
       "label": "Type d'escalier",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "34°, largeur 1000 mm (Principal)",
         "45°, largeur 800 mm (Secondaire)",
@@ -344,7 +330,6 @@
       "id": "q_gardecorps",
       "label": "Garde-corps",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Industriel (NF E85-015, plateforme de stockage)",
         "Industriel (NF 14-122, plateforme de travail)",
@@ -356,7 +341,6 @@
       "id": "q_ouverture",
       "label": "Type d'ouverture",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Barrière écluse basculante (Ouverture permanente)",
         "Barrière écluse pliante (Pour hauteur utile < 1800 mm)",
@@ -374,7 +358,6 @@
       "id": "q_barre_basc",
       "label": "Barrière écluse Basculante — Dimensions",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "T1 (Ht charge: 1650) - L 1700",
         "T1 (Ht charge: 1650) - L 2100",
@@ -394,7 +377,6 @@
       "id": "q_barre_pli",
       "label": "Barrière écluse Pliante — Dimensions",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "T1 (Ht charge: 1800) - L 1700",
         "T1 (Ht charge: 1800) - L 2100",
@@ -423,7 +405,6 @@
       "id": "q_protec_poteau",
       "label": "Protections poteau",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Non",
         "HT 400",
@@ -436,7 +417,6 @@
       "id": "q_accessoires",
       "label": "Accessoires complémentaires",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Cornières de chant",
         "Tôle de liaison / franchissement",
@@ -523,7 +503,6 @@
       "id": "qe_bardage",
       "label": "Bardage à prévoir",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Pas de bardage à prévoir",
         "Bardage arrière",
@@ -630,36 +609,6 @@
       "label": "Commentaires",
       "type": "textarea",
       "placeholder": "Informations complémentaires..."
-    }
-  ],
-  "liste_produits": [
-    {
-      "id": "proplus_lp3",
-      "label": "Proplus LP3"
-    },
-    {
-      "id": "proplus_lp3_2n",
-      "label": "Proplus LP3 - 2 Niveaux"
-    },
-    {
-      "id": "install_ext",
-      "label": "Installation extérieure"
-    },
-    {
-      "id": "prod_1779436061922",
-      "label": "PROPAL 3"
-    },
-    {
-      "id": "prod_1779440938626",
-      "label": "PROSPACE +"
-    },
-    {
-      "id": "prod_1780412206778",
-      "label": "PRORACK+"
-    },
-    {
-      "id": "prod_cantipro3",
-      "label": "CANTIPRO 3"
     }
   ],
   "prod_1779436061922": [
@@ -1056,6 +1005,194 @@
       "id": "q_canti_commentaires",
       "label": "Commentaires",
       "type": "textarea"
+    }
+  ],
+  "proplus_lp3_erp": [
+    {
+      "id": "q_erp_cat5",
+      "label": "ERP Catégorie 5",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ],
+      "placeholder": "Établissements accueillant un nombre de personnes inférieur au seuil dépendant du type d'établissement, unique catégorie traitée par PROVOST"
+    },
+    {
+      "id": "q_erp_mairie",
+      "label": "La mairie, une commission de sécurité et un cabinet de contrôle ont-ils déjà été contactés pour échanger sur le projet?",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_erp_charge_ur",
+      "label": "Charge UR (kg/m²)",
+      "type": "text"
+    },
+    {
+      "id": "q_erp_charge_r",
+      "label": "Charge Roulante (kg)",
+      "type": "text"
+    },
+    {
+      "id": "q_erp_fleche",
+      "label": "Flèche",
+      "type": "radio",
+      "options": [
+        "1/300 (Flèche admissible)",
+        "1/500 (Plus de confort)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_usage",
+      "label": "Catégorie d'usage",
+      "type": "text",
+      "image": "",
+      "placeholder": "Se référer au tableau des catégories d'usage"
+    },
+    {
+      "id": "q_erp_nb_pers",
+      "label": "Nombre de personne sur la plateforme",
+      "type": "radio",
+      "options": [
+        "Moins de 19",
+        "20 à 50",
+        "51 à 100",
+        "101 à 200",
+        "201 à 300"
+      ],
+      "placeholder": "Cette information permet de dimensionner et quantifier les escaliers"
+    },
+    {
+      "id": "q_erp_recouvrement",
+      "label": "Type de recouvrement",
+      "type": "radio",
+      "options": [
+        "Agglo P4 BRUT",
+        "Agglo P4 Sous Face Blanche",
+        "Agglo P5 BRUT (milieu humide)",
+        "Agglo P6 EUB (M1, ignifugé)",
+        "Agglo P6 Antidérapant et Sous Face Blanche",
+        "Caillebotis",
+        "Plancher tôlé",
+        "Plancher collaborant béton (PCB 20)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_hauteur",
+      "label": "Hauteur (mm) sur plancher (A) ou sous structure (B)",
+      "type": "text",
+      "image": "",
+      "placeholder": "Préciser si la hauteur indiquée correspond à l'élévation A ou B"
+    },
+    {
+      "id": "q_erp_contrevent",
+      "label": "Type de contreventement",
+      "type": "checkbox",
+      "options": [
+        "Jambe de force",
+        "Croix de St André",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_gardecorps",
+      "label": "Garde-corps",
+      "type": "radio",
+      "options": [
+        "Cadre barraudé",
+        "Cadre grillagé",
+        "Cadre tôlé",
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_protec_poteau",
+      "label": "Protections poteau",
+      "type": "radio",
+      "options": [
+        "Non",
+        "HT 400",
+        "HT 600",
+        "HT 1000",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_accessoires",
+      "label": "Accessoires complémentaires",
+      "type": "checkbox",
+      "options": [
+        "Cornières de chant",
+        "Tôle de liaison / franchissement",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "RAL 7016 (Standard)",
+        "RAL 5019 (Ancien standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_erp_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
+  "liste_produits": [
+    {
+      "id": "proplus_lp3",
+      "label": "Proplus LP3"
+    },
+    {
+      "id": "proplus_lp3_2n",
+      "label": "Proplus LP3 - 2 Niveaux"
+    },
+    {
+      "id": "install_ext",
+      "label": "Installation extérieure"
+    },
+    {
+      "id": "prod_1779436061922",
+      "label": "PROPAL 3"
+    },
+    {
+      "id": "prod_1779440938626",
+      "label": "PROSPACE +"
+    },
+    {
+      "id": "prod_1780412206778",
+      "label": "PRORACK+"
+    },
+    {
+      "id": "prod_cantipro3",
+      "label": "CANTIPRO 3"
+    },
+    {
+      "id": "proplus_lp3_erp",
+      "label": "PROPLUS LP3 ERP"
     }
   ]
 }
