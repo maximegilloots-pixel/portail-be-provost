@@ -235,380 +235,23 @@ var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été
 function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var map = {}; raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } }); return map; }
 function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
 function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
-function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('admin_auth', '1'); sessionStorage.setItem('google_token', response.credential); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerPermanente(); } else { alert("Email @provost.fr requis."); } }
-function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
-function sauvegarderConfig() { localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); }
-function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); if(el) { el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; } }
-
-var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
-function initChampsProduits() { 
-  // Sécurisation de la liste des produits
-  if (!formData.liste_produits || !Array.isArray(formData.liste_produits)) { 
-    formData.liste_produits = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}]; 
+// 🔐 RECEPTION ET VALIDATION DU COMPTE GOOGLE
+function handleCredentialResponse(response) { 
+  console.log("🌐 Callback Google activé...");
+  var payload = jwtDecode(response.credential); 
+  
+  if (payload.email && payload.email.endsWith('@provost.fr')) { 
+    console.log("✅ Email Provost valide : " + payload.email);
+    sessionStorage.setItem('admin_auth', '1'); 
+    sessionStorage.setItem('google_token', response.credential); 
+    
+    // 🔓 On masque le login et on affiche l'administration
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    chargerPermanente(); 
   } else { 
-    formData.liste_produits = formData.liste_produits.filter(function(p){ return p && p.id !== 'infos_generales'; }); 
+    alert("❌ Accès refusé : L'adresse email \"" + (payload.email || "inconnue") + "\" n'est pas une adresse officielle @provost.fr."); 
   } 
-  
-  // 🛡️ SÉCURITÉ STRICTE : On vérifie explicitement si c'est un vrai TABLEAU et s'il contient des données
-  // Si le format sur GitHub est corrompu (string, objet...), on le réinitialise proprement avec les valeurs par défaut
-  if (!formData.infos_generales || !Array.isArray(formData.infos_generales) || formData.infos_generales.length === 0) { 
-    console.warn("Admin : Structure 'infos_generales' invalide ou vide sur GitHub. Restauration des champs par défaut.");
-    formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); 
-  } 
-  
-  if (!formData.proplus_lp3_2n || !Array.isArray(formData.proplus_lp3_2n) || formData.proplus_lp3_2n.length === 0) { 
-    formData.proplus_lp3_2n = JSON.parse(JSON.stringify(formData.proplus_lp3 || [])); 
-  } 
-}
-
-function renderQuestions() {
-  var list = document.getElementById('q-list-container'); 
-  if (!list) return;
-  list.innerHTML = ''; 
-  
-  var questions = formData[currentProduit];
-  
-  // Si la section demandée n'est pas un tableau valide, on la redresse en tableau vide pour éviter le crash
-  if (!questions || !Array.isArray(questions)) {
-    questions = [];
-  }
-
-  // Affichage de la boîte d'information verrouillée pour l'étape 1
-  if (currentProduit === 'infos_generales') { 
-    var lockedEl = document.createElement('div'); 
-    lockedEl.className = 'info-box'; 
-    lockedEl.innerHTML = '🔒 <b>Champs cardinaux structurels fixes (Non modifiables depuis le pannel) :</b><br>• N° EDEAL<br>• Nom du commercial<br>• Nom du client<br>• Département / Ville<br>• Date chantier souhaitée<br>• Sélection du/des produit(s)<br>• Commentaires'; 
-    list.appendChild(lockedEl); 
-  }
-  
-  if(!questions.length){ 
-    var emptyDiv = document.createElement('div'); 
-    emptyDiv.style.padding = '10px'; 
-    emptyDiv.style.fontStyle = 'italic'; 
-    emptyDiv.textContent = 'Aucune question complémentaire dynamique ajoutée dans cette rubrique.'; 
-    list.appendChild(emptyDiv); 
-    return; 
-  }
-  
-  // 🛡️ Protection de la boucle de rendu avec un bloc try/catch
-  try {
-    questions.forEach(function(q, i) {
-      if (!q || typeof q !== 'object') return; // Ignore l'élément s'il est corrompu (ex: une chaîne de texte perdue)
-      
-      var labelText = q.label || "Question sans libellé";
-      var typeText = typeLbl(q.type || "text");
-      var hasImage = q.image ? ' [🖼️ Image]' : '';
-      
-      var el = document.createElement('div'); 
-      el.className = 'q-item'; 
-      el.draggable = true; 
-      el.innerHTML = '<div class="drag-handle">⠿</div><div class="q-item-body"><div class="q-item-label">' + labelText + hasImage + '</div><span class="q-item-type">' + typeText + '</span></div>' + '<div class="q-item-actions"><button class="btn-icon" onclick="editQuestion(' + i + ')">✏️</button><button class="btn-icon del" onclick="deleteQuestion(' + i + ')">🗑️</button></div>';
-      
-      el.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text', i); el.style.opacity='.4'; }); 
-      el.addEventListener('dragend', function(){ el.style.opacity='1'; }); 
-      el.addEventListener('dragover', function(e){ e.preventDefault(); el.style.background='var(--blue-light)'; }); 
-      el.addEventListener('dragleave', function(){ el.style.background=''; });
-      el.addEventListener('drop', function(e){ e.preventDefault(); el.style.background=''; var from=parseInt(e.dataTransfer.getData('text')),to=i; if(from===to) return; var arr=formData[currentProduit],item=arr.splice(from,1)[0]; arr.splice(to,0,item); renderQuestions(); }); 
-      
-      list.appendChild(el);
-    });
-  } catch (err) {
-    console.error("Erreur critique lors du rendu des questions :", err);
-    var errDiv = document.createElement('div');
-    errDiv.style.color = 'var(--red)';
-    errDiv.style.padding = '10px';
-    errDiv.innerHTML = '⚠️ <b>Erreur de formatage :</b> Les données de cette rubrique contenues dans le fichier config.json sont corrompues et empêchent l\'affichage.';
-    list.appendChild(errDiv);
-  }
-}
-  
-function renderProduitTabs() {
-  var container = document.getElementById('produit-tabs-container'); if (!container) return;
-  
-  // Onglet fixe pour l'étape 1
-  var html = '<button class="produit-btn' + (currentProduit === 'infos_generales' ? ' active' : '') + '" onclick="currentProduit=\'infos_generales\'; renderProduitTabs(); renderQuestions();">Infos Générales (Étape 1)</button>';
-  
-  // Boucle dynamique sur les produits de l'Étape 2
-  (formData.liste_produits || []).forEach(function(p) {
-    var isActive = (currentProduit === p.id);
-    
-    html += '<div style="display:inline-flex; align-items:center; background:' + (isActive ? 'var(--blue)' : 'var(--white)') + '; border:1.5px solid var(--border); border-radius:40px; padding:2px 4px 2px 14px; gap:8px; margin-right:6px; margin-bottom:6px; transition:var(--tr);">';
-    html += '<span style="font-weight:700; font-size:11px; cursor:pointer; color:' + (isActive ? '#fff' : 'var(--text-light)') + ';" onclick="currentProduit=\'' + p.id + '\'; renderProduitTabs(); renderQuestions();">' + p.label + '</span>';
-    
-    // Si l'onglet est actif, on affiche les boutons d'action rapide : Renommer, Dupliquer, Supprimer
-    if (isActive) {
-      html += '<button onclick="renommerSection(\'' + p.id + '\')" title="Renommer cette section" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">📝</button>';
-      html += '<button onclick="dupliquerSection(\'' + p.id + '\')" title="Dupliquer cette section" style="background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">👯</button>';
-      html += '<button onclick="supprimerSection(\'' + p.id + '\')" title="Supprimer cette section" style="background:rgba(192,57,43,0.2); border:none; color:#ff9494; border-radius:20px; padding:2px 6px; font-size:10px; font-weight:700; cursor:pointer;">🗑️</button>';
-    }
-    
-    html += '</div>';
-  });
-  
-  container.innerHTML = html;
-}
-function ajouterNouveauProduit() { var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now(); if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; currentProduit = id; renderProduitTabs(); renderQuestions(); }
-function chargerDepuisGitHub() {
-  var gh = getGHConfig(); 
-  majStatusGH(); 
-  if(document.getElementById('gh-user')){document.getElementById('gh-user').value=gh.user;document.getElementById('gh-repo').value=gh.repo;document.getElementById('gh-token').value=gh.token;} 
-  if(document.getElementById('tech-list-config')) { document.getElementById('tech-list-config').value = localStorage.getItem('tech_list') || ""; } 
-  if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
-  
-  // Sécurité : si les champs fondamentaux sont vides dans l'onglet paramètres
-  if (!gh.user || !gh.repo) {
-    console.warn("Admin : Configuration GitHub manquante dans l'onglet Paramètres.");
-    formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-    initChampsProduits(); renderProduitTabs(); renderQuestions();
-    return;
-  }
-
-  console.log("Admin : Connexion à l'API de sécurité GitHub...");
-  
-  var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
-  var headers = { 'Accept': 'application/vnd.github.v3+json' };
-  if (gh.token) { headers['Authorization'] = 'token ' + gh.token; }
-
-  fetch(apiUrl, { headers: headers, cache: 'no-store' })
-    .then(function(r) {
-      if (!r.ok) {
-        // Interceptions chirurgicales des raisons de blocage de GitHub
-        if (r.status === 401) {
-          throw new Error("Code 401 (Non autorisé).\nLe Token PAT GitHub copié dans l'onglet Paramètres est invalide, expiré ou comporte une erreur de frappe.");
-        }
-        if (r.status === 404) {
-          throw new Error("Code 404 (Introuvable).\nL'utilisateur '" + gh.user + "' ou le dépôt '" + gh.repo + "' est mal orthographié, ou alors le fichier 'config.json' n'est pas situé à la racine du repository.");
-        }
-        if (r.status === 403) {
-          throw new Error("Code 403 (Accès interdit).\nVotre Token PAT n'a pas les droits cochés pour lire ce dépôt, ou vous avez dépassé la limite de requêtes autorisées par GitHub.");
-        }
-        throw new Error("Réponse serveur GitHub inattendue : Statut " + r.status);
-      }
-      return r.json();
-    })
-    .then(function(info) {
-      if (!info.content) {
-        throw new Error("Le fichier config.json a été trouvé mais son contenu semble vide.");
-      }
-      
-      // Décodage de la base64 sécurisée pour les accents français
-      var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
-      var cfg = JSON.parse(decodedContent);
-      
-      console.log("Admin : Synchro réussie !", cfg);
-      formData = cfg; 
-      initChampsProduits(); 
-      renderProduitTabs(); 
-      renderQuestions(); 
-    })
-    .catch(function(err) {
-      console.error("⚠️ CRASH DU CHARGEMENT DIRECT :", err);
-      
-      // La fameuse alerte qui va briser le silence du bug :
-      alert("⚠️ ÉCHEC DE SYNCHRONISATION TECHNIQUE :\n\n" + err.message + "\n\nPar sécurité, l'écran reste blanc pour ne pas corrompre vos données.");
-      
-      formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-      initChampsProduits(); 
-      renderProduitTabs(); 
-      renderQuestions(); 
-    }); 
-}
-
-function sauvegarder() { 
-  var gh = getGHConfig(); 
-  if (!gh.token || !gh.user || !gh.repo) {
-    alert("❌ Action impossible : Les paramètres de configuration GitHub (Utilisateur, Repository ou Token PAT) sont manquants dans l'onglet Paramètres.");
-    return;
-  }
-
-  var apiUrl = 'https://api.github.com/repos/'+gh.user+'/'+gh.repo+'/contents/config.json'; 
-  toast('⏳ Connexion à GitHub...', 'ok');
-  
-  // Étape 1 : Récupérer le SHA actuel du fichier (obligatoire pour GitHub)
-  fetch(apiUrl, { headers: {'Authorization':'token '+gh.token} })
-    .then(function(r) {
-      if (!r.ok) {
-        throw new Error("Impossible de récupérer les métadonnées (SHA) du fichier sur GitHub (Statut " + r.status + "). Votre Token PAT est-il toujours valide ?");
-      }
-      return r.json();
-    })
-    .then(function(info) { 
-      toast('⏳ Écriture du fichier...', 'ok');
-      // Étape 2 : Envoyer la mise à jour
-      return fetch(apiUrl, { 
-        method: 'PUT', 
-        headers: {
-          'Authorization':'token '+gh.token,
-          'Content-Type': 'application/json'
-        }, 
-        body: JSON.stringify({ 
-          message: 'Mise à jour des questions via Admin BE (v5.2)', 
-          content: btoa(unescape(encodeURIComponent(JSON.stringify(formData, null, 2)))), 
-          sha: info.sha || '' 
-        }) 
-      });
-    })
-    .then(function(r2) {
-      if (!r2.ok) {
-        throw new Error("GitHub a refusé l'écriture du fichier (Statut " + r2.status + "). Vérifiez les permissions de votre Token PAT.");
-      }
-      return r2.json();
-    })
-    .then(function() { 
-      toast('✓ Publié !', 'ok'); 
-      alert("🎉 Succès ! La nouvelle configuration a été publiée sur GitHub.\nElle sera active instantanément sur le portail des commerciaux.");
-    })
-    .catch(function(err) {
-      console.error("⚠️ ÉCHEC DE LA PUBLICATION SUR GITHUB :", err);
-      alert("❌ ÉCHEC DE LA SAUVEGARDE :\n" + err.message);
-    });
-}
-
-
-function typeLbl(t){ return {text:'Texte',textarea:'Zone texte',dropdown:'Menu déroulant',scale:'Échelle 1-5',radio:'Unique',checkbox:'Multiple'}[t]||t; }
-function openAddModal() { editingIndex=-1; tempImageUrl=""; document.getElementById('modal-title').textContent='Ajouter'; document.getElementById('m-label').value=''; document.getElementById('m-type').value='text'; document.getElementById('m-hint').value=''; document.getElementById('m-image-preview').innerHTML=''; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); document.getElementById('modal-bg').classList.add('open'); }
-function editQuestion(i) { editingIndex=i; var q=formData[currentProduit][i]; tempImageUrl=q.image||""; document.getElementById('modal-title').textContent='Modifier'; document.getElementById('m-label').value=q.label; document.getElementById('m-type').value=q.type; document.getElementById('m-hint').value=q.placeholder||''; document.getElementById('m-image-preview').innerHTML=tempImageUrl?"✅ Image liée":""; document.getElementById('m-opts-list').innerHTML=''; toggleOptsSection(); (q.options||[]).forEach(function(o){ addOpt(o); }); document.getElementById('modal-bg').classList.add('open'); }
-function deleteQuestion(i){ if(confirm('Supprimer ?')){ formData[currentProduit].splice(i,1); renderQuestions(); } }
-function toggleOptsSection(){ var t=document.getElementById('m-type').value; document.getElementById('m-opts-section').style.display=(t==='radio'||t==='checkbox'||t==='dropdown')?'block':'none'; }
-
-function addOpt(v) {
-  var r = document.createElement('div'); r.className = 'opt-row'; r.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:5px;';
-  var txtVal = (typeof v === 'object' && v !== null) ? (v.text || '') : (v || '');
-  var imgVal = (typeof v === 'object' && v !== null) ? (v.image || '') : '';
-  var uid = 'opt_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-
-  r.innerHTML = '<input type="text" class="opt-txt-input" value="' + txtVal + '" placeholder="Option texte" style="flex:2;">' +
-    '<input type="text" class="opt-img-input" id="img_' + uid + '" value="' + imgVal + '" placeholder="URL image" style="flex:2; padding:6px 10px; border:1.5px solid var(--border); border-radius:6px; font-family:\'Be Vietnam Pro\',sans-serif; font-size:12px; outline:none;">' +
-    '<label style="cursor:pointer;padding:5px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;background:var(--white);">📁 <input type="file" accept="image/*" style="display:none;" onchange="uploadOptImage(this, \'img_' + uid + '\')"></label>';
-
-  document.getElementById('m-opts-list').appendChild(r);
-}
-
-function uploadOptImage(input, targetId) {
-  if (!input.files || !input.files[0]) return;
-  var file = input.files[0];
-  var gh = getGHConfig();
-  if (!gh.token) { alert("Token GitHub manquant."); return; }
-
-  var r = new FileReader();
-  r.onload = function(e) {
-    var base64 = e.target.result.split(',')[1];
-    var nomFichier = 'images/opt_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + nomFichier;
-
-    document.getElementById(targetId).value = "⏳ Upload...";
-
-    fetch(apiUrl, {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + gh.token },
-      body: JSON.stringify({ message: 'Upload automatique image option: ' + nomFichier, content: base64 })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      if (res.content && res.content.download_url) {
-        var url = 'https://raw.githubusercontent.com/' + gh.user + '/' + gh.repo + '/main/' + nomFichier;
-        document.getElementById(targetId).value = url;
-      } else {
-        document.getElementById(targetId).value = "";
-        alert("❌ Erreur upload image option");
-      }
-    })
-    .catch(function() { document.getElementById(targetId).value = ""; alert("❌ Erreur réseau"); });
-  };
-  r.readAsDataURL(file);
-}
-
-function handleImageUpload(input) {
-  if (!input.files || !input.files[0]) return;
-  var file = input.files[0];
-  var gh = getGHConfig();
-  if (!gh.token) { alert("Token GitHub manquant dans les paramètres."); return; }
-
-  var r = new FileReader();
-  r.onload = function(e) {
-    var base64 = e.target.result.split(',')[1];
-    var timestamp = Date.now();
-    var nomFichier = 'images/' + timestamp + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/' + nomFichier;
-
-    document.getElementById('m-image-preview').innerHTML = "⏳ Upload en cours...";
-
-    fetch(apiUrl, {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + gh.token },
-      body: JSON.stringify({
-        message: 'Upload illustration via Admin BE',
-        content: base64
-      })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      if (res.content && res.content.download_url) {
-        tempImageUrl = 'https://raw.githubusercontent.com/' + gh.user + '/' + gh.repo + '/main/' + nomFichier;
-        document.getElementById('m-image-preview').innerHTML = "✅ Image uploadée sur GitHub";
-      } else {
-        document.getElementById('m-image-preview').innerHTML = "❌ Erreur upload";
-        console.error(res);
-      }
-    })
-    .catch(function(err) {
-      document.getElementById('m-image-preview').innerHTML = "❌ Erreur réseau";
-      console.error(err);
-    });
-  };
-  r.readAsDataURL(file);
-}
-function saveModal() {
-  var l=document.getElementById('m-label').value.trim(); var t=document.getElementById('m-type').value; var opts=[];
-  document.querySelectorAll('#m-opts-list .opt-row').forEach(function(row){
-    var txt = row.querySelector('.opt-txt-input').value.trim();
-    var img = row.querySelector('.opt-img-input').value.trim();
-    if(txt) { if(img) opts.push({text: txt, image: img}); else opts.push(txt); }
-  });
-  var q={id:'q_'+Date.now(), label:l, type:t}; if(opts.length) q.options=opts;
-  if(document.getElementById('m-hint').value.trim()) q.placeholder=document.getElementById('m-hint').value.trim();
-  if(tempImageUrl) q.image=tempImageUrl; if(editingIndex>=0) formData[currentProduit][editingIndex]=q;
-  else { if(!formData[currentProduit])formData[currentProduit]=[]; formData[currentProduit].push(q); } renderQuestions(); closeModal();
-}
-function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
-
-function showTab(tab, e) { document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')}); document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')}); document.getElementById('section-'+tab).classList.add('active'); if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); } if(tab==='suivi') chargerSuivi(); if(tab==='parametres') chargerPermanente(); }
-function chargerSuivi() { var token = sessionStorage.getItem('google_token') || ''; fetch(APPS_SCRIPT_URL+'?action=getSuivi&token='+encodeURIComponent(token)).then(function(r){return r.json();}).then(function(res){ allDemandes=res.demandes||[]; populateAdminFilters(allDemandes); appliquerFiltres(); }); }
-
-function populateAdminFilters(demandes) {
-  var selectTech = document.getElementById('tech-filter'); if(selectTech) { var currentTech = selectTech.value; selectTech.innerHTML = '<option value="">Tous les techniciens</option>'; getTechList().forEach(function(t) { var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt); }); }
-  var selectStatus = document.getElementById('status-filter'); if(selectStatus) { var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>'; ['En attente', 'Attribuée', "Manque d'infos"].forEach(function(s) { var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt); }); }
-  var selectComm = document.getElementById('commercial-filter'); if(selectComm) { var currentComm = selectComm.value; selectComm.innerHTML = '<option value="">Tous les commerciaux</option>'; var comms = []; demandes.forEach(function(d) { if(d.commercial && d.commercial.trim() !== '' && comms.indexOf(d.commercial.trim()) === -1) comms.push(d.commercial.trim()); }); comms.sort().forEach(function(c) { var opt = document.createElement('option'); opt.value = c; opt.textContent = c; if(c === currentComm) opt.selected = true; selectComm.appendChild(opt); }); }
-}
-
-function appliquerFiltres() {
-  var query = document.getElementById('filter-input').value.toLowerCase().trim(); var tech = document.getElementById('tech-filter').value.toLowerCase().trim(); var status = document.getElementById('status-filter').value.toLowerCase().trim(); var commercial = document.getElementById('commercial-filter').value.toLowerCase().trim();
-  var filtered = allDemandes.filter(function(d) {
-    var matchesQuery = query === "" || (d.edeal && d.edeal.toLowerCase().includes(query)) || (d.client && d.client.toLowerCase().includes(query));
-    var matchesTech = tech === "" || (d.attribueA && d.attribueA.toLowerCase().trim() === tech);
-    var matchesStatus = status === "" || (d.statut && d.statut.toLowerCase().trim() === status);
-    var matchesComm = commercial === "" || (d.commercial && d.commercial.toLowerCase().trim() === commercial);
-    return matchesQuery && matchesTech && matchesStatus && matchesComm;
-  });
-  renderSuivi(filtered);
-}
-
-function renderSuivi(demandes) {
-  var body=document.getElementById('admin-suivi-body'); var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
-  if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande correspondante</td></tr>'; return; }
-  var techs = getTechList();
-  body.innerHTML=filtrées.map(function(d,i){
-    var optsStatus = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
-    var optsTechs = ['','—'].concat(techs).map(function(t){ return '<option value="' + t + '" ' + (d.attribueA===t?'selected':'') + '>' + (t||'Non attribué') + '</option>'; }).join('');
-    
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
-      '<td><select class="st-select" id="st-' + i + '">' + optsStatus + '</select></td>' +
-      '<td><select class="st-select" style="width:120px;" id="ass-' + i + '">' + optsTechs + '</select></td>' +
-      '<td><input class="assign-input" style="width:140px;" id="com-' + i + '" value="' + d.commentaireBE + '"></td>' +
-      '<td><button class="save-row" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> ' +
-          '<button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button> ' +
-          '<button class="save-row" style="background:var(--yellow);color:var(--dark);margin-left:4px;font-weight:bold;" onclick="envoyerMailDossier(\'' + d.edeal + '\', ' + i + ')">✉️ Mail</button></td></tr>';
-  }).join('');
 }
 
 function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); }); }
@@ -700,114 +343,55 @@ function saveDetail(edeal){ var fd=new FormData(); fd.append('action','updateSui
 function toast(msg,type){var el=document.getElementById('toast');if(!el)return;document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
 function chargerPermanente(){ chargerDepuisGitHub(); }
 function exporter(){ var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData, null, 2)); var downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "config_backup.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
-if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
+
+// 🚀 INITIALISATION ET DETECTEUR AUTOMATIQUE DE DEVERROUILLAGE ON-LOAD
+window.addEventListener('DOMContentLoaded', function() {
+  if (sessionStorage.getItem('admin_auth') === '1') {
+    console.log("🔒 Session admin déjà active. Masquage automatique du login...");
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    chargerPermanente();
+  }
+});
+
 // 👯 FONCTION DE DUPLICATION D'UNE SECTION PRODUIT (CORRIGÉE FORM_DATA)
 function dupliquerSection(oldId) {
-  if (!formData || !formData.liste_produits) {
-    alert("⚠️ Erreur : Configuration non chargée.");
-    return;
-  }
-  
-  // 1. Trouver la section d'origine
+  if (!formData || !formData.liste_produits) { alert("⚠️ Erreur : Configuration non chargée."); return; }
   var originalProd = formData.liste_produits.find(function(p) { return p.id === oldId; });
   if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
-  
-  // 2. Générer un ID unique et le nouveau nom avec " - copie"
   var newId = oldId + "_" + Date.now();
   var newLabel = originalProd.label + " - copie";
-  
-  // 3. Ajouter le nouveau produit dans la liste des rubriques
-  formData.liste_produits.push({
-    id: newId,
-    label: newLabel
-  });
-  
-  // 4. Dupliquer l'intégralité de son tableau de questions
-  if (formData[oldId]) {
-    formData[newId] = JSON.parse(JSON.stringify(formData[oldId]));
-  } else {
-    formData[newId] = [];
-  }
-  
+  formData.liste_produits.push({ id: newId, label: newLabel });
+  if (formData[oldId]) { formData[newId] = JSON.parse(JSON.stringify(formData[oldId])); } else { formData[newId] = []; }
   alert("🎉 Section dupliquée avec succès !\nNouveau nom : " + newLabel);
-  
-  // 5. Basculer automatiquement sur la copie et rafraîchir l'écran
-  currentProduit = newId;
-  renderProduitTabs();
-  renderQuestions();
+  currentProduit = newId; renderProduitTabs(); renderQuestions();
 }
 
 // 🗑️ FONCTION DE SUPPRESSION D'UNE SECTION PRODUIT (CORRIGÉE FORM_DATA)
 function supprimerSection(id) {
   if (!formData || !formData.liste_produits) return;
-  
-  // 1. Trouver la section
   var prod = formData.liste_produits.find(function(p) { return p.id === id; });
   if (!prod) return;
-  
-  // 2. Demander une confirmation de sécurité blindée
   var confirmation = confirm("⚠️ ATTENTION DANGER ⚠️\n\nVoulez-vous vraiment supprimer définitivement la section \"" + prod.label + "\" ?\nCela effacera également TOUTES les questions associées à ce produit.");
   if (!confirmation) return;
-  
-  // 3. Retirer de la liste des produits
   formData.liste_produits = formData.liste_produits.filter(function(p) { return p.id !== id; });
-  
-  // 4. Supprimer le bloc de questions de la configuration
-  if (formData[id]) {
-    delete formData[id];
-  }
-  
+  if (formData[id]) { delete formData[id]; }
   alert("🗑️ Section \"" + prod.label + "\" supprimée de la configuration.");
-  
-  // 5. Rebasculer automatiquement sur l'étape 1 par sécurité
-  currentProduit = 'infos_generales';
-  renderProduitTabs();
-  renderQuestions();
+  currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions();
 }
-function reinitialiserConfiguration() {
-  var confirmation = confirm("⚠️ ATTENTION : Vous allez effacer TOUTE la configuration actuelle de l'écran pour charger un modèle d'usine vierge.\n\n(Vos modifications ne seront définitives sur GitHub que si vous cliquez sur 'Publier sur le portail' après la remise à zéro). Continuer ?");
-  if (!confirmation) return;
 
-  // Chargement d'une structure d'origine Provost 100% saine
-  formData = {
-    liste_produits: [
-      { id: 'proplus_lp3', label: 'Proplus LP3' },
-      { id: 'proplus_lp3_2n', label: 'Proplus LP3 - 2 Niveaux' },
-      { id: 'install_ext', label: 'Installation extérieure' }
-    ],
-    infos_generales: JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)),
-    proplus_lp3: [],
-    proplus_lp3_2n: [],
-    install_ext: []
-  };
-
-  currentProduit = 'infos_generales';
-  renderProduitTabs();
-  renderQuestions();
-  toast("🔄 Modèle d'origine rechargé. Cliquez sur 'Publier' pour écraser GitHub !", "ok");
-}
 // 📝 FONCTION POUR RENOMMER UNE SECTION PRODUIT
 function renommerSection(id) {
-  if (!formData || !formData.liste_produits) return; [cite: 35]
-  
-  // 1. Trouver la section dans le registre des produits
-  var prod = formData.liste_produits.find(function(p) { return p.id === id; }); [cite: 35]
+  if (!formData || !formData.liste_produits) return;
+  var prod = formData.liste_produits.find(function(p) { return p.id === id; });
   if (!prod) return;
-  
-  // 2. Ouvrir une boîte de dialogue pré-remplie avec le nom actuel
   var nouveauNom = prompt("🏷️ Modification du libellé\n\nEntrez le nouveau nom pour la section \"" + prod.label + "\" :", prod.label);
-  
-  // Si l'utilisateur clique sur Annuler ou laisse vide, on stoppe
   if (!nouveauNom || nouveauNom.trim() === "") return;
-  
-  // 3. Appliquer le nouveau nom nettoyé
   prod.label = nouveauNom.trim();
-  
-  toast("✓ Section renommée !", "ok"); [cite: 32]
-  
-  // 4. Rafraîchir instantanément l'affichage des onglets
+  toast("✓ Section renommée !", "ok");
   renderProduitTabs();
 }
+
 </script>
 </body>
 </html>
