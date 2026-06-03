@@ -198,23 +198,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 
 <script>
 
-// 🔐 VERROU DE SÉCURITÉ ADMIN
-(function() {
-  var MOT_DE_PASSE_ATTENDU = "1960"; // 👈 TON MOT DE PASSE
-  if (sessionStorage.getItem("admin_autorise") !== "true") {
-    var tentative = prompt("🔐 Accès sécurisé — Portail Administrateur Provost\n\nVeuillez saisir le mot de passe master :");
-    if (tentative === MOT_DE_PASSE_ATTENDU) {
-      sessionStorage.setItem("admin_autorise", "true");
-    } else {
-      alert("❌ Mot de passe incorrect. Accès strictement refusé !");
-      document.documentElement.innerHTML = `
-        <body style="background:#1e2638; font-family:Arial, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; color:#fff; text-align:center;">
-          <div><span style="font-size:50px;">🔒</span><h1 style="color:#c0392b; margin-top:15px; font-size:24px;">Accès Réservé et Sécurisé</h1></div>
-        </body>`;
-      window.stop();
-    }
-  }
-})();
+
 
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2EsSOwl_jkD1yoWTNbtSKBMbYThZfhhBUAkMsCMZW6zO6DAwcDefrrhP_nI7W4WsO/exec';
 var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "", lastOpenedDemande = null;
