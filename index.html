@@ -6,6 +6,65 @@
 <title>Portail BE — Provost</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
+/* 💡 DESIGN DE LA PASTILLE D'AIDE (?) ET SA BULLE FLASH */
+.q-text-tooltip-container {
+  position: relative;
+  margin-left: auto; /* Aimante la pastille tout à droite de la ligne */
+  display: inline-flex;
+  align-items: center;
+  z-index: 15;
+}
+
+.q-text-tooltip-icon {
+  width: 20px;
+  height: 20px;
+  background: var(--blue-light);
+  color: var(--blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: help;
+  transition: var(--tr);
+  border: 1px solid rgba(45,75,140,0.12);
+}
+
+.q-text-tooltip-container:hover .q-text-tooltip-icon {
+  background: var(--blue);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(45,75,140,0.2);
+}
+
+/* Bulle d'explication textuelle */
+.q-text-tooltip-content {
+  position: absolute;
+  bottom: 130%; /* S'ouvre proprement au-dessus du titre */
+  right: 0;
+  background: var(--white);
+  color: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  width: 300px;
+  max-width: 75vw;
+  font-size: 13px; /* 🚀 Plus gros et confortable qu'avant */
+  font-weight: 500;
+  font-style: normal; /* Plus propre en normal dans la bulle */
+  text-transform: none; /* Annule l'uppercase si hérité du titre */
+  letter-spacing: normal;
+  line-height: 1.5;
+  white-space: pre-wrap; /* Respecte les sauts de lignes et tirets de l'admin */
+  z-index: 99999;
+  animation: fadeUp 0.2s ease-out;
+}
+
+.q-text-tooltip-container:hover .q-text-tooltip-content {
+  display: block;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-mid:#3a5ca8;
@@ -450,11 +509,23 @@ function buildInfosGeneralesDynamic() {
   var container = document.getElementById('infos-generales-dynamic-container'); if(!container) return; container.innerHTML = '';
   var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
   questions.forEach(function(q) {
-    var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider"><div class="card-title">' + q.label + '</div>';
+    var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider">';
     
+    // 🛠️ Reconstruction du titre en élément DOM pour y injecter proprement la bulle d'aide à droite
+    var titleEl = document.createElement('div');
+    titleEl.className = 'card-title';
+    titleEl.style.width = '100%';
+    titleEl.innerHTML = '<span>' + q.label + '</span>';
+    
+    // 🌟 Pastille (?) connectée si un texte d'aide existe dans l'admin
     if (q.placeholder && q.placeholder.trim() !== '') {
-      qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-10px; margin-bottom:12px; padding-left:11px; white-space: pre-wrap;">' + q.placeholder + '</div>';
+      var textTooltip = document.createElement('div');
+      textTooltip.className = 'q-text-tooltip-container';
+      textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
+      textTooltip.addEventListener('click', function(e) { e.stopPropagation(); }); // Sécurité anti-clic
+      titleEl.appendChild(textTooltip);
     }
+    qDiv.appendChild(titleEl);
     
     if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
     var fid = 'info_' + q.id;
@@ -490,17 +561,13 @@ function buildInfosGeneralesDynamic() {
         
         div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
         
-        // 🌟 NOUVEAU : Injection de l'info-bulle si image présente
         if (optImg) {
           var tooltipContainer = document.createElement('div');
           tooltipContainer.className = 'q-tooltip-container';
           tooltipContainer.innerHTML = '<span class="q-tooltip-icon">🖼️ Voir le schéma</span><div class="q-tooltip-content"><img src="' + optImg + '" class="q-tooltip-img" alt="Illustration"></div>';
-          
-          // Sécurité anti-clic : évite de cocher/décocher la case en survolant ou cliquant l'image
           tooltipContainer.addEventListener('click', function(e) { e.stopPropagation(); });
           div.appendChild(tooltipContainer);
         }
-        
         optsDiv.appendChild(div);
         
         var otherInput = null;
@@ -568,11 +635,25 @@ function buildDiagnostic() {
     var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
     questions.forEach(function(q) {
-      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px'; qDiv.innerHTML='<div class="q-title">' + q.label + '</div>';
+      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px';
       
+      // 🛠️ Reconstruction du titre en élément DOM pour y injecter proprement la bulle d'aide à droite
+      var titleEl = document.createElement('div');
+      titleEl.className = 'q-title';
+      titleEl.style.display = 'flex';
+      titleEl.style.alignItems = 'center';
+      titleEl.style.width = '100%';
+      titleEl.innerHTML = '<span>' + q.label + '</span>';
+      
+      // 🌟 Pastille (?) connectée si un texte d'aide existe dans l'admin
       if (q.placeholder && q.placeholder.trim() !== '') {
-        qDiv.innerHTML += '<div style="font-size:11px; color:var(--text-light); font-style:italic; margin-top:-4px; margin-bottom:8px; white-space: pre-wrap;">' + q.placeholder + '</div>';
+        var textTooltip = document.createElement('div');
+        textTooltip.className = 'q-text-tooltip-container';
+        textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
+        textTooltip.addEventListener('click', function(e) { e.stopPropagation(); }); // Sécurité anti-clic
+        titleEl.appendChild(textTooltip);
       }
+      qDiv.appendChild(titleEl);
       
       if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
       var fid = pid+'_'+q.id;
@@ -608,17 +689,13 @@ function buildDiagnostic() {
           
           optDiv.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
           
-          // 🌟 NOUVEAU : Injection de l'info-bulle si image présente
           if (optImg) {
             var tooltipContainer = document.createElement('div');
             tooltipContainer.className = 'q-tooltip-container';
             tooltipContainer.innerHTML = '<span class="q-tooltip-icon">🖼️ Voir le schéma</span><div class="q-tooltip-content"><img src="' + optImg + '" class="q-tooltip-img" alt="Illustration"></div>';
-            
-            // Sécurité anti-clic
             tooltipContainer.addEventListener('click', function(e) { e.stopPropagation(); });
             optDiv.appendChild(tooltipContainer);
           }
-          
           optsDiv.appendChild(optDiv);
           
           var otherInput = null;
