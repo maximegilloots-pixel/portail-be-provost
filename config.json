@@ -766,6 +766,37 @@
         "Aucun",
         "Autre :"
       ]
+    },
+    {
+      "id": "q_1780472546389",
+      "label": "Protections",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Protection sabot",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472457543_unnamed.jpg"
+        },
+        {
+          "text": "Protection cornière",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472472198_unnamed.jpg"
+        },
+        {
+          "text": "Protection Polyuréthane",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472489938_unnamed.jpg"
+        },
+        {
+          "text": "Protection latérale sigma",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472504266_unnamed.jpg"
+        },
+        {
+          "text": "Protection latérale bois",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472517694_unnamed.jpg"
+        },
+        {
+          "text": "Protection latérale tubulaire",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472535524_unnamed.jpg"
+        }
+      ]
     }
   ],
   "prod_1779440938626": [
