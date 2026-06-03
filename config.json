@@ -656,7 +656,7 @@
     {
       "id": "prod_1780412206778",
       "label": "PRORACK+"
-    }
+    },
     {
       "id": "prod_cantipro3",
       "label": "CANTIPRO 3"
@@ -892,7 +892,7 @@
       "label": "cscsc",
       "type": "text"
     }
-  ]
+  ],
   "prod_cantipro3": [
     {
       "id": "q_canti_dim_fardeau",
@@ -1057,5 +1057,5 @@
       "label": "Commentaires",
       "type": "textarea"
     }
-  ],
+  ]
 }
