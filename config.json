@@ -592,14 +592,15 @@
       ]
     },
     {
-      "id": "qe_eaux",
+      "id": "q_1780471287618",
       "label": "Descentes d'eaux pluviales",
       "type": "radio",
       "options": [
         "Oui",
         "Non",
         "Autre :"
-      ]
+      ],
+      "placeholder": "Ajouter des descentes d'eau pluviale permet de garantir une évacuation efficace de l'eau de pluie, évitant ainsi l'accumulation sur la toiture, les infiltrations et les risques de dégradation des matériaux. Cela aide également à prévenir les problèmes d'humidité et à préserver l'intégrité structurelle de la construction."
     },
     {
       "id": "qe_sol",
@@ -614,19 +615,19 @@
       ]
     },
     {
-      "id": "qe_ancrage",
+      "id": "q_1780471305952",
       "label": "Type d'ancrages",
       "type": "checkbox",
-      "multi": true,
       "options": [
         "Vis béton",
         "Ancrages Inox",
         "Ancrages chimiques",
         "Autre :"
-      ]
+      ],
+      "placeholder": "Les ancrages vis béton offrent une installation rapide et efficace, avec une bonne résistance aux charges statiques, mais peuvent être moins adaptés pour des applications nécessitant une haute résistance à la corrosion. \nLes ancrages inox sont très résistants à la corrosion, idéaux pour les environnements extérieurs ou marins (ex : pour installation Nautirack), mais peuvent être plus coûteux. \nLes ancrages chimiques, quant à eux, offrent une fixation très forte, surtout dans des matériaux faibles ou poreux (ex : bitume) mais nécessitent un temps de durcissement et une installation plus technique."
     },
     {
-      "id": "qe_commentaires",
+      "id": "q_1780471312240",
       "label": "Commentaires",
       "type": "textarea",
       "placeholder": "Informations complémentaires..."
