@@ -722,13 +722,48 @@
       "type": "text"
     },
     {
-      "id": "q_1780471625310",
+      "id": "q_1780471669363",
       "label": "Largeurs d'allées nécessaires",
       "type": "radio",
       "options": [
         "Environ 2300 mm mini (Transpalette ou gerbeur)",
         "Environ 2600 mm mini (Chariot à mat rétractable)",
         "Environ 3300 mm mini (Chariot élévateur)",
+        "Autre :"
+      ],
+      "placeholder": "La largeur d'allée dépend du type chariot utilisé. Les valeurs proposées ci-dessous sont approximatives, elles seront précisées lorsque le modèle de l'engin utilisé sera connu du technicien."
+    },
+    {
+      "id": "q_1780472408294",
+      "label": "Recouvrement",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Caillebotis",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472280177_11.png"
+        },
+        {
+          "text": "Tablette fils (PMRO)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472304001_12.png"
+        },
+        {
+          "text": "Plancher mettalique (PMXP)",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472322676_13.png"
+        },
+        {
+          "text": "Sapin jointif",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472344653_14.png"
+        },
+        {
+          "text": "Sapin claire-voies",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472361558_15.png"
+        },
+        {
+          "text": "Panneaux agglo",
+          "image": "https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/images/opt_1780472374866_16.png"
+        },
+        "Plateaux tôle galva",
+        "Aucun",
         "Autre :"
       ]
     }
