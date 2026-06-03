@@ -657,6 +657,10 @@
       "id": "prod_1780412206778",
       "label": "PRORACK+"
     }
+    {
+      "id": "prod_cantipro3",
+      "label": "CANTIPRO 3"
+    }
   ],
   "prod_1779436061922": [
     {
@@ -889,4 +893,169 @@
       "type": "text"
     }
   ]
+  "prod_cantipro3": [
+    {
+      "id": "q_canti_dim_fardeau",
+      "label": "Dimension fardeau (largeur x profondeur x hauteur)",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_charge_fardeau",
+      "label": "Charge fardeau",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_charge_bras",
+      "label": "OU Charge par bras",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_densite",
+      "label": "OU Densité fardeau",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_nature",
+      "label": "Nature du produit stocké (Bois, métal, descriptif rapide)",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_rigidite",
+      "label": "Rigidité du fardeau",
+      "type": "radio",
+      "options": [
+        "Très souple",
+        "Souple",
+        "Rigide"
+      ]
+    },
+    {
+      "id": "q_canti_long",
+      "label": "Longueur disponible bâtiment ou longueur installation",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_larg",
+      "label": "Largeur disponible bâtiment ou largeur installation",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_haut",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_meuble",
+      "label": "Type de meuble souhaité",
+      "type": "checkbox",
+      "options": [
+        "SF (Simple face)",
+        "DF (Double face)"
+      ]
+    },
+    {
+      "id": "q_canti_entraxe",
+      "label": "Entraxe colonnes souhaité",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_niveaux",
+      "label": "Nombre de niveaux (hors socle)",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_long_bras",
+      "label": "Longueur des bras",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_cg",
+      "label": "Position du centre de gravité sur le bras",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_incline",
+      "label": "Bras spécifiques inclinés",
+      "placeholder": "Pour stockage fers tors",
+      "type": "checkbox",
+      "options": [
+        "Bras inclinés Longueur 500",
+        "Rallonge Longueur 1000",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_canti_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Rails de guidage",
+          "image": ""
+        },
+        {
+          "text": "Embouts de protection",
+          "image": ""
+        },
+        {
+          "text": "Butée amovible Ht150 sur bras et socle",
+          "image": ""
+        },
+        {
+          "text": "Recouvrement caillebotis",
+          "image": ""
+        },
+        {
+          "text": "Porte étiquette",
+          "image": ""
+        },
+        {
+          "text": "Kit sécurité",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_canti_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Bras RAL 1028 + Colonne Galva Z (Standard)",
+        "Bras Galva à chaud + Colonne Galva Z (Standard extérieur)",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_canti_chariot",
+      "label": "Type de chariot",
+      "type": "radio",
+      "options": [
+        "Chariot latéral (Allée circu plus petite, nécessité rail de guidage)",
+        "Chariot frontal (Allée circulation plus large pour manoeuvrer)"
+      ]
+    },
+    {
+      "id": "q_canti_levee",
+      "label": "Hauteur de levée max du chariot",
+      "type": "text"
+    },
+    {
+      "id": "q_canti_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_canti_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
 }
