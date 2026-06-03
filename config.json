@@ -1161,6 +1161,223 @@
       "type": "textarea"
     }
   ],
+  "prod_dynamique_lourd_pl3": [
+    {
+      "id": "q_dyn_type_utilisation",
+      "label": "Type d'utilisation",
+      "type": "radio",
+      "options": [
+        {
+          "text": "Dynamique Rouleaux FIFO (First In, First Out)",
+          "image": ""
+        },
+        {
+          "text": "Dynamique Rouleaux LIFO (Last In, First Out)",
+          "image": ""
+        },
+        {
+          "text": "Carrier Pushback LIFO (Last In, First Out)",
+          "image": ""
+        }
+      ],
+      "placeholder": "Le rayonnage dynamique à rouleaux en FIFO (First In – First Out) est conçu pour assurer une rotation optimale des stocks : les palettes entrent d’un côté et sortent de l’autre. Ce système est idéal pour les produits périssables ou à forte rotation, mais il exige deux allées distinctes.\n\nLe rayonnage dynamique à rouleaux en LIFO (Last In – First Out) fonctionne sur le même principe de gravité mais avec une seule face pour le chargement et le prélèvement. Il optimise l’espace et réduit les déplacements, mais ne permet pas de gestion en FIFO, ce qui peut poser problème pour les produits sensibles à la durée de stockage.\n\nLe rayonnage Pushback à chariots (LIFO) utilise des chariots montés sur rails, chaque nouvelle palette poussant la précédente. Ce système combine densité de stockage et simplicité d’exploitation, tout en ayant un avantage majeur : il peut accueillir des palettes de qualité inférieure ou endommagées, car ce sont les chariots qui roulent et non les palettes elles-mêmes. Cela le rend plus tolérant et robuste que les systèmes à rouleaux, tout en conservant la logique LIFO."
+    },
+    {
+      "id": "q_dyn_type_palettes",
+      "label": "Type de Palettes",
+      "type": "radio",
+      "options": [
+        "Palette EUROPE 800 x 1200",
+        "Palette INDUS 1000 x 1200",
+        "Autre :"
+      ],
+      "placeholder": "Photos obligatoires pour s'assurer de la compatibilité avec système gravitaire / vérifier sens des skis..."
+    },
+    {
+      "id": "q_dyn_nature_palette",
+      "label": "Nature de la palette",
+      "type": "radio",
+      "options": [
+        {
+          "text": "Palette bois",
+          "image": ""
+        },
+        {
+          "text": "Palette plastique",
+          "image": ""
+        },
+        {
+          "text": "Palette métallique",
+          "image": ""
+        },
+        "Autre :"
+      ],
+      "placeholder": "Selon le matériau de la palette, des tests seront potentiellement obligatoires pour s'assurer du bon fonctionnement de l'installation"
+    },
+    {
+      "id": "q_dyn_hauteur_palettes",
+      "label": "Hauteur Palettes",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_poids_palettes",
+      "label": "Poids Palettes",
+      "type": "text",
+      "placeholder": "Indiquer poids mini et maxi"
+    },
+    {
+      "id": "q_dyn_charge_debordante",
+      "label": "Charge débordante",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur longeron et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_dyn_hauteur_dispo",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_profondeur",
+      "label": "Nombre de Palettes en profondeur ou Profondeur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_longueur",
+      "label": "Nombre de couloirs en façade ou Longueur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_protections",
+      "label": "Protections",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Protection sabot",
+          "image": ""
+        },
+        {
+          "text": "Protection cornière",
+          "image": ""
+        },
+        {
+          "text": "Protection Polyuréthane",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale sigma",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale bois",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale tubulaire",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dyn_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Filet de protection",
+        "Cadre grillagé (fonds)",
+        "Côté grillagé",
+        "Butée sol (en face des couloirs)",
+        "Butée sol ECO (en face des roues du chariot)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dyn_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Longeron Galva à chaud + échelle Galva Z",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dyn_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dyn_manu_entree",
+      "label": "Moyens de manutention (entrée)",
+      "type": "radio",
+      "options": [
+        "Gerbeur (avec fourches basses)",
+        "Chariot latéral",
+        "Chariot frontal",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dyn_mat_entree",
+      "label": "Mat inclinable (entrée)",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_dyn_levee_entree",
+      "label": "Hauteur de levée (entrée)",
+      "type": "text"
+    },
+    {
+      "id": "q_dyn_manu_sortie",
+      "label": "Moyens de manutention (sortie)",
+      "type": "radio",
+      "options": [
+        "Gerbeur (avec fourches basses)",
+        "Chariot latéral",
+        "Chariot frontal",
+        "Transpalette",
+        "Autre :"
+      ],
+      "placeholder": "Ne pas remplir si identique au moyen de manutention utilisé côté entrée"
+    },
+    {
+      "id": "q_dyn_mat_sortie",
+      "label": "Mat inclinable (sortie)",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ],
+      "placeholder": "Ne pas remplir si identique au moyen de manutention utilisé côté entrée"
+    },
+    {
+      "id": "q_dyn_levee_sortie",
+      "label": "Hauteur de levée (sortie)",
+      "type": "text",
+      "placeholder": "Ne pas remplir si identique au moyen de manutention utilisé côté entrée"
+    },
+    {
+      "id": "q_dyn_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1193,6 +1410,10 @@
     {
       "id": "proplus_lp3_erp",
       "label": "PROPLUS LP3 ERP"
+    }
+    {
+      "id": "prod_dynamique_lourd_pl3",
+      "label": "PROPAL 3 DYNAMIQUE LOURD (PALETTES)"
     }
   ]
 }
