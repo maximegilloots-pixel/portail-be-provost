@@ -6,7 +6,7 @@
 <title>Portail BE — Provost</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
-/* 💡 DESIGN DE LA PASTILLE D'AIDE (?) ET SA BULLE FLASH */
+/* 💡 DESIGN DE LA PASTILLE D'AIDE (?) EN ROUGE ET SA BULLE FLASH */
 .q-text-tooltip-container {
   position: relative;
   margin-left: auto; /* Aimante la pastille tout à droite de la ligne */
@@ -18,8 +18,8 @@
 .q-text-tooltip-icon {
   width: 20px;
   height: 20px;
-  background: var(--blue-light);
-  color: var(--blue);
+  background: var(--red-bg); /* Fond rouge très léger */
+  color: var(--red); /* Texte rouge Provost */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -28,19 +28,19 @@
   font-weight: 900;
   cursor: help;
   transition: var(--tr);
-  border: 1px solid rgba(45,75,140,0.12);
+  border: 1px solid rgba(192,57,43,0.15);
 }
 
 .q-text-tooltip-container:hover .q-text-tooltip-icon {
-  background: var(--blue);
+  background: var(--red); /* Rouge plein au survol */
   color: var(--white);
-  box-shadow: 0 2px 8px rgba(45,75,140,0.2);
+  box-shadow: 0 2px 8px rgba(192,57,43,0.25);
 }
 
 /* Bulle d'explication textuelle */
 .q-text-tooltip-content {
   position: absolute;
-  bottom: 130%; /* S'ouvre proprement au-dessus du titre */
+  bottom: 130%;
   right: 0;
   background: var(--white);
   color: var(--dark);
@@ -51,19 +51,26 @@
   display: none;
   width: 300px;
   max-width: 75vw;
-  font-size: 13px; /* 🚀 Plus gros et confortable qu'avant */
+  font-size: 13px;
   font-weight: 500;
-  font-style: normal; /* Plus propre en normal dans la bulle */
-  text-transform: none; /* Annule l'uppercase si hérité du titre */
+  font-style: normal;
+  text-transform: none;
   letter-spacing: normal;
   line-height: 1.5;
-  white-space: pre-wrap; /* Respecte les sauts de lignes et tirets de l'admin */
+  white-space: pre-wrap;
   z-index: 99999;
   animation: fadeUp 0.2s ease-out;
 }
 
 .q-text-tooltip-container:hover .q-text-tooltip-content {
   display: block;
+}
+
+/* 🚀 BOOST DE L'ESPACEMENT : Donne de l'air aux lignes de séparation de l'Étape 1 */
+.divider {
+  border: none;
+  border-top: 1.5px solid var(--border);
+  margin: 32px 0 20px 0 !important; /* Augmentation des marges pour bien séparer */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -511,18 +518,16 @@ function buildInfosGeneralesDynamic() {
   questions.forEach(function(q) {
     var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider">';
     
-    // 🛠️ Reconstruction du titre en élément DOM pour y injecter proprement la bulle d'aide à droite
     var titleEl = document.createElement('div');
     titleEl.className = 'card-title';
     titleEl.style.width = '100%';
     titleEl.innerHTML = '<span>' + q.label + '</span>';
     
-    // 🌟 Pastille (?) connectée si un texte d'aide existe dans l'admin
     if (q.placeholder && q.placeholder.trim() !== '') {
       var textTooltip = document.createElement('div');
       textTooltip.className = 'q-text-tooltip-container';
       textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
-      textTooltip.addEventListener('click', function(e) { e.stopPropagation(); }); // Sécurité anti-clic
+      textTooltip.addEventListener('click', function(e) { e.stopPropagation(); });
       titleEl.appendChild(textTooltip);
     }
     qDiv.appendChild(titleEl);
@@ -635,9 +640,9 @@ function buildDiagnostic() {
     var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
     var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
     questions.forEach(function(q) {
-      var qDiv = document.createElement('div'); qDiv.style.marginBottom='14px';
+      var qDiv = document.createElement('div'); 
+      qDiv.style.marginBottom = '28px'; // 🚀 BOOST DE L'ESPACEMENT (Passage de 14px à 28px pour aérer le diagnostic)
       
-      // 🛠️ Reconstruction du titre en élément DOM pour y injecter proprement la bulle d'aide à droite
       var titleEl = document.createElement('div');
       titleEl.className = 'q-title';
       titleEl.style.display = 'flex';
@@ -645,12 +650,11 @@ function buildDiagnostic() {
       titleEl.style.width = '100%';
       titleEl.innerHTML = '<span>' + q.label + '</span>';
       
-      // 🌟 Pastille (?) connectée si un texte d'aide existe dans l'admin
       if (q.placeholder && q.placeholder.trim() !== '') {
         var textTooltip = document.createElement('div');
         textTooltip.className = 'q-text-tooltip-container';
         textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
-        textTooltip.addEventListener('click', function(e) { e.stopPropagation(); }); // Sécurité anti-clic
+        textTooltip.addEventListener('click', function(e) { e.stopPropagation(); });
         titleEl.appendChild(textTooltip);
       }
       qDiv.appendChild(titleEl);
@@ -703,7 +707,7 @@ function buildDiagnostic() {
             otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
             otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
             otherInput.addEventListener('input', function() {
-              if (otherInput.value.trim() !== '') { optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim()); otherInput.classList.add('filled'); } else { optDiv.setAttribute('data-val', optText); otherInput.classList.remove('filled'); }
+              if (otherInput.value.trim() !== '') { optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim()); otherInput.classList.add('filled'); } else { optDiv.setAttribute('data-val', optText); optDiv.setAttribute('data-remove'); }
             });
             optsDiv.appendChild(otherInput);
           }
