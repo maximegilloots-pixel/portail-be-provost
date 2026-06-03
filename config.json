@@ -469,14 +469,15 @@
       "placeholder": "Cette information est essentielle pour évaluer avec précision les contraintes de neige et de vent affectant l’implantation."
     },
     {
-      "id": "qe_salin",
+      "id": "q_1780470205618",
       "label": "Environnement salin ?",
       "type": "radio",
       "options": [
         "Oui",
         "Non",
         "Autre :"
-      ]
+      ],
+      "placeholder": "- L’implantation est exposée à une atmosphère saline, susceptible d’accélérer la corrosion des matériaux métalliques et d’affecter la durabilité des infrastructures, nécessitant des traitements spécifiques pour assurer leur pérennité. \n- Située en zone littorale (<5 km de la mer), l’implantation est soumise à un air chargé en embruns salins, pouvant avoir des impacts sur les constructions, les équipements et les aménagements paysagers."
     },
     {
       "id": "qe_toiture",
