@@ -232,8 +232,26 @@ var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été
 function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var map = {}; raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } }); return map; }
 function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
 function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
-function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('admin_auth', '1'); sessionStorage.setItem('google_token', response.credential); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerPermanente(); } else { alert("Email @provost.fr requis."); } }
-function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
+var ADMIN_WHITELIST = [
+  'maxime.gilloots@provost',
+  'autre.admin@provost.fr'
+];
+
+function handleCredentialResponse(response) {
+  var payload = jwtDecode(response.credential);
+  if (payload.email && 
+      payload.email.endsWith('@provost.fr') && 
+      ADMIN_WHITELIST.indexOf(payload.email) !== -1) {
+    sessionStorage.setItem('admin_auth', '1');
+    sessionStorage.setItem('google_token', response.credential);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-content').classList.add('visible');
+    chargerPermanente();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('login-err').textContent = '❌ Accès réservé aux administrateurs habilités.';
+  }
+}function getGHConfig() { return { user: localStorage.getItem('gh_user')||'', repo: localStorage.getItem('gh_repo')||'', token: localStorage.getItem('gh_token')||'' }; }
 function sauvegarderConfig() { localStorage.setItem('gh_user', document.getElementById('gh-user').value.trim()); localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim()); localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim()); localStorage.setItem('tech_list', document.getElementById('tech-list-config').value); localStorage.setItem('mail_body', document.getElementById('mail-body-config').value); toast('✓ Configuration sauvegardée', 'ok'); majStatusGH(); chargerSuivi(); }
 function majStatusGH() { var gh = getGHConfig(); var el = document.getElementById('gh-status'); if(el) { el.textContent = gh.user ? 'GitHub : ' + gh.user : 'GitHub : non configuré'; el.className = gh.user ? 'github-status gh-ok' : 'github-status gh-err'; } }
 
