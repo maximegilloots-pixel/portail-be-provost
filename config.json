@@ -665,9 +665,72 @@
   ],
   "prod_1779436061922": [
     {
-      "id": "q_1779436071288",
-      "label": "Charge ?",
+      "id": "q_1780471484504",
+      "label": "Type de palette",
+      "type": "radio",
+      "options": [
+        "Palettes EUROPE 800 x 1200",
+        "Palettes INDUS 1000 x 1200",
+        "Autre :"
+      ],
+      "placeholder": "Préciser le côté prise (Photos si possible)"
+    },
+    {
+      "id": "q_1780471496034",
+      "label": "Hauteur Palettes",
       "type": "text"
+    },
+    {
+      "id": "q_1780471506870",
+      "label": "Charge débordante",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471501554",
+      "label": "Poids Palettes",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471547452",
+      "label": "OU Charge par niveau",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471515523",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur longeron et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_1780471525511",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471528283",
+      "label": "Largeur de baie souhaitée",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471573703",
+      "label": "Profondeur meuble simple face",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471578326",
+      "label": "Profondeur meuble double face",
+      "type": "text"
+    },
+    {
+      "id": "q_1780471625310",
+      "label": "Largeurs d'allées nécessaires",
+      "type": "radio",
+      "options": [
+        "Environ 2300 mm mini (Transpalette ou gerbeur)",
+        "Environ 2600 mm mini (Chariot à mat rétractable)",
+        "Environ 3300 mm mini (Chariot élévateur)",
+        "Autre :"
+      ]
     }
   ],
   "prod_1779440938626": [
