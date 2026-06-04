@@ -1529,7 +1529,7 @@
       "id": "q_acc_commentaires",
       "label": "Commentaires",
       "type": "textarea"
-    },
+    }
   ],
     
   "liste_produits": [
