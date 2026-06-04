@@ -1376,8 +1376,9 @@
       "id": "q_dyn_commentaires",
       "label": "Commentaires",
       "type": "textarea"
-    },
-    "prod_accumulation_pl3": [
+    }
+  ],
+  "prod_accumulation_pl3": [
     {
       "id": "q_acc_type_utilisation",
       "label": "Type d'utilisation",
@@ -1530,8 +1531,7 @@
       "label": "Commentaires",
       "type": "textarea"
     }
-  ]
-    
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
