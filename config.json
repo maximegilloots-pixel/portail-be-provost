@@ -1376,8 +1376,162 @@
       "id": "q_dyn_commentaires",
       "label": "Commentaires",
       "type": "textarea"
+    },
+    "prod_accumulation_pl3": [
+    {
+      "id": "q_acc_type_utilisation",
+      "label": "Type d'utilisation",
+      "type": "radio",
+      "options": [
+        "Accumulation FIFO (First In, First Out)",
+        "Accumulation LIFO - (Last In, First Out)"
+      ]
+    },
+    {
+      "id": "q_acc_type_palettes",
+      "label": "Type de Palettes",
+      "type": "radio",
+      "options": [
+        "Palette EUROPE 800 x 1200 (CP)",
+        "Palette INDUS 1000 x 1200 (CP)",
+        "Autre :"
+      ],
+      "placeholder": "Photos obligatoires pour s'assurer de la compatibilité avec système Accumulation\nATTENTION : En Accumulation, les skis sont perpendiculaires aux rails (ex : 1200 mm pour une palette EUROPE ou INDUS)"
+    },
+    {
+      "id": "q_acc_hauteur_palettes",
+      "label": "Hauteur Palettes",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_poids_palettes",
+      "label": "Poids Palettes",
+      "type": "text",
+      "placeholder": "Indiquer poids mini et maxi"
+    },
+    {
+      "id": "q_acc_charge_debordante",
+      "label": "Charge débordante",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur rails"
+    },
+    {
+      "id": "q_acc_hauteur_dispo",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_profondeur",
+      "label": "Nombre de Palettes en profondeur ou Profondeur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_longueur",
+      "label": "Nombre de couloirs en façade ou Longueur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_contreventement",
+      "label": "Système de contreventement du meuble",
+      "type": "radio",
+      "options": [
+        "Le plus compétitif",
+        "Par Tours de 300 mm",
+        "Par Tours de 400 mm",
+        "Par Tours de 600 mm",
+        "Par cornières (contreventement horizontal / Vertical) - INCOMPATIBLE si Utilisation en FIFO"
+      ]
+    },
+    {
+      "id": "q_acc_protections",
+      "label": "Protections",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Protection sabot",
+          "image": ""
+        },
+        {
+          "text": "Protection cornière",
+          "image": ""
+        },
+        {
+          "text": "protection Polyuréthane",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale sigma",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale bois",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale tubulaire",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_acc_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Guides d'entrée palettes",
+        "Rails de guidage au sol",
+        "Filet de protection",
+        "Cadre grillagé (fonds)",
+        "Côté grillagé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_acc_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Longeron Galva à chaud + échelle Galva Z",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_acc_manutention",
+      "label": "Moyens de manutention",
+      "type": "radio",
+      "options": [
+        "Gerbeur (avec fourches basses) - NON COMPATIBLE SAUF CAS EXCEPTIONNEL (Photos à envoyer)",
+        "Chariot latéral",
+        "Chariot frontal",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_acc_hauteur_levee",
+      "label": "Hauteur de levée",
+      "type": "text"
+    },
+    {
+      "id": "q_acc_hauteur_cabine",
+      "label": "Hauteur de la cabine (si 1er niveau sur rails bas)",
+      "type": "text",
+      "placeholder": "Permet de s'assurer que le chariot passe bien entre les rails des niveaux bas"
+    },
+    {
+      "id": "q_acc_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
     }
   ],
+    
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1414,6 +1568,10 @@
     {
       "id": "prod_dynamique_lourd_pl3",
       "label": "PROPAL 3 DYNAMIQUE LOURD (PALETTES)"
+    },
+    {
+      "id": "prod_accumulation_pl3",
+      "label": "PROPAL 3 ACCUMULATION"
     }
   ]
 }
