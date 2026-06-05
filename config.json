@@ -3210,6 +3210,224 @@
       "type": "textarea"
     }
   ],
+  "prod_icare": [
+    {
+      "id": "q_icare_type_structure",
+      "label": "Type de structure",
+      "type": "radio",
+      "options": [
+        "Tubulaire",
+        "Tôlé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_type_produit",
+      "label": "Type de produit à stocker",
+      "type": "text",
+      "placeholder": "(Cartons, bacs, archives etc...)"
+    },
+    {
+      "id": "q_icare_hauteur_charges",
+      "label": "Hauteur charges",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_largeur_charges",
+      "label": "Largeur en façade des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_profondeur_charges",
+      "label": "Profondeur des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_poids_charges",
+      "label": "Poids des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur tablette et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_icare_hauteur_dispo",
+      "label": "Hauteur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_charge_niveau",
+      "label": "Charge par niveau",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_prof_simple",
+      "label": "Profondeur meuble simple face",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_prof_double",
+      "label": "Profondeur meuble double face",
+      "type": "text"
+    },
+    {
+      "id": "q_icare_type_pied",
+      "label": "Type de pied",
+      "type": "checkbox",
+      "options": [
+        "Embout plastique (Solution économique)",
+        "Embout plastique au sol et en tête de montant",
+        "Plaquette de base (Calage possible)",
+        "Plaque de base pour ancrage (Calage + ancrage possible)"
+      ]
+    },
+    {
+      "id": "q_icare_type_echelle",
+      "label": "Type d'échelle",
+      "type": "radio",
+      "options": [
+        "Ouverte (Avec Tablettes tubulaires)",
+        "Ouverte avec traverses (Avec Tablettes tôlées)",
+        "Tôlée en extrémité",
+        "Tout tôlé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_type_fond",
+      "label": "Type de fond",
+      "type": "checkbox",
+      "options": [
+        "Ouvert (Avec Tablettes Tubulaires)",
+        "Ouvert avec croisillons (Avec Tablettes tôlées)",
+        "Tôlé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_recouvrement",
+      "label": "Recouvrement",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Plateau fibre",
+          "image": ""
+        },
+        {
+          "text": "Plateau tôle galva",
+          "image": ""
+        },
+        {
+          "text": "Grillagé",
+          "image": ""
+        },
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Abouts grillagés",
+          "image": ""
+        },
+        {
+          "text": "Grillages intermédiaires",
+          "image": ""
+        },
+        {
+          "text": "Fonds grillagés",
+          "image": ""
+        },
+        {
+          "text": "Abouts agglo",
+          "image": ""
+        },
+        {
+          "text": "Agglo intermdiaires",
+          "image": ""
+        },
+        {
+          "text": "Fonds agglo",
+          "image": ""
+        },
+        {
+          "text": "Tube penderie",
+          "image": ""
+        },
+        {
+          "text": "Séparateur fil intérieur",
+          "image": ""
+        },
+        {
+          "text": "Cloison tôlée",
+          "image": ""
+        },
+        {
+          "text": "Séparation tôlée",
+          "image": ""
+        },
+        {
+          "text": "Portes pliantes / battantes",
+          "image": ""
+        },
+        {
+          "text": "Protèges montants pliés",
+          "image": ""
+        },
+        {
+          "text": "Tube butée",
+          "image": ""
+        },
+        {
+          "text": "Lisse de retenue",
+          "image": ""
+        },
+        {
+          "text": "Butée centrale + demi plateau fibre",
+          "image": ""
+        },
+        {
+          "text": "Tôle de retenue",
+          "image": ""
+        },
+        {
+          "text": "Supports bacs",
+          "image": ""
+        },
+        {
+          "text": "Barre de charge",
+          "image": ""
+        },
+        {
+          "text": "Plateau + cornières support",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Montants Gris RAL 7016 + tablette Galva Z (Standard)",
+        "Montants Bleu RAL 5019 + tablette Galva Z",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_icare_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -3286,6 +3504,10 @@
     {
       "id": "prod_proclass_362",
       "label": "PROCLASS 362"
+    },
+    {
+      "id": "prod_icare",
+      "label": "ICARE"
     }
   ]
 }
