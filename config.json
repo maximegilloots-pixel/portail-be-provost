@@ -2945,6 +2945,87 @@
       "type": "textarea"
     }
   ],
+  "prod_cloisons_modul_plus": [
+    {
+      "id": "q_modul_usage",
+      "label": "Type d'usage",
+      "type": "radio",
+      "options": [
+        "Protection / fermeture d'accès",
+        "Protection de machine (Non conforme avec la Modul +)",
+        "Isolation de produits dangereux",
+        "Délimitation de zones à risque",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_modul_panneaux",
+      "label": "Type de panneaux",
+      "type": "radio",
+      "options": [
+        "Grillagé",
+        "Demi Tôlé",
+        "Tout Tôlé",
+        "Mixte (à bien indiquer sur croquis, plan...)"
+      ]
+    },
+    {
+      "id": "q_modul_hauteur",
+      "label": "Hauteur",
+      "type": "radio",
+      "options": [
+        "1000",
+        "1200",
+        "1500",
+        "1800",
+        "2000",
+        "2200",
+        "2400",
+        "2500",
+        "2700",
+        "3000",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_modul_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Gris RAL 7016 (Standard)",
+        "Bleu RAL 5019",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_modul_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Porte battante simple",
+        "Porte battante double",
+        "Porte coulissante simple",
+        "Porte coulissante double",
+        "Guichet",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_modul_kits_finition",
+      "label": "Prévoir kits de finitions supplémentaires ?",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ],
+      "placeholder": "Les kits de finition permettent de recouper les panneaux pour s'ajuster au mieux au contraintes sur chantier."
+    },
+    {
+      "id": "q_modul_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -3013,6 +3094,10 @@
     {
       "id": "prod_cloisons_m85",
       "label": "CLOISONS BUREAUX M85"
+    },
+    {
+      "id": "prod_cloisons_modul_plus",
+      "label": "CLOISONS ATELIER MODUL+"
     }
   ]
 }
