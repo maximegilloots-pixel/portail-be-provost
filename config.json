@@ -2757,6 +2757,194 @@
       "type": "textarea"
     }
   ],
+  "prod_cloisons_m85": [
+    {
+      "id": "q_m85_gamme",
+      "label": "Gamme cloison",
+      "type": "radio",
+      "options": [
+        "ECO",
+        "DECOR",
+        "PLACO (Gamme DECOR)"
+      ]
+    },
+    {
+      "id": "q_m85_hauteur",
+      "label": "Hauteur cloison",
+      "type": "text"
+    },
+    {
+      "id": "q_m85_type_modules",
+      "label": "Type de modules",
+      "type": "checkbox",
+      "options": [
+        "Plein",
+        "Doublage",
+        "Vitré 1000-2100",
+        "Vitré 1000-2500",
+        "Vitré Toute Hauteur",
+        "Imposte Vitré",
+        "Autre :"
+      ],
+      "placeholder": "Si plusieurs types de modules, bien le préciser sur croquis / plan"
+    },
+    {
+      "id": "q_m85_type_vitrages",
+      "label": "Type de vitrages",
+      "type": "checkbox",
+      "options": [
+        "SV 5mm",
+        "SV 6mm",
+        "SV 8mm",
+        "SV Stadip 33.2",
+        "SV Stadip 44.2",
+        "DV 5mm + 5mm",
+        "DV 5mm + 6mm",
+        "DV 5mm + 8mm",
+        "DV 5mm + Stadip 33.2",
+        "DV 5mm + Stadip 44.2",
+        "DV 6mm + 6mm",
+        "DV 6mm + 8mm",
+        "DV 6mm + Stadip 33.2",
+        "DV 6mm + Stadip 44.2",
+        "DV 8mm + 8mm",
+        "DV 8mm + Stadip 33.2",
+        "DV 8mm + Stadip 44.2",
+        "DV Stadip 33.2 + Stadip 33.2",
+        "DV Stadip 33.2 + Stadip 44.2",
+        "DV Stadip 44.2 + Stadip 44.2"
+      ],
+      "placeholder": "Si plusieurs types de vitrages, bien le préciser sur croquis / plan"
+    },
+    {
+      "id": "q_m85_options_vitrages",
+      "label": "Options Vitrages",
+      "type": "checkbox",
+      "options": [
+        "Chassis coulissant",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_m85_type_portes",
+      "label": "Type de portes",
+      "type": "checkbox",
+      "options": [
+        "Ouverture libre (sans porte) - Largeur 730",
+        "Ouverture libre (sans porte) - Largeur 830",
+        "Ouverture libre (sans porte) - Largeur 930",
+        "Battante Simple - Largeur 730",
+        "Battante Simple - Largeur 830",
+        "Battante Simple - Largeur 930",
+        "Battante Simple Occulus - Largeur 730",
+        "Battante Simple Occulus - Largeur 830",
+        "Battante Simple Occulus - Largeur 930",
+        "Battante Double - Largeur 730",
+        "Battante Double - Largeur 830",
+        "Battante Double - Largeur 930",
+        "Batante Double Occulus - Largeur 730",
+        "Batante Double Occulus - Largeur 830",
+        "Batante Double Occulus - Largeur 930",
+        "Coulissante Simple - Largeur 730",
+        "Coulissante Simple - Largeur 830",
+        "Coulissante Simple - Largeur 930",
+        "Coulissante Simple Occulus - Largeur 730",
+        "Coulissante Simple Occulus - Largeur 830",
+        "Coulissante Simple Occulus - Largeur 930",
+        "Coulissante Double - Largeur 730",
+        "Coulissante Double - Largeur 830",
+        "Coulissante Double - Largeur 930",
+        "Coulissante Double Occulus - Largeur 730",
+        "Coulissante Double Occulus - Largeur 830",
+        "Coulissante Double Occulus - Largeur 930",
+        "Battante Simple Alu 1/2 Vitré - Largeur 730",
+        "Battante Simple Alu 1/2 Vitré - Largeur 830",
+        "Battante Simple Alu 1/2 Vitré - Largeur 930",
+        "Battante simple Alu Vitré - Largeur 730",
+        "Battante simple Alu Vitré - Largeur 830",
+        "Battante simple Alu Vitré - Largeur 930",
+        "Battante Double Alu 1/2 Vitré - Largeur 730",
+        "Battante Double Alu 1/2 Vitré - Largeur 830",
+        "Battante Double Alu 1/2 Vitré - Largeur 930",
+        "Battante Double Alu Vitré - Largeur 730",
+        "Battante Double Alu Vitré - Largeur 830",
+        "Battante Double Alu Vitré - Largeur 930",
+        "Coulissante Simple Alu 1/2 Vitré - Largeur 730",
+        "Coulissante Simple Alu 1/2 Vitré - Largeur 830",
+        "Coulissante Simple Alu 1/2 Vitré - Largeur 930",
+        "Coulissante Simple Alu Vitré - Largeur 730",
+        "Coulissante Simple Alu Vitré - Largeur 830",
+        "Coulissante Simple Alu Vitré - Largeur 930",
+        "Coulissante Double Alu 1/2 Vitré - Largeur 730",
+        "Coulissante Double Alu 1/2 Vitré - Largeur 830",
+        "Coulissante Double Alu 1/2 Vitré - Largeur 930",
+        "Coulissante Double Alu Vitré - Largeur 730",
+        "Coulissante Double Alu Vitré - Largeur 830",
+        "Coulissante Double Alu Vitré - Largeur 930"
+      ],
+      "placeholder": "Si plusieurs types de portes, bien le préciser sur croquis / plan"
+    },
+    {
+      "id": "q_m85_options_portes",
+      "label": "Options Portes",
+      "type": "checkbox",
+      "options": [
+        "Porte tierce",
+        "Plinthes",
+        "Barre Anti-Panique",
+        "Occulus rond",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_m85_faux_plafond",
+      "label": "Faux plafond",
+      "type": "checkbox",
+      "options": [
+        "Sous mezzanine LP3",
+        "Avec structure Primaire entre cloisons"
+      ]
+    },
+    {
+      "id": "q_m85_options_faux_plafond",
+      "label": "Options Faux plafond",
+      "type": "checkbox",
+      "options": [
+        "Dalles standards",
+        "Dalles ISOTONE",
+        "Dalles POLY ALVEOLAIRES",
+        "Dalles EUROCOUSTIC Ep15",
+        "Dalles EUROCOUSTIC Ep25",
+        "Dalles EUROCOUSTIC Ep40",
+        "Voile intissé Noir",
+        "Cavaliers anti soulèvement",
+        "Doublage Laine de verre (Acoustique)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_m85_accessoires",
+      "label": "Accessoires divers",
+      "type": "checkbox",
+      "options": [
+        "Ebrasement fenetres",
+        "Habillage Poutres LP3",
+        "Habillage Poteaux",
+        "Stores",
+        "Films vitrés dépoli",
+        "Dalles sol PVC U2SP2",
+        "Dalles sol PVC U3SP3",
+        "Pavés Leds 600x600",
+        "Laine de roche plutot que laine de verre dans cloisons (Acoustique)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_m85_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -2821,6 +3009,10 @@
     {
       "id": "prod_allee_circulation",
       "label": "ALLÉE DE CIRCULATION SUR RAYONNAGES"
+    },
+    {
+      "id": "prod_cloisons_m85",
+      "label": "CLOISONS BUREAUX M85"
     }
   ]
 }
