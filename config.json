@@ -1654,6 +1654,111 @@
       "type": "textarea"
     }
   ],
+  "prod_rack_touret": [
+    {
+      "id": "q_touret_solution",
+      "label": "Solution choisie",
+      "type": "radio",
+      "options": [
+        {
+          "text": "En façade (standard)",
+          "image": ""
+        },
+        {
+          "text": "Touret central (ancienne version)",
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "q_touret_largeur",
+      "label": "Largeur touret(s)",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_diam_ext",
+      "label": "Diamètre extérieur touret(s) (Standard maxi: 1400 mm)",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_diam_int",
+      "label": "Diamètre intérieur touret(s)",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_poids",
+      "label": "Poids touret(s) (Standard maxi: 1200 kg)",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_nb_niveaux",
+      "label": "Nombre de niveau de stockage",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_hauteur_bat",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_touret_jeu",
+      "label": "Jeu de manutention souhaité",
+      "type": "text",
+      "image": "",
+      "placeholder": "Jeu mini : 150 mm"
+    },
+    {
+      "id": "q_touret_protections",
+      "label": "Protections",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Protection sabot",
+          "image": ""
+        },
+        {
+          "text": "Protection cornière",
+          "image": ""
+        },
+        {
+          "text": "protection Polyuréthane",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_touret_rouleau",
+      "label": "Avec rouleau de renvoi",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_touret_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Longeron Galva à chaud + échelle Galva Z",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_touret_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1694,6 +1799,10 @@
     {
       "id": "prod_shuttle_pl3",
       "label": "PROPAL 3 SHUTTLE (NAVETTES)"
+    },
+    {
+      "id": "prod_rack_touret",
+      "label": "RACK À TOURET"
     }
   ]
 }
