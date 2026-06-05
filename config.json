@@ -3428,6 +3428,87 @@
       "type": "textarea"
     }
   ],
+  "prod_nautirack": [
+    {
+      "id": "q_nauti_type",
+      "label": "Type de Nautirack",
+      "type": "radio",
+      "options": [
+        "1500 I (Intérieur - Bateaux 5 à 6 m / 1500 kg )",
+        "1500 E (Exterieur - Bateaux 5 à 6 m / 1500 kg)",
+        "3000 E - Baie 2700 (Exterieur - Bateaux 5 à 6 m / 3000 kg / Largeur +/- 2150 mm environ)",
+        "3000 E - Baie 3000 (Exterieur - Bateaux 5 à 6 m / 3000 kg / Largeur +/- 2450 mm environ)",
+        "3000 E - Baie 3300 (Exterieur - Bateaux 6 à 7 m / 3000 kg / Largeur +/- 2750 mm environ)",
+        "Hors Standard"
+      ]
+    },
+    {
+      "id": "q_nauti_hs_niveaux",
+      "label": "Si Hors Standard : Nombre de niveaux (niveau bas sur longerons compris)",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_hs_hauteur",
+      "label": "Si Hors Standard : Hauteur bateaux max",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_hs_longueur",
+      "label": "Si Hors Standard : Longueur bateaux max",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_hs_largeur",
+      "label": "Si Hors Standard : Largeur bateaux max",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_hs_poids",
+      "label": "Si Hors Standard : Poids bateaux max",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_allee",
+      "label": "Largeur d'allée mini souhaitée (voir en fonction du type d'engin)",
+      "type": "text"
+    },
+    {
+      "id": "q_nauti_implantation",
+      "label": "Type d'implantation (joindre un schéma ou plan dwg dans tous les cas)",
+      "type": "radio",
+      "options": [
+        "Installation classique (en bataille)",
+        "Installation en Epi"
+      ]
+    },
+    {
+      "id": "q_nauti_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard intérieur)",
+        "Longeron Galva à chaud + échelle Galva Z (Standard extérieur / Non recommandé en bord de littoral)",
+        "Tout galva à chaud (Standard extérieur / recommandé en bord de littoral)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_nauti_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_nauti_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -3508,6 +3589,10 @@
     {
       "id": "prod_icare",
       "label": "ICARE"
+    }
+    {
+      "id": "prod_nautirack",
+      "label": "NAUTIRACK PROPAL 3 (STOCKAGE BATEAUX)"
     }
   ]
 }
