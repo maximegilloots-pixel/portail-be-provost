@@ -1759,6 +1759,177 @@
       ]
     }
   ],
+  "prod_prorack_plus": [
+    {
+      "id": "q_prorack_type_produit",
+      "label": "Type de produit à stocker",
+      "type": "text",
+      "placeholder": "(Cartons, bacs, pneumatiques etc...)"
+    },
+    {
+      "id": "q_prorack_hauteur_charges",
+      "label": "Hauteur charges",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_largeur_charges",
+      "label": "Largeur en façade des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_profondeur_charges",
+      "label": "Profondeur des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_poids_charges",
+      "label": "Poids des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur longeron et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_prorack_hauteur_batiment",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_largeur_baie",
+      "label": "Largeur de baie souhaitée",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_charge_niveau",
+      "label": "Charge par niveau",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_prof_simple",
+      "label": "Profondeur meuble simple face",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_prof_double",
+      "label": "Profondeur meuble double face",
+      "type": "text"
+    },
+    {
+      "id": "q_prorack_type_pied",
+      "label": "Type de pied",
+      "type": "checkbox",
+      "options": [
+        "Plaquette de base amovible",
+        "Plaque de base boulonnée (à ancrer)"
+      ]
+    },
+    {
+      "id": "q_prorack_recouvrement",
+      "label": "Recouvrement",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Tablette fils (PMRO)",
+          "image": ""
+        },
+        {
+          "text": "Plancher mettalique (PMXP)",
+          "image": ""
+        },
+        {
+          "text": "Sapin jointif",
+          "image": ""
+        },
+        {
+          "text": "Sapin claire-voies",
+          "image": ""
+        },
+        {
+          "text": "Panneaux agglo",
+          "image": ""
+        },
+        {
+          "text": "Plateaux tôle galva",
+          "image": ""
+        },
+        {
+          "text": "Tablette galva",
+          "image": ""
+        },
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_prorack_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Cadre grillagé (fonds)",
+          "image": ""
+        },
+        {
+          "text": "Côté grillagé",
+          "image": ""
+        },
+        {
+          "text": "Séparateurs horizontaux",
+          "image": ""
+        },
+        {
+          "text": "Séparateurs fils",
+          "image": ""
+        },
+        {
+          "text": "Séparateur d'appui",
+          "image": ""
+        },
+        {
+          "text": "Cloison verticale",
+          "image": ""
+        },
+        {
+          "text": "Barres de sécurité",
+          "image": ""
+        },
+        {
+          "text": "About tôle perforée",
+          "image": ""
+        },
+        {
+          "text": "Portes grillagées battante (Largeur utile : 1800 mm)",
+          "image": ""
+        },
+        {
+          "text": "Portes grillagées coulisante (Largeur utile : 2050 mm)",
+          "image": ""
+        },
+        {
+          "text": "Portes grillagées pliante (Largeur utile : 1800 mm)",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_prorack_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_prorack_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1803,6 +1974,10 @@
     {
       "id": "prod_rack_touret",
       "label": "RACK À TOURET"
+    },
+    {
+      "id": "prod_prorack_plus",
+      "label": "PRORACK+"
     }
   ]
 }
