@@ -2558,6 +2558,205 @@
       "type": "textarea"
     }
   ],
+  "prod_allee_circulation": [
+    {
+      "id": "q_ac_charge_ur",
+      "label": "Charge UR (kg/m²)",
+      "type": "text"
+    },
+    {
+      "id": "q_ac_charge_r",
+      "label": "Charge Roulante (kg)",
+      "type": "text"
+    },
+    {
+      "id": "q_ac_fleche",
+      "label": "Flèche",
+      "type": "radio",
+      "options": [
+        "1/250",
+        "1/300",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_nb_pers",
+      "label": "Nombre de personne sur la plateforme",
+      "type": "radio",
+      "options": [
+        "Moins de 21",
+        "21 à 100",
+        "101 à 300",
+        "301 à 500"
+      ],
+      "placeholder": "Cette information permet de dimensionner et quantifier les escaliers"
+    },
+    {
+      "id": "q_ac_recouvrement",
+      "label": "Type de recouvrement",
+      "type": "radio",
+      "options": [
+        "Agglo P4 BRUT",
+        "Agglo P4 Sous Face Blanche",
+        "Agglo P5 BRUT (milieu humide)",
+        "Agglo P6 EUB (M1, ignifugé)",
+        "Agglo P6 Antidérapant et Sous Face Blanche",
+        "Caillebotis",
+        "Plancher tôlé",
+        "Autre"
+      ]
+    },
+    {
+      "id": "q_ac_nb_niveau",
+      "label": "Nombre de niveau souhaité",
+      "type": "radio",
+      "options": [
+        "1 + sol",
+        "2 + sol",
+        "3 + sol"
+      ]
+    },
+    {
+      "id": "q_ac_hauteur",
+      "label": "Hauteur (mm) sur plancher (A) ou sous structure (B)",
+      "type": "text",
+      "image": "",
+      "placeholder": "Préciser si la hauteur indiquée correspond à l'élévation A ou B"
+    },
+    {
+      "id": "q_ac_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_escalier",
+      "label": "Type d'escalier",
+      "type": "checkbox",
+      "options": [
+        "34°, largeur 1000 mm (Principal)",
+        "45°, largeur 800 mm (Secondaire)",
+        "Escalier hélicoïdal largeur utile 800 mm",
+        "Escalier hélicoïdal largeur utile 600 mm",
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_gardecorps",
+      "label": "Garde-corps",
+      "type": "radio",
+      "options": [
+        "Industriel (NF E85-015, plateforme de stockage)",
+        "Industriel (NF 14-122, plateforme de travail)",
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_ouverture",
+      "label": "Type d'ouverture",
+      "type": "checkbox",
+      "options": [
+        "Barrière écluse basculante (Ouverture privilégiée)",
+        "Barrière écluse pliante (Pour hauteur utile d'implantation limitée)",
+        "Portillon coulissant (Ouverture occasionnelle, risque de chute, 1600 mm utile)",
+        "Portillon battant (Ouverture occasionnelle, risque de chute, 1395 mm utile)",
+        "Monte colis (Charge maxi: 100 ou 300 kg)",
+        "Monte charge (Charge maxi 1000 kg, hors fourniture Provost (apporteur d'affaire pour ACI))",
+        "Toboggan (Charge maxi: 20 kg)",
+        "Convoyeur",
+        "Aucune",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_barre_basc",
+      "label": "Barrière écluse Basculante",
+      "type": "checkbox",
+      "options": [
+        "T1 (Ht charge: 1650) - L 1700",
+        "T1 (Ht charge: 1650) - L 2100",
+        "T1 (Ht charge: 1650) - L 2500",
+        "T1 (Ht charge: 1650) - L 3100",
+        "T2 (Ht charge: 2100) - L 1700",
+        "T2 (Ht charge: 2100) - L 2100",
+        "T2 (Ht charge: 2100) - L 2500",
+        "T2 (Ht charge: 2100) - L 3100",
+        "T3 (Ht charge: 2350) - L 1700",
+        "T3 (Ht charge: 2350) - L 2100",
+        "T3 (Ht charge: 2350) - L 2500",
+        "T3 (Ht charge: 2350) - L 3100"
+      ]
+    },
+    {
+      "id": "q_ac_barre_pliante",
+      "label": "Barrière écluse pliante",
+      "type": "checkbox",
+      "options": [
+        "T1 (Ht charge: 1800) - L 1700",
+        "T1 (Ht charge: 1800) - L 2100",
+        "T1 (Ht charge: 1800) - L 2500",
+        "T1 (Ht charge: 1800) - L 3100",
+        "T2 (Ht charge: 2000) - L 1700",
+        "T2 (Ht charge: 2000) - L 2100",
+        "T2 (Ht charge: 2000) - L 2500",
+        "T2 (Ht charge: 2000) - L 3100",
+        "T3 (Ht charge: 2350) - L 1700",
+        "T3 (Ht charge: 2350) - L 2100",
+        "T3 (Ht charge: 2350) - L 2500",
+        "T3 (Ht charge: 2350) - L 3100"
+      ]
+    },
+    {
+      "id": "q_ac_tole_depose",
+      "label": "Tôle de dépose",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_ac_protection_poteau",
+      "label": "Protection poteau",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_ac_accessoires",
+      "label": "Accessoires complémentaires",
+      "type": "checkbox",
+      "options": [
+        "Cornières de chant",
+        "Tôle de liaison / franchissement",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "RAL 7016 (Standard)",
+        "RAL 5019 (Ancien standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_ac_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -2618,6 +2817,10 @@
     {
       "id": "prod_niveau_uni",
       "label": "NIVEAU UNI SUR RAYONNAGES"
+    },
+    {
+      "id": "prod_allee_circulation",
+      "label": "ALLÉE DE CIRCULATION SUR RAYONNAGES"
     }
   ]
 }
