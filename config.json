@@ -3026,6 +3026,190 @@
       "type": "textarea"
     }
   ],
+  "prod_proclass_362": [
+    {
+      "id": "q_pc362_type_produit",
+      "label": "Type de produit à stocker",
+      "type": "text",
+      "placeholder": "(Cartons, bacs, archives etc...)"
+    },
+    {
+      "id": "q_pc362_hauteur_charges",
+      "label": "Hauteur charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_largeur_charges",
+      "label": "Largeur en façade des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_profondeur_charges",
+      "label": "Profondeur des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_poids_charges",
+      "label": "Poids des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur tablette et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_pc362_hauteur_dispo",
+      "label": "Hauteur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_charge_niveau",
+      "label": "Charge par niveau",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_prof_simple",
+      "label": "Profondeur meuble simple face (uniquement 362)",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_prof_double",
+      "label": "Profondeur meuble double face (uniquement 2x362)",
+      "type": "text"
+    },
+    {
+      "id": "q_pc362_type_pied",
+      "label": "Type de pied",
+      "type": "checkbox",
+      "options": [
+        "Embout plastique (Solution économique)",
+        "Plaquette (Calage + ancrage possible)"
+      ]
+    },
+    {
+      "id": "q_pc362_type_echelle",
+      "label": "Type d'échelle",
+      "type": "radio",
+      "options": [
+        "Ouverte avec traverses",
+        "Tôlée en extrémité",
+        "Tout tôlée",
+        "Coque pleine en extrémité et ouverte en intermédiaire",
+        "Coque perforée en extrémité et ouverte en intermédiaire",
+        "Coque pleine en extrémité et tôlée en intermédiaire",
+        "Coque perforée en extrémité et tôlée en intermédiaire",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pc362_type_fond",
+      "label": "Type de fond",
+      "type": "checkbox",
+      "options": [
+        "Ouvert avec croisillons",
+        "Tôlé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pc362_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Séparation verticale fixe",
+          "image": ""
+        },
+        {
+          "text": "Séparateur mobile",
+          "image": ""
+        },
+        {
+          "text": "Séparateur fil",
+          "image": ""
+        },
+        {
+          "text": "Serre livres",
+          "image": ""
+        },
+        {
+          "text": "Plinthe",
+          "image": ""
+        },
+        {
+          "text": "Tablette rabattable",
+          "image": ""
+        },
+        {
+          "text": "Tablette relevable",
+          "image": ""
+        },
+        {
+          "text": "Portes battantes",
+          "image": ""
+        },
+        {
+          "text": "Portes pliantes",
+          "image": ""
+        },
+        {
+          "text": "Porte fiche ( adhésif)",
+          "image": ""
+        },
+        {
+          "text": "Plaque de signalisation 90 °",
+          "image": ""
+        },
+        {
+          "text": "Indicateur de meuble",
+          "image": ""
+        },
+        {
+          "text": "Tablette de consultation",
+          "image": ""
+        },
+        {
+          "text": "Cadre télescopique pour dossiers suspendus",
+          "image": ""
+        },
+        {
+          "text": "Coque intérieure pour échelle bords roulés",
+          "image": ""
+        },
+        {
+          "text": "Coque intérieure pour échelle tôlée",
+          "image": ""
+        },
+        {
+          "text": "Profil fermeture toît",
+          "image": ""
+        },
+        {
+          "text": "Jonction intermédiaire de tablette",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pc362_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Montants Gris RAL 7016 + tablette Galva Z (Standard)",
+        "Montants Blanc RAL 9016 + tablette Galva Z (Standard)",
+        "Montants Blanc RAL 9016 + tablette  Blanc RAL 9016 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pc362_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -3098,6 +3282,10 @@
     {
       "id": "prod_cloisons_modul_plus",
       "label": "CLOISONS ATELIER MODUL+"
+    },
+    {
+      "id": "prod_proclass_362",
+      "label": "PROCLASS 362"
     }
   ]
 }
