@@ -4150,6 +4150,128 @@
       "type": "textarea"
     }
   ],
+  "prod_protub": [
+    {
+      "id": "q_pt_type_produit",
+      "label": "Type de produit à stocker",
+      "type": "text",
+      "placeholder": "(Cartons, bacs, pneumatiques etc...)"
+    },
+    {
+      "id": "q_pt_hauteur_charges",
+      "label": "Hauteur charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_largeur_charges",
+      "label": "Largeur en façade des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_profondeur_charges",
+      "label": "Profondeur des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_poids_charges",
+      "label": "Poids des charges",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur longeron et s'il y a un niveau au sol ou non"
+    },
+    {
+      "id": "q_pt_hauteur_bat",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_largeur_baie",
+      "label": "Largeur de baie souhaitée",
+      "type": "text",
+      "placeholder": "Standard : 1000 ou 1250"
+    },
+    {
+      "id": "q_pt_charge_niveau",
+      "label": "Charge par niveau",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_prof_simple",
+      "label": "Profondeur meuble simple face",
+      "type": "text",
+      "placeholder": "Standard : 300, 400, 500, 600, 700 ou 800"
+    },
+    {
+      "id": "q_pt_prof_double",
+      "label": "Profondeur meuble double face",
+      "type": "text"
+    },
+    {
+      "id": "q_pt_recouvrement",
+      "label": "Recouvrement",
+      "type": "checkbox",
+      "options": [
+        "Plateau fibres",
+        "Plateaux tôle galva",
+        "Aucun",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pt_type_pied",
+      "label": "Type de pied",
+      "type": "checkbox",
+      "options": [
+        "Embout plastique",
+        "Plaquette de base",
+        "Vérin 400 kg",
+        "Vérin 1500 kg",
+        "Roulette Ø 50",
+        "Roulette Ø 75",
+        "Roulette Ø 125",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pt_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Séparateur fils",
+        "Cloison de côté avec profil",
+        "Cloison intermédiaire et attache",
+        "Cloison médiane",
+        "Cloison de fond support et clips pour simple face",
+        "Profil de butée",
+        "Bordure porte étiquette",
+        "Indicateur d'allée",
+        "Intercalaire arasé et percé",
+        "Séparateur tube et crochet séparateur",
+        "Barre penderie",
+        "Gousset d'empilage",
+        "Barre pour dossiers suspendus",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pt_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "RAL 5019 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pt_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -4242,6 +4364,10 @@
     {
       "id": "prod_probar_manuel",
       "label": "PROBAR+ MANUEL"
+    }
+    {
+      "id": "prod_protub",
+      "label": "PROTUB"
     }
   ]
 }
