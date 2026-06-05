@@ -830,18 +830,6 @@
       "type": "textarea"
     }
   ],
-  "prod_1780412206778": [
-    {
-      "id": "q_1780412224081",
-      "label": "sdsd",
-      "type": "scale"
-    },
-    {
-      "id": "q_1780494124437",
-      "label": "cscsc",
-      "type": "text"
-    }
-  ],
   "prod_cantipro3": [
     {
       "id": "q_canti_dim_fardeau",
@@ -1686,10 +1674,6 @@
     {
       "id": "prod_1779440938626",
       "label": "PROSPACE +"
-    },
-    {
-      "id": "prod_1780412206778",
-      "label": "PRORACK+"
     },
     {
       "id": "prod_cantipro3",
