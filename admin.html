@@ -208,7 +208,7 @@ function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var m
 function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
 function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
 
-var ADMIN_WHITELIST = ['maxime.gilloots@provost.fr', 'autre.admin@provost.fr'];
+var ADMIN_WHITELIST = ['maxime.gilloots@provost.fr','cedric.desombre@provost.fr','arnaud.vanderwegen@provost.fr', 'autre.admin@provost.fr'];
 
 function handleCredentialResponse(response) {
   var payload = jwtDecode(response.credential);
