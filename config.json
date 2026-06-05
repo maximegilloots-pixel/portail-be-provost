@@ -2229,6 +2229,146 @@
       "type": "textarea"
     }
   ],
+  "prod_proroll": [
+    {
+      "id": "q_pro_type_chariot",
+      "label": "Type de chariot",
+      "type": "radio",
+      "options": [
+        "Chariots C100/C120",
+        "Chariot manuel (faible charge / chariot court)",
+        "Chariot étroit (rayonnage faisant moins de 500mm)"
+      ]
+    },
+    {
+      "id": "q_pro_type_volants",
+      "label": "Type de volants",
+      "type": "radio",
+      "options": [
+        {
+          "text": "Volant PROVOST",
+          "image": ""
+        },
+        {
+          "text": "Volant PUSH/PULL",
+          "image": ""
+        },
+        {
+          "text": "Volant PUSH/PULL verrouillage à clé",
+          "image": ""
+        },
+        {
+          "text": "Volant Etroit (à combiner avec chariot étroit)",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pro_type_carter",
+      "label": "Type de carter / Habillage",
+      "type": "radio",
+      "options": [
+        {
+          "text": "Carter",
+          "image": ""
+        },
+        {
+          "text": "Habillage Tôlé",
+          "image": ""
+        },
+        {
+          "text": "Habillage mélaminé (Indiquer dans les commentaires si panneaux Gamme ECO ou DECOR)",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pro_type_plancher",
+      "label": "Type de plancher",
+      "type": "radio",
+      "options": [
+        "Agglo P4 Brut",
+        "Agglo P5 Brut (environnement légèrement humide)",
+        "Agglo P5EuB (M1, ignifugé)",
+        "Agglo P6 Antidérapant",
+        "Métallique (Tôles larmées aluminium)",
+        "Encastré (sans reservation - Nécessite chape béton 55mm)",
+        "Encastré (avec reservation dans béton existant))",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pro_type_rails",
+      "label": "Type de rails",
+      "type": "radio",
+      "options": [
+        "Standard (Acier Brut)",
+        "Electrozingués (Environnement humide)"
+      ]
+    },
+    {
+      "id": "q_pro_socle_fixes",
+      "label": "Socle sous fixes",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_pro_rails_planchers_fixes",
+      "label": "Rails et planchers sous meubles fixes",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_pro_largeur_allees_service",
+      "label": "Largeur mini des allées de service (entre chariots)",
+      "type": "text"
+    },
+    {
+      "id": "q_pro_largeur_allee_principale",
+      "label": "Largeur mini de l'allée principale (devant chariots)",
+      "type": "text"
+    },
+    {
+      "id": "q_pro_calage_sol_mauvais",
+      "label": "Calage supplémentaire en cas de sol mauvais",
+      "type": "radio",
+      "options": [
+        "Oui",
+        "Non"
+      ]
+    },
+    {
+      "id": "q_pro_finition_chariots",
+      "label": "Finition des chariots",
+      "type": "radio",
+      "options": [
+        "Gris RAL 7024 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pro_finition_carters",
+      "label": "Finition des carters",
+      "type": "radio",
+      "options": [
+        "Noir RAL 9011 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pro_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -2281,6 +2421,10 @@
     {
       "id": "prod_prospace_plus",
       "label": "PROSPACE +"
+    },
+    {
+      "id": "prod_proroll",
+      "label": "PROROLL"
     }
   ]
 }
