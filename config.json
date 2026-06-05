@@ -1919,6 +1919,97 @@
       "type": "textarea"
     }
   ],
+  "prod_dyn_leger_cadres": [
+    {
+      "id": "q_dlc_contenant",
+      "label": "Type de contenant",
+      "type": "radio",
+      "options": [
+        "Cartons",
+        "Bac plastique (à fond plat)",
+        "Autre :"
+      ],
+      "placeholder": "Photos obligatoires pour s'assurer de la compatibilité avec système gravitaire / vérifier sens des skis..."
+    },
+    {
+      "id": "q_dlc_dims",
+      "label": "Hauteur x Largeur x Profondeur Colis",
+      "type": "text"
+    },
+    {
+      "id": "q_dlc_poids",
+      "label": "Poids Colis",
+      "type": "text",
+      "placeholder": "Indiquer poids mini et maxi"
+    },
+    {
+      "id": "q_dlc_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text"
+    },
+    {
+      "id": "q_dlc_prof",
+      "label": "Nombre de Colis en profondeur ou Profondeur cadre souhaité",
+      "type": "text"
+    },
+    {
+      "id": "q_dlc_larg",
+      "label": "Nombre de Colis en largeur ou largeur cadre souhaité",
+      "type": "text"
+    },
+    {
+      "id": "q_dlc_rails",
+      "label": "Nombre de rails par couloir",
+      "type": "checkbox",
+      "options": [
+        "A dimensionner",
+        "2",
+        "3",
+        "4",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dlc_connecteur",
+      "label": "Type de connecteur",
+      "type": "checkbox",
+      "options": [
+        "Universel (pour montants autre que PROVOST)",
+        "Prorack+",
+        "Propal 3",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dlc_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Plage de dépose",
+        "Plage de dépose amovible",
+        "Guide d'entrée",
+        "Guide longitudinal",
+        "Présentoir 5°",
+        "Présentoir 15°",
+        "Clips freineur pour rail à galet",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dlc_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Galet jaune (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_dlc_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1963,6 +2054,10 @@
     {
       "id": "prod_prorack_plus",
       "label": "PRORACK+"
+    },
+    {
+      "id": "prod_dyn_leger_cadres",
+      "label": "PRODYN+ DYNAMIQUE LÉGER (CADRES)"
     }
   ]
 }
