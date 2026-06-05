@@ -3509,6 +3509,647 @@
       "type": "textarea"
     }
   ],
+  "prod_proart_propal3": [
+    {
+      "id": "q_proart_type",
+      "label": "Type de Pro-Art",
+      "type": "radio",
+      "options": [
+        "Grilles extractibles",
+        "Mobile",
+        "Grilles sur pieds",
+        "Grilles murales",
+        "Plateaux extractibles"
+      ]
+    },
+    {
+      "id": "q_proart_ge_surface",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Surface à équiper (Préciser longueur et profondeur)",
+      "type": "text",
+      "placeholder": "La surface correspond à la zone de stockage ainsi que les allées"
+    },
+    {
+      "id": "q_proart_ge_utilisation",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Utilisation du meuble en :",
+      "type": "radio",
+      "options": [
+        {
+          "text": "SF (Standard)",
+          "image": ""
+        },
+        {
+          "text": "DF",
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "q_proart_ge_hauteur",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Hauteur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_proart_ge_entraxe",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Entraxe des grilles",
+      "type": "radio",
+      "options": [
+        "200 mm",
+        "300 mm",
+        "400 mm",
+        "500 mm",
+        "600 mm"
+      ]
+    },
+    {
+      "id": "q_proart_ge_crochets",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Crochets à prévoir",
+      "type": "radio",
+      "options": [
+        "Oui, crochets Simples",
+        "Oui, crochets doubles",
+        "Non"
+      ],
+      "placeholder": "Si oui, indiquer en commentaire la quantité souhaitée"
+    },
+    {
+      "id": "q_proart_ge_roulettes",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Type de roulettes",
+      "type": "radio",
+      "options": [
+        "Roulettes sans frein",
+        "Roulettes avec frein"
+      ]
+    },
+    {
+      "id": "q_proart_ge_finition",
+      "label": "PRO-ART GRILLES EXTRACTIBLES : Finition",
+      "type": "radio",
+      "options": [
+        "Gris RAL 7035",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_proart_mob_surface",
+      "label": "PRO-ART MOBILE : Surface à équiper (Préciser longueur et profondeur)",
+      "type": "text",
+      "placeholder": "La surface correspond à la zone de stockage seule"
+    },
+    {
+      "id": "q_proart_mob_prof",
+      "label": "PRO-ART MOBILE : Profondeur des chariots",
+      "type": "radio",
+      "options": [
+        "400 mm (étroit)",
+        "600 mm"
+      ]
+    },
+    {
+      "id": "q_proart_mob_hauteur",
+      "label": "PRO-ART MOBILE : Hauteur utile des grilles",
+      "type": "radio",
+      "options": [
+        "2000",
+        "2200",
+        "2400"
+      ]
+    },
+    {
+      "id": "q_proart_mob_accessoires",
+      "label": "PRO-ART MOBILE : Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Tôle recouvrement sur base mobile",
+        "Tôle recouvrement pour toit"
+      ]
+    },
+    {
+      "id": "q_proart_mob_crochets",
+      "label": "PRO-ART MOBILE : Crochets à prévoir",
+      "type": "radio",
+      "options": [
+        "Oui, crochets Simples",
+        "Oui, crochets doubles",
+        "Non"
+      ],
+      "placeholder": "Si oui, indiquer en commentaire la quantité souhaitée"
+    },
+    {
+      "id": "q_proart_mob_finition",
+      "label": "PRO-ART MOBILE : Finition",
+      "type": "radio",
+      "options": [
+        "Chariot Gris RAL 7016 / Structure + grilles Gris RAL 7035 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_proart_gsp_quantite",
+      "label": "PRO-ART GRILLES SUR PIEDS : Quantité de grilles",
+      "type": "checkbox",
+      "options": [
+        "Quantité 1 - Baie Départ 800",
+        "Quantité 1 - Baie Suivante 800",
+        "Quantité 1 - Baie Départ 1000",
+        "Quantité 1 - Baie Suivante 1000",
+        "Quantité 1 - Baie Départ 1200",
+        "Quantité 1 - Baie Suivante 1200",
+        "Quantité 2 - Baie Départ 800",
+        "Quantité 2 - Baie Suivante 800",
+        "Quantité 2 - Baie Départ 1000",
+        "Quantité 2 - Baie Suivante 1000",
+        "Quantité 2 - Baie Départ 1200",
+        "Quantité 2 - Baie Suivante 1200",
+        "Quantité 3 - Baie Départ 800",
+        "Quantité 3 - Baie Suivante 800",
+        "Quantité 3 - Baie Départ 1000",
+        "Quantité 3 - Baie Suivante 1000",
+        "Quantité 3 - Baie Départ 1200",
+        "Quantité 3 - Baie Suivante 1200",
+        "Quantité 4 - Baie Départ 800",
+        "Quantité 4 - Baie Suivante 800",
+        "Quantité 4 - Baie Départ 1000",
+        "Quantité 4 - Baie Suivante 1000",
+        "Quantité 4 - Baie Départ 1200",
+        "Quantité 4 - Baie Suivante 1200",
+        "Quantité 5 - Baie Départ 800",
+        "Quantité 5 - Baie Suivante 800",
+        "Quantité 5 - Baie Départ 1000",
+        "Quantité 5 - Baie Suivante 1000",
+        "Quantité 5 - Baie Départ 1200",
+        "Quantité 5 - Baie Suivante 1200",
+        "Quantité 6 - Baie Départ 800",
+        "Quantité 6 - Baie Suivante 800",
+        "Quantité 6 - Baie Départ 1000",
+        "Quantité 6 - Baie Suivante 1000",
+        "Quantité 6 - Baie Départ 1200",
+        "Quantité 6 - Baie Suivante 1200",
+        "Quantité 7 - Baie Départ 800",
+        "Quantité 7 - Baie Suivante 800",
+        "Quantité 7 - Baie Départ 1000",
+        "Quantité 7 - Baie Suivante 1000",
+        "Quantité 7 - Baie Départ 1200",
+        "Quantité 7 - Baie Suivante 1200",
+        "Quantité 8 - Baie Départ 800",
+        "Quantité 8 - Baie Suivante 800",
+        "Quantité 8 - Baie Départ 1000",
+        "Quantité 8 - Baie Suivante 1000",
+        "Quantité 8 - Baie Départ 1200",
+        "Quantité 8 - Baie Suivante 1200",
+        "Quantité 9 - Baie Départ 800",
+        "Quantité 9 - Baie Suivante 800",
+        "Quantité 9 - Baie Départ 1000",
+        "Quantité 9 - Baie Suivante 1000",
+        "Quantité 9 - Baie Départ 1200",
+        "Quantité 9 - Baie Suivante 1200",
+        "Quantité 10 - Baie Départ 800",
+        "Quantité 10 - Baie Suivante 800",
+        "Quantité 10 - Baie Départ 1000",
+        "Quantité 10 - Baie Suivante 1000",
+        "Quantité 10 - Baie Départ 1200",
+        "Quantité 10 - Baie Suivante 1200",
+        "Quantité 11 - Baie Départ 800",
+        "Quantité 11 - Baie Suivante 800",
+        "Quantité 11 - Baie Départ 1000",
+        "Quantité 11 - Baie Suivante 1000",
+        "Quantité 11 - Baie Départ 1200",
+        "Quantité 11 - Baie Suivante 1200",
+        "Quantité 12 - Baie Départ 800",
+        "Quantité 12 - Baie Suivante 800",
+        "Quantité 12 - Baie Départ 1000",
+        "Quantité 12 - Baie Suivante 1000",
+        "Quantité 12 - Baie Départ 1200",
+        "Quantité 12 - Baie Suivante 1200",
+        "Quantité 13 - Baie Départ 800",
+        "Quantité 13 - Baie Suivante 800",
+        "Quantité 13 - Baie Départ 1000",
+        "Quantité 13 - Baie Suivante 1000",
+        "Quantité 13 - Baie Départ 1200",
+        "Quantité 13 - Baie Suivante 1200",
+        "Quantité 14 - Baie Départ 800",
+        "Quantité 14 - Baie Suivante 800",
+        "Quantité 14 - Baie Départ 1000",
+        "Quantité 14 - Baie Suivante 1000",
+        "Quantité 14 - Baie Départ 1200",
+        "Quantité 14 - Baie Suivante 1200",
+        "Quantité 15 - Baie Départ 800",
+        "Quantité 15 - Baie Suivante 800",
+        "Quantité 15 - Baie Départ 1000",
+        "Quantité 15 - Baie Suivante 1000",
+        "Quantité 15 - Baie Départ 1200",
+        "Quantité 15 - Baie Suivante 1200"
+      ]
+    },
+    {
+      "id": "q_proart_gsp_hauteur",
+      "label": "PRO-ART GRILLES SUR PIEDS : Hauteur utile des grilles",
+      "type": "radio",
+      "options": [
+        "2000"
+      ]
+    },
+    {
+      "id": "q_proart_gsp_crochets",
+      "label": "PRO-ART GRILLES SUR PIEDS : Crochets à prévoir",
+      "type": "radio",
+      "options": [
+        "Oui, crochets Simples",
+        "Oui, crochets doubles",
+        "Non"
+      ],
+      "placeholder": "Si oui, indiquer en commentaire la quantité souhaitée"
+    },
+    {
+      "id": "q_proart_gsp_finition",
+      "label": "PRO-ART GRILLES SUR PIEDS : Finition",
+      "type": "radio",
+      "options": [
+        "Gris RAL 7035 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_proart_gm_quantite",
+      "label": "PRO-ART GRILLES MURALES : Quantité de grilles",
+      "type": "checkbox",
+      "options": [
+        "Quantité 1 - 800",
+        "Quantité 1 - 1000",
+        "Quantité 1 - 1200",
+        "Quantité 2 - 800",
+        "Quantité 2 - 1000",
+        "Quantité 2 - 1200",
+        "Quantité 3 - 800",
+        "Quantité 3 - 1000",
+        "Quantité 3 - 1200",
+        "Quantité 4 - 800",
+        "Quantité 4 - 1000",
+        "Quantité 4 - 1200",
+        "Quantité 5 - 800",
+        "Quantité 5 - 1000",
+        "Quantité 5 - 1200",
+        "Quantité 6 - 800",
+        "Quantité 6 - 1000",
+        "Quantité 6 - 1200",
+        "Quantité 7 - 800",
+        "Quantité 7 - 1000",
+        "Quantité 7 - 1200",
+        "Quantité 8 - 800",
+        "Quantité 8 - 1000",
+        "Quantité 8 - 1200",
+        "Quantité 9 - 800",
+        "Quantité 9 - 1000",
+        "Quantité 9 - 1200",
+        "Quantité 10 - 800",
+        "Quantité 10 - 1000",
+        "Quantité 10 - 1200",
+        "Quantité 11 - 800",
+        "Quantité 11 - 1000",
+        "Quantité 11 - 1200",
+        "Quantité 12 - 800",
+        "Quantité 12 - 1000",
+        "Quantité 12 - 1200",
+        "Quantité 13 - 800",
+        "Quantité 13 - 1000",
+        "Quantité 13 - 1200",
+        "Quantité 14 - 800",
+        "Quantité 14 - 1000",
+        "Quantité 14 - 1200",
+        "Quantité 15 - 800",
+        "Quantité 15 - 1000",
+        "Quantité 15 - 1200"
+      ]
+    },
+    {
+      "id": "q_proart_gm_hauteur",
+      "label": "PRO-ART GRILLES MURALES : Hauteur utile des grilles",
+      "type": "radio",
+      "options": [
+        "2000",
+        "2200",
+        "2400"
+      ]
+    },
+    {
+      "id": "q_proart_gm_accessoires",
+      "label": "PRO-ART GRILLES MURALES : Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Pieds à verin (cas de murs peu résistants type Placo) - IMCOMPATIBLE si plinthe en partie basse"
+      ]
+    },
+    {
+      "id": "q_proart_gm_mur",
+      "label": "PRO-ART GRILLES MURALES : Type de mur",
+      "type": "radio",
+      "options": [
+        "Béton / Brique pleine / parpaing plein",
+        "Brique creuse / parpaing creux",
+        "Béton cellulaire / Carreaux de platre"
+      ]
+    },
+    {
+      "id": "q_proart_gm_crochets",
+      "label": "PRO-ART GRILLES MURALES : Crochets à prévoir",
+      "type": "radio",
+      "options": [
+        "Oui, crochets Simples",
+        "Oui, crochets doubles",
+        "Non"
+      ],
+      "placeholder": "Si oui, indiquer en commentaire la quantité souhaitée"
+    },
+    {
+      "id": "q_proart_gm_finition",
+      "label": "PRO-ART GRILLES MURALES : Finition",
+      "type": "radio",
+      "options": [
+        "Gris RAL 7035 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_proart_pe_niveaux",
+      "label": "PRO-ART PLATEAUX EXTRACTIBLES : Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Maxi 18"
+    },
+    {
+      "id": "q_proart_pe_hauteur",
+      "label": "PRO-ART PLATEAUX EXTRACTIBLES : Hauteur du rayonnage",
+      "type": "radio",
+      "options": [
+        "2000",
+        "2200",
+        "2450"
+      ]
+    },
+    {
+      "id": "q_proart_pe_baies",
+      "label": "PRO-ART PLATEAUX EXTRACTIBLES : Nombre de baies (utiles)",
+      "type": "checkbox",
+      "options": [
+        "Baie 1 - Départ 485",
+        "Baie 1 - Suivante 485",
+        "Baie 1 - Départ 585",
+        "Baie 1 - Suivante 585",
+        "Baie 1 - Départ 800",
+        "Baie 1 - Suivante 800",
+        "Baie 2 - Départ 485",
+        "Baie 2 - Suivante 485",
+        "Baie 2 - Départ 585",
+        "Baie 2 - Suivante 585",
+        "Baie 2 - Départ 800",
+        "Baie 2 - Suivante 800",
+        "Baie 3 - Départ 485",
+        "Baie 3 - Suivante 485",
+        "Baie 3 - Départ 585",
+        "Baie 3 - Suivante 585",
+        "Baie 3 - Départ 800",
+        "Baie 3 - Suivante 800",
+        "Baie 4 - Départ 485",
+        "Baie 4 - Suivante 485",
+        "Baie 4 - Départ 585",
+        "Baie 4 - Suivante 585",
+        "Baie 4 - Départ 800",
+        "Baie 4 - Suivante 800",
+        "Baie 5 - Départ 485",
+        "Baie 5 - Suivante 485",
+        "Baie 5 - Départ 585",
+        "Baie 5 - Suivante 585",
+        "Baie 5 - Départ 800",
+        "Baie 5 - Suivante 800",
+        "Baie 6 - Départ 485",
+        "Baie 6 - Suivante 485",
+        "Baie 6 - Départ 585",
+        "Baie 6 - Suivante 585",
+        "Baie 6 - Départ 800",
+        "Baie 6 - Suivante 800",
+        "Baie 7 - Départ 485",
+        "Baie 7 - Suivante 485",
+        "Baie 7 - Départ 585",
+        "Baie 7 - Suivante 585",
+        "Baie 7 - Départ 800",
+        "Baie 7 - Suivante 800",
+        "Baie 8 - Départ 485",
+        "Baie 8 - Suivante 485",
+        "Baie 8 - Départ 585",
+        "Baie 8 - Suivante 585",
+        "Baie 8 - Départ 800",
+        "Baie 8 - Suivante 800",
+        "Baie 9 - Départ 485",
+        "Baie 9 - Suivante 485",
+        "Baie 9 - Départ 585",
+        "Baie 9 - Suivante 585",
+        "Baie 9 - Départ 800",
+        "Baie 9 - Suivante 800",
+        "Baie 10 - Départ 485",
+        "Baie 10 - Suivante 485",
+        "Baie 10 - Départ 585",
+        "Baie 10 - Suivante 585",
+        "Baie 10 - Départ 800",
+        "Baie 10 - Suivante 800",
+        "Baie 11 - Départ 485",
+        "Baie 11 - Suivante 485",
+        "Baie 11 - Départ 585",
+        "Baie 11 - Suivante 585",
+        "Baie 11 - Départ 800",
+        "Baie 11 - Suivante 800",
+        "Baie 12 - Départ 485",
+        "Baie 12 - Suivante 485",
+        "Baie 12 - Départ 585",
+        "Baie 12 - Suivante 585",
+        "Baie 12 - Départ 800",
+        "Baie 12 - Suivante 800",
+        "Baie 13 - Départ 485",
+        "Baie 13 - Suivante 485",
+        "Baie 13 - Départ 585",
+        "Baie 13 - Suivante 585",
+        "Baie 13 - Départ 800",
+        "Baie 13 - Suivante 800",
+        "Baie 14 - Départ 485",
+        "Baie 14 - Suivante 485",
+        "Baie 14 - Départ 585",
+        "Baie 14 - Suivante 585",
+        "Baie 14 - Départ 800",
+        "Baie 14 - Suivante 800",
+        "Baie 15 - Départ 485",
+        "Baie 15 - Suivante 485",
+        "Baie 15 - Départ 585",
+        "Baie 15 - Suivante 585",
+        "Baie 15 - Départ 800",
+        "Baie 15 - Suivante 800"
+      ]
+    },
+    {
+      "id": "q_proart_pe_utilisation",
+      "label": "PRO-ART PLATEAUX EXTRACTIBLES : Utilisation avec",
+      "type": "radio",
+      "options": [
+        {
+          "text": "Plateaux MDF 12mm",
+          "image": ""
+        },
+        {
+          "text": "Tiroirs amovibles",
+          "image": ""
+        },
+        {
+          "text": "Mixte (Préciser en commentaire la répartition)",
+          "image": ""
+        }
+      ]
+    },
+    {
+      "id": "q_proart_pe_finition",
+      "label": "PRO-ART PLATEAUX EXTRACTIBLES : Finition",
+      "type": "radio",
+      "options": [
+        "Blanc RAL 9016 (Standard)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_proart_commentaires",
+      "label": "Commentaires (valable pour tous les types de Pro-Art)",
+      "type": "textarea"
+    }
+  ],
+  "prod_probar_manuel": [
+    {
+      "id": "q_pbm_dim_fardeau",
+      "label": "Dimension fardeau (largeur x profondeur x hauteur)",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_charge_fardeau",
+      "label": "Charge fardeau",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_nature",
+      "label": "Nature du produit stocké (Bois, métal, descriptif rapide)",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_rigidite",
+      "label": "Rigidité du fardeau",
+      "type": "radio",
+      "options": [
+        "Très souple",
+        "Souple",
+        "Rigide"
+      ]
+    },
+    {
+      "id": "q_pbm_long_bat",
+      "label": "Longueur disponible bâtiment ou longueur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_larg_bat",
+      "label": "Largeur disponible bâtiment ou largeur installation",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_haut_bat",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_type_meuble",
+      "label": "Type de meuble souhaité",
+      "type": "checkbox",
+      "options": [
+        "SF (Simple face)",
+        "DF (Double face)"
+      ]
+    },
+    {
+      "id": "q_pbm_entraxe",
+      "label": "Entraxe colonnes souhaité",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_haut_col",
+      "label": "Hauteur colonne",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_nb_niv",
+      "label": "Nombre de niveaux (hors socle)",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_long_bras",
+      "label": "Longueur des bras",
+      "type": "text"
+    },
+    {
+      "id": "q_pbm_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Butée support",
+          "image": ""
+        },
+        {
+          "text": "Butée embase",
+          "image": ""
+        },
+        {
+          "text": "Séparateur amovible",
+          "image": ""
+        },
+        {
+          "text": "Bras support double",
+          "image": ""
+        },
+        {
+          "text": "Séparateur d'appui",
+          "image": ""
+        },
+        {
+          "text": "Séparateur d'appui sur colonne",
+          "image": ""
+        },
+        {
+          "text": "Séparateur horizontal",
+          "image": ""
+        },
+        {
+          "text": "Séparateur horizontal sur colonne",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pbm_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Bras RAL 1028 + Colonne GalvaZ",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pbm_sol",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_pbm_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -3593,6 +4234,14 @@
     {
       "id": "prod_nautirack",
       "label": "NAUTIRACK PROPAL 3 (STOCKAGE BATEAUX)"
+    }
+    {
+      "id": "prod_proart_propal3",
+      "label": "PRO-ART PROPAL 3 (STOCKAGE MUSÉE)"
+    }
+    {
+      "id": "prod_probar_manuel",
+      "label": "PROBAR+ MANUEL"
     }
   ]
 }
