@@ -1532,6 +1532,140 @@
       "type": "textarea"
     }
   ],
+  "prod_shuttle_pl3": [
+    {
+      "id": "q_shut_type_utilisation",
+      "label": "Type d'utilisation",
+      "type": "radio",
+      "options": [
+        "Accumulation FIFO (First In, First Out)",
+        "Accumulation LIFO - Pushback (Last In, First Out)"
+      ]
+    },
+    {
+      "id": "q_shut_type_palettes",
+      "label": "Type de Palettes",
+      "type": "radio",
+      "options": [
+        "Palette EUROPE 800 x 1200 (CP)",
+        "Palette INDUS 1000 x 1200 (CP)",
+        "Autre :"
+      ],
+      "placeholder": "Photos obligatoires pour s'assurer de la compatibilité avec système Shuttle\nATTENTION : En Shuttle, les skis sont souvent perpendiculaires aux rails (ex : 1200 mm pour une palette EUROPE ou INDUS)"
+    },
+    {
+      "id": "q_shut_hauteur_palettes",
+      "label": "Hauteur Palettes",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_poids_palettes",
+      "label": "Poids Palettes",
+      "type": "text",
+      "placeholder": "Indiquer poids mini et maxi"
+    },
+    {
+      "id": "q_shut_charge_debordante",
+      "label": "Charge débordante",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_nb_niveaux",
+      "label": "Nombre de niveaux",
+      "type": "text",
+      "placeholder": "Indiquer le nombre de niveaux sur rails"
+    },
+    {
+      "id": "q_shut_hauteur_dispo",
+      "label": "Hauteur disponible bâtiment",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_profondeur",
+      "label": "Nombre de Palettes en profondeur ou Profondeur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_longueur",
+      "label": "Nombre de couloirs en façade ou Longueur disponible",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_protections",
+      "label": "Protections",
+      "type": "checkbox",
+      "options": [
+        {
+          "text": "Protection sabot - ATTENTION HT 1ER NIVEAU A REHAUSSER",
+          "image": ""
+        },
+        {
+          "text": "Protection cornière",
+          "image": ""
+        },
+        {
+          "text": "protection Polyuréthane",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale sigma",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale bois",
+          "image": ""
+        },
+        {
+          "text": "Protection latérale tubulaire",
+          "image": ""
+        },
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_shut_accessoires",
+      "label": "Accessoires",
+      "type": "checkbox",
+      "options": [
+        "Filet de protection",
+        "Cadre grillagé (fonds)",
+        "Côté grillagé",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_shut_finition",
+      "label": "Finition",
+      "type": "radio",
+      "options": [
+        "Longeron RAL 1028 + échelle Galva Z (Standard)",
+        "Longeron Galva à chaud + échelle Galva Z",
+        "Tout galva à chaud",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_shut_manutention",
+      "label": "Moyens de manutention",
+      "type": "radio",
+      "options": [
+        "Gerbeur (avec fourches basses) - NON COMPATIBLE SAUF CAS EXCEPTIONNEL (Photos à envoyer)",
+        "Chariot latéral",
+        "Chariot frontal",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_shut_hauteur_levee",
+      "label": "Hauteur de levée",
+      "type": "text"
+    },
+    {
+      "id": "q_shut_commentaires",
+      "label": "Commentaires",
+      "type": "textarea"
+    }
+  ],
   "liste_produits": [
     {
       "id": "proplus_lp3",
@@ -1572,6 +1706,10 @@
     {
       "id": "prod_accumulation_pl3",
       "label": "PROPAL 3 ACCUMULATION"
+    }
+    {
+      "id": "prod_shuttle_pl3",
+      "label": "PROPAL 3 SHUTTLE (NAVETTES)"
     }
   ]
 }
