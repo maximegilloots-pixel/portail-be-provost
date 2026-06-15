@@ -1186,37 +1186,7 @@ function buildRecap() {
   container.innerHTML = html;
   if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
 }
-// ==========================================
-// ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
-// ==========================================
-var btnRemonter = document.getElementById("btnRemonter");
-if(btnRemonter) {
-  // Fonction robuste pour détecter le scroll
-  function checkScroll() {
-    var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    if (scrollPos > 300) {
-      btnRemonter.classList.add("show");
-    } else {
-      btnRemonter.classList.remove("show");
-    }
-  }
 
-  // Écouteurs d'événements sur la fenêtre et le document
-  window.addEventListener("scroll", checkScroll);
-  document.addEventListener("scroll", checkScroll);
-
-  // Action au clic
-  btnRemonter.addEventListener("click", function() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-}
-<button id="btnRemonter" title="Remonter en haut" aria-label="Remonter en haut">
-  <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="18 15 12 9 6 15"></polyline>
-  </svg>
-</button>
-
-<script>
 // ==========================================
 // ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
 // ==========================================
@@ -1242,5 +1212,12 @@ if(btnRemonter) {
   });
 }
 </script>
+
+<!-- Bouton Remonter en haut -->
+<button id="btnRemonter" title="Remonter en haut" aria-label="Remonter en haut">
+  <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
 </body>
 </html>
