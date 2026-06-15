@@ -1853,54 +1853,21 @@
       ]
     },
     {
-      "id": "q_prorack_accessoires",
+      "id": "q_1781512029162",
       "label": "Accessoires",
       "type": "checkbox",
       "options": [
-        {
-          "text": "Cadre grillagé (fonds)",
-          "image": ""
-        },
-        {
-          "text": "Côté grillagé",
-          "image": ""
-        },
-        {
-          "text": "Séparateurs horizontaux",
-          "image": ""
-        },
-        {
-          "text": "Séparateurs fils",
-          "image": ""
-        },
-        {
-          "text": "Séparateur d'appui",
-          "image": ""
-        },
-        {
-          "text": "Cloison verticale",
-          "image": ""
-        },
-        {
-          "text": "Barres de sécurité",
-          "image": ""
-        },
-        {
-          "text": "About tôle perforée",
-          "image": ""
-        },
-        {
-          "text": "Portes grillagées battante (Largeur utile : 1800 mm)",
-          "image": ""
-        },
-        {
-          "text": "Portes grillagées coulisante (Largeur utile : 2050 mm)",
-          "image": ""
-        },
-        {
-          "text": "Portes grillagées pliante (Largeur utile : 1800 mm)",
-          "image": ""
-        },
+        "Cadre grillagé (fonds)",
+        "Côté grillagé",
+        "Séparateurs horizontaux",
+        "Séparateurs fils",
+        "Séparateur d'appui",
+        "Cloison verticale",
+        "Barres de sécurité",
+        "About tôle perforée",
+        "Portes grillagées battante (Largeur utile : 1800 mm)",
+        "Portes grillagées coulissante (Largeur utile : 2050 mm)",
+        "Portes grillagées pliante (Largeur utile : 1800 mm)",
         "Autre :"
       ]
     },
