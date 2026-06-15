@@ -273,8 +273,10 @@ tbody tr:hover{background:var(--blue-lighter)}
   border-radius: var(--radius-sm);
 }
   /* ⬆️ BOUTON REMONTER EN HAUT */
+/* ⬆️ BOUTON REMONTER EN HAUT (Version robuste) */
 #btnRemonter {
-  display: none; /* Masqué par défaut */
+  opacity: 0;
+  visibility: hidden;
   position: fixed;
   bottom: 30px;
   right: 30px;
@@ -287,19 +289,28 @@ tbody tr:hover{background:var(--blue-lighter)}
   height: 50px;
   cursor: pointer;
   box-shadow: var(--shadow-lg);
-  transition: var(--tr);
+  transition: all 0.3s ease;
+  display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none; /* Empêche de cliquer quand il est invisible */
+}
+
+/* Classe ajoutée dynamiquement par le JS pour l'afficher */
+#btnRemonter.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 #btnRemonter:hover {
   background-color: var(--blue-dark);
-  transform: translateY(-4px) scale(1.05); /* Petit effet de soulèvement au survol */
+  transform: translateY(-4px) scale(1.05);
   box-shadow: 0 8px 25px rgba(45,75,140,0.4);
 }
 
 #btnRemonter svg {
-  margin-top: 2px; /* Centrage optique de la flèche */
+  margin-top: 2px;
 }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -1180,16 +1191,21 @@ function buildRecap() {
 // ==========================================
 var btnRemonter = document.getElementById("btnRemonter");
 if(btnRemonter) {
-  // Affiche le bouton uniquement si on a scrollé vers le bas (plus de 300px)
-  window.addEventListener("scroll", function() {
-    if (window.scrollY > 300 || document.documentElement.scrollTop > 300) {
-      btnRemonter.style.display = "flex";
+  // Fonction robuste pour détecter le scroll
+  function checkScroll() {
+    var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (scrollPos > 300) {
+      btnRemonter.classList.add("show");
     } else {
-      btnRemonter.style.display = "none";
+      btnRemonter.classList.remove("show");
     }
-  });
+  }
 
-  // Action au clic : remonte en haut de la page de manière fluide
+  // Écouteurs d'événements sur la fenêtre et le document
+  window.addEventListener("scroll", checkScroll);
+  document.addEventListener("scroll", checkScroll);
+
+  // Action au clic
   btnRemonter.addEventListener("click", function() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
