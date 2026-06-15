@@ -832,7 +832,135 @@ function sauvegarderBrouillon() {
   var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('token', sessionStorage.getItem('google_token') || '');
   fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
 }
+function dupliquerDemande(edeal) {
+  toast("⏳ Préparation de la copie...", "ok");
+  
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
+  fd.append('token', sessionStorage.getItem('google_token') || '');
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(!res.success || !res.formData) { toast("⚠️ Demande introuvable", "err"); return; }
+    var fd = res.formData; 
+    
+    // 🚨 MODIFICATIONS SPÉCIFIQUES POUR LA DUPLICATION
+    fd.edeal = ''; // On vide l'EDEAL
+    state.loadedDraft = null; // Indique au système que c'est un nouveau dossier
+    
+    // Nettoyage de la bannière BE
+    var warningEl = document.getElementById('be-comment-warning');
+    if (warningEl) warningEl.style.display = 'none';
 
+    // Remplissage des champs de base
+    var champsDeBase = {
+      'f-edeal': fd.edeal,
+      'f-client': fd.client,
+      'f-ville': fd.ville,
+      'f-date': fd.dateChantier,
+      'f-commentaire': fd.commentaire
+    };
+    
+    Object.keys(champsDeBase).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.value = champsDeBase[id] || '';
+        if (el.value.trim() !== '') el.classList.add('filled');
+        else el.classList.remove('filled');
+      }
+    });
+    
+    document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    document.querySelectorAll('.q-scale-item').forEach(function(el){el.classList.remove('selected')});
+    
+    if(fd.infos) {
+      var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+      infoQuestions.forEach(function(q) { 
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; 
+        if(q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        } 
+      });
+    }
+    
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
+    try {
+      buildDiagnostic(); 
+      state.rebuildDiagnosticRequired = false;
+    } catch(e) { console.error("Erreur buildDiagnostic:", e); }
+    
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'||q.type==='dropdown'){ 
+          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        }
+      });
+    });
+    
+    // 🚨 Vidage forcé des pièces jointes pour la copie
+    state.selectedFiles = []; 
+    try { renderFiles(); } catch(e) { console.error(e); }
+    
+    showTab('demande'); 
+    goStep(1); 
+    toast("📋 Demande dupliquée ! Saisissez le nouveau N° EDEAL.", "ok");
+  })
+  .catch(function(err) { 
+    console.error("Erreur critique duplication :", err); 
+    toast("❌ Erreur lors de la duplication", "err"); 
+  });
+}
 function reprendreBrouillon(edeal) {
   toast("⏳ Chargement du dossier...", "ok");
   
@@ -1090,16 +1218,25 @@ function renderSuivi(demandes) {
   }
   
   body.innerHTML = demandes.map(function(d) {
-    // 1. AJOUT DE LA CONDITION "Manque d'infos"
     var isEditable = (d.statut === 'Brouillon' || d.statut === "Manque d'infos");
     
-    // 2. UTILISATION DE LA NOUVELLE CONDITION POUR LES BOUTONS
-    var actionBtn = isEditable ? '<div style="display:flex; gap:6px;"><button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button><button class="btn btn-sm btn-outline" style="border-color:var(--red); color:var(--red); padding:5px 12px;" onclick="supprimerBrouillon(\'' + d.edeal + '\')">🗑️ Supprimer</button></div>' : '—';
+    // 🛠️ Création du conteneur de boutons
+    var btns = '<div style="display:flex; gap:6px; flex-wrap:wrap;">';
     
-    // Le reste ne change pas (attribution des couleurs des badges)
+    // Boutons Reprendre / Supprimer (uniquement pour les brouillons)
+    if (isEditable) {
+      btns += '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>';
+      btns += '<button class="btn btn-sm btn-outline" style="border-color:var(--red); color:var(--red); padding:5px 10px;" title="Supprimer" onclick="supprimerBrouillon(\'' + d.edeal + '\')">🗑️</button>';
+    }
+    
+    // Bouton Dupliquer (Toujours visible pour TOUS les dossiers)
+    btns += '<button class="btn btn-sm btn-outline" style="border-color:var(--blue); color:var(--blue); padding:5px 10px;" onclick="dupliquerDemande(\'' + d.edeal + '\')" title="Copier cette demande">📄 Dupliquer</button>';
+    
+    btns += '</div>';
+    
     var bClass = d.statut === 'Brouillon' ? 'b-draft' : (d.statut === 'En attente' ? 'b-wait' : (d.statut === 'Attribuée' ? 'b-attr' : 'b-urg'));
     
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + actionBtn + '</td></tr>';
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + btns + '</td></tr>';
   }).join('');
 }
 function resetForm() { 
