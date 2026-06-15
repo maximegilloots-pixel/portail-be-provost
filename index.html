@@ -272,6 +272,35 @@ tbody tr:hover{background:var(--blue-lighter)}
   object-fit: contain; /* Garantit aucun recadrage / respect des proportions strictes */
   border-radius: var(--radius-sm);
 }
+  /* ⬆️ BOUTON REMONTER EN HAUT */
+#btnRemonter {
+  display: none; /* Masqué par défaut */
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 99999;
+  background-color: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: var(--tr);
+  align-items: center;
+  justify-content: center;
+}
+
+#btnRemonter:hover {
+  background-color: var(--blue-dark);
+  transform: translateY(-4px) scale(1.05); /* Petit effet de soulèvement au survol */
+  box-shadow: 0 8px 25px rgba(45,75,140,0.4);
+}
+
+#btnRemonter svg {
+  margin-top: 2px; /* Centrage optique de la flèche */
+}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -629,7 +658,18 @@ function buildInfosGeneralesDynamic() {
   });
 }
   
-function goStep(n) { document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); document.getElementById('step'+n).classList.add('active'); ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ var el=document.getElementById(id); if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); }); if(n===4) buildRecap(); }
+function goStep(n) { 
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); 
+  document.getElementById('step'+n).classList.add('active'); 
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ 
+    var el=document.getElementById(id); 
+    if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); 
+  }); 
+  if(n===4) buildRecap(); 
+  
+  // ⬆️ Remonte automatiquement en haut de la page lors du changement d'onglet
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 function goStep2() { if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; } if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; } var container = document.getElementById('diagnostic-container'); if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) { buildDiagnostic(); state.rebuildDiagnosticRequired = false; } goStep(2); }
 var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},{id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},{id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},{id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux...'},{id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},{id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},{id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Caillebotis','Plancher tôlé','Autre :']},{id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},{id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},{id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
 var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
@@ -1135,7 +1175,31 @@ function buildRecap() {
   container.innerHTML = html;
   if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
 }
+// ==========================================
+// ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
+// ==========================================
+var btnRemonter = document.getElementById("btnRemonter");
+if(btnRemonter) {
+  // Affiche le bouton uniquement si on a scrollé vers le bas (plus de 300px)
+  window.addEventListener("scroll", function() {
+    if (window.scrollY > 300 || document.documentElement.scrollTop > 300) {
+      btnRemonter.style.display = "flex";
+    } else {
+      btnRemonter.style.display = "none";
+    }
+  });
 
+  // Action au clic : remonte en haut de la page de manière fluide
+  btnRemonter.addEventListener("click", function() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
 </script>
+  <!-- Bouton Remonter en haut -->
+<button id="btnRemonter" title="Remonter en haut" aria-label="Remonter en haut">
+  <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
 </body>
 </html>
