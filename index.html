@@ -134,7 +134,14 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--te
 .produit-cb.checked{border-color:var(--blue);background:var(--blue-light)}
 .cb-box{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
 .produit-cb.checked .cb-box{background:var(--blue);border-color:var(--blue)}
-.cb-check{display:none;color:white;font-size:11px;font-weight:900}
+.cb-check {
+  display: none;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Force le blanc même si le navigateur croit que c'est un emoji */
+  text-shadow: 0 0 0 #ffffff; /* Astuce infaillible anti-emoji noir */
+  font-size: 14px;
+  font-weight: 900;
+}
 .produit-cb.checked .cb-check{display:block}
 .produit-cb span{font-size:12px;font-weight:600;color:var(--dark)}
 .q-produit-header{font-size:14px;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;border-bottom:2px solid var(--blue-light);padding-bottom:6px}
