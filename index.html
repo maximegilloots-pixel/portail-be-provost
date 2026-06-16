@@ -319,6 +319,22 @@ tbody tr:hover{background:var(--blue-lighter)}
 #btnRemonter svg {
   margin-top: 2px;
 }
+/* 🔄 LOGIGRAMME DOCUMENTATION */
+.flowchart { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.flow-node { display: flex; align-items: center; gap: 16px; background: var(--white); border: 1.5px solid var(--border); padding: 16px; border-radius: var(--radius); position: relative; box-shadow: var(--shadow); transition: var(--tr); }
+.flow-node:hover { border-color: var(--blue-mid); transform: translateX(5px); box-shadow: var(--shadow-lg); }
+.flow-icon { font-size: 20px; background: var(--bg); width: 46px; height: 46px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0; border: 1.5px solid var(--border); }
+.flow-text h4 { font-size: 13px; color: var(--blue-dark); margin-bottom: 4px; font-weight: 700; }
+.flow-text p { font-size: 12px; color: var(--text); line-height: 1.5; margin: 0; }
+.flow-arrow { text-align: center; color: var(--blue-mid); font-size: 20px; margin: 2px 0; font-weight: 900; }
+.flow-status { position: absolute; right: 16px; top: 16px; }
+
+/* GRILLE DES FONCTIONNALITÉS */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+.feature-box { background: var(--blue-lighter); border: 1px solid rgba(45,75,140,0.1); padding: 16px; border-radius: var(--radius); transition: var(--tr); }
+.feature-box:hover { background: var(--white); border-color: var(--blue); box-shadow: var(--shadow); }
+.feature-box h4 { font-size: 13px; color: var(--blue-dark); margin-bottom: 8px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.feature-box p { font-size: 12px; color: var(--text); line-height: 1.5; margin: 0; }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -349,15 +365,84 @@ tbody tr:hover{background:var(--blue-lighter)}
 </nav>
 
 <section class="section active" id="section-comment">
-  <div class="s-label">Documentation</div><h2 class="s-title">Comment ça marche ?</h2>
-  <p class="s-desc">Déposez vos demandes BE en quelques minutes, directement depuis cette page.</p>
+  <div class="s-label">Documentation & Aide</div>
+  <h2 class="s-title">Comment ça marche ?</h2>
+  <p class="s-desc">Découvrez le cycle de vie de vos demandes au Bureau d'Études et les outils à votre disposition.</p>
+  
   <div class="card">
-    <div class="steps">
-      <div class="step"><div class="step-n">1</div><div><strong>Remplir et Sauvegarder</strong><span>Saisissez vos données. Vous pouvez sauver en pré-demande à tout moment.</span></div></div>
-      <div class="step"><div class="step-n">2</div><div><strong>Validation BE</strong><span>Une fois envoyé définitivement, le BE prend en charge le dossier.</span></div></div>
+    <div class="card-title">🔄 Logigramme du Processus BE</div>
+    <div class="flowchart">
+      
+      <div class="flow-node">
+        <div class="flow-icon">📝</div>
+        <div class="flow-text">
+          <h4>1. Saisie de la demande</h4>
+          <p>Remplissez le formulaire technique ou dupliquez un dossier existant. Vous pouvez enregistrer en "Pré-demande" à tout moment pour y revenir plus tard sans perdre vos données.</p>
+        </div>
+        <div class="flow-status"><span class="badge b-draft">Brouillon</span></div>
+      </div>
+      
+      <div class="flow-arrow">↓</div>
+      
+      <div class="flow-node">
+        <div class="flow-icon">🚀</div>
+        <div class="flow-text">
+          <h4>2. Envoi au Bureau d'Études</h4>
+          <p>Joignez vos plans et photos (15 Mo max) puis validez. Un PDF récapitulatif est généré automatiquement et le dossier entre dans la file d'attente priorisée du BE.</p>
+        </div>
+        <div class="flow-status"><span class="badge b-wait">En attente</span></div>
+      </div>
+      
+      <div class="flow-arrow">↓</div>
+      
+      <div class="flow-node">
+        <div class="flow-icon">⚙️</div>
+        <div class="flow-text">
+          <h4>3. Prise en charge & Analyse</h4>
+          <p>Un technicien s'attribue votre dossier. Si des éléments bloquants manquent, il bascule la demande en "Manque d'infos" avec un commentaire : le dossier vous est renvoyé pour correction.</p>
+        </div>
+        <div class="flow-status">
+          <span class="badge b-attr">Attribuée</span> 
+          <span class="badge b-urg" style="margin-left:4px; background:var(--red-bg); color:var(--red);">Manque d'infos</span>
+        </div>
+      </div>
+
+      <div class="flow-arrow">↓</div>
+      
+      <div class="flow-node" style="border-color: var(--green); background: var(--green-bg);">
+        <div class="flow-icon" style="border-color: var(--green); color: var(--green); background: var(--white);">✅</div>
+        <div class="flow-text">
+          <h4>4. Finalisation de l'étude</h4>
+          <p>Le technicien termine l'étude (plan, chiffrage...) et vous transmet les éléments finaux directement.</p>
+        </div>
+      </div>
+
     </div>
   </div>
-  <button class="btn btn-primary" id="btn-doc-start">Créer une nouvelle demande</button>
+
+  <div class="card">
+    <div class="card-title">💡 Fonctionnalités clés à votre disposition</div>
+    <div class="features-grid">
+      <div class="feature-box">
+        <h4>📄 Duplication de dossier</h4>
+        <p>Dans l'onglet "Suivi", cliquez sur <b>Dupliquer</b> pour copier un ancien dossier (sans ses PJ et son EDEAL) et recréer une demande similaire en 2 secondes.</p>
+      </div>
+      <div class="feature-box">
+        <h4>💾 Pré-demande (Sauvegarde)</h4>
+        <p>Interrompu pendant une saisie ? Cliquez sur <b>Enregistrer en pré-demande</b>. Vous retrouverez votre brouillon intact dans l'onglet de suivi.</p>
+      </div>
+      <div class="feature-box">
+        <h4>🔍 Recherche & Filtres</h4>
+        <p>Retrouvez facilement un dossier en tapant le N° EDEAL ou le nom du client dans la barre de recherche intégrée à votre tableau de bord.</p>
+      </div>
+      <div class="feature-box">
+        <h4>📎 Nettoyage automatique</h4>
+        <p>Les fichiers lourds sont purgés après 30 jours pour garantir la rapidité du portail, mais les PDF techniques de synthèse peuvent être regénérés à l'infini.</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btn-doc-start" onclick="document.getElementById('tab-demande').click(); window.scrollTo({ top: 0, behavior: 'smooth' });">Créer une nouvelle demande →</button>
 </section>
 
 <section class="section" id="section-demande">
