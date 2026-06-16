@@ -1313,16 +1313,18 @@ function buildRecap() {
 // ==========================================
 // ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
 // ==========================================
-var btnRemonter = document.getElementById("btnRemonter");
-if(btnRemonter) {
-  function checkScroll() {
-    var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    if (scrollPos > 300) { btnRemonter.classList.add("show"); } else { btnRemonter.classList.remove("show"); }
+window.addEventListener('DOMContentLoaded', function() {
+  var btnRemonter = document.getElementById("btnRemonter");
+  if(btnRemonter) {
+    function checkScroll() {
+      var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      if (scrollPos > 300) { btnRemonter.classList.add("show"); } else { btnRemonter.classList.remove("show"); }
+    }
+    window.addEventListener("scroll", checkScroll);
+    document.addEventListener("scroll", checkScroll);
+    btnRemonter.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); });
   }
-  window.addEventListener("scroll", checkScroll);
-  document.addEventListener("scroll", checkScroll);
-  btnRemonter.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); });
-}
+});
 </script>
 
 <button id="btnRemonter" title="Remonter en haut" aria-label="Remonter en haut">
