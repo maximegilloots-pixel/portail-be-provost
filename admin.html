@@ -6,6 +6,19 @@
 <title>Admin BE — Provost</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
+  
+  /* 📊 GRAPHIQUES DE CHARGE BE (Version compacte latérale) */
+.charge-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.charge-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.charge-header { display: flex; justify-content: space-between; align-items: center; }
+.charge-name { font-weight: 900; font-size: 13px; color: var(--blue-dark); text-transform: uppercase; letter-spacing: 0.5px; }
+.charge-bar-container { background: var(--blue-lighter); height: 24px; border-radius: 12px; overflow: hidden; position: relative; display: flex; border: 1px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); width: 100%; }
+.charge-bar-work { height: 100%; display: flex; align-items: center; padding-left: 10px; color: white; font-weight: 900; font-size: 11px; white-space: nowrap; overflow: hidden; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.charge-bar-abs { background: var(--red); height: 100%; opacity: 0.75; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px); transition: width 0.6s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 900; }
+.charge-stats { font-size: 10px; display: flex; gap: 4px; flex-wrap: wrap; }
+.stat-badge { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; background: var(--white); border: 1px solid var(--border); font-weight: 700; color: var(--text); }
+.stat-total { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
+  
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;padding:20px}
@@ -114,31 +127,42 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 </section>
 
 <section class="section" id="section-suivi">
-  <div class="card">
-    <div class="card-title">Gestion des demandes</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
-      <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
-      <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 30 jours</button>
-      <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
-        <option value="">Tous les techniciens</option>
-      </select>
-      <select id="status-filter" class="fselect" style="width:140px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
-        <option value="">Tous les statuts</option>
-      </select>
-      <select id="commercial-filter" class="fselect" style="width:160px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
-        <option value="">Tous les commerciaux</option>
-      </select>
-      <input id="filter-input" placeholder="Recherche par N° EDEAL ou Client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="appliquerFiltres()">
+  <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+    
+    <div class="card" style="flex: 1; min-width: 650px; margin-bottom: 0;">
+      <div class="card-title">Gestion des demandes</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
+        <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
+        <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 30 jours</button>
+        <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+          <option value="">Tous les techniciens</option>
+        </select>
+        <select id="status-filter" class="fselect" style="width:140px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+          <option value="">Tous les statuts</option>
+        </select>
+        <select id="commercial-filter" class="fselect" style="width:160px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
+          <option value="">Tous les commerciaux</option>
+        </select>
+        <input id="filter-input" placeholder="Recherche par N° EDEAL ou Client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="appliquerFiltres()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
+          <tbody id="admin-suivi-body"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
-        <tbody id="admin-suivi-body"></tbody>
-      </table>
+
+    <div class="card" style="width: 340px; flex-shrink: 0; margin-bottom: 0;">
+      <div class="card-title">📊 Charge BE Prévisionnelle</div>
+      <p style="font-size: 11px; color: var(--text-light); margin-bottom: 16px; line-height: 1.4;">Calcul en temps réel intégrant le % de temps partiel et additionnant les absences pour obtenir le délai de prise en main.</p>
+      
+      <div id="charge-dashboard" style="display: flex; flex-direction: column;">
+        </div>
     </div>
+
   </div>
 </section>
-
 <section class="section" id="section-parametres">
   <div class="card">
     <div class="card-title">Configuration GitHub</div>
@@ -414,8 +438,113 @@ function saveModal() {
 
 function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
 function showTab(tab, e) { document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')}); document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')}); document.getElementById('section-'+tab).classList.add('active'); if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); } if(tab==='suivi') chargerSuivi(); if(tab==='parametres') chargerPermanente(); }
-function chargerSuivi() { var token = sessionStorage.getItem('google_token') || ''; fetch(APPS_SCRIPT_URL+'?action=getSuivi&token='+encodeURIComponent(token)).then(function(r){return r.json();}).then(function(res){ allDemandes=res.demandes||[]; populateAdminFilters(allDemandes); appliquerFiltres(); }); }
+// On modifie chargerSuivi pour qu'elle déclenche aussi la mise à jour des graphiques
+function chargerSuivi() { 
+  var token = sessionStorage.getItem('google_token') || ''; 
+  fetch(APPS_SCRIPT_URL+'?action=getSuivi&token='+encodeURIComponent(token))
+  .then(function(r){return r.json();})
+  .then(function(res){ 
+    allDemandes=res.demandes||[]; 
+    populateAdminFilters(allDemandes); 
+    appliquerFiltres(); 
+  }); 
+  
+  // 📊 On actualise aussi la charge BE sur la droite !
+  chargerChargeBE();
+}
 
+// ==========================================
+// 📊 MOTEUR DU DASHBOARD DE CHARGE BE
+// ==========================================
+function chargerChargeBE() {
+  var dash = document.getElementById('charge-dashboard');
+  if(!dash) return;
+  dash.innerHTML = '<div style="text-align:center; padding:20px; font-weight:bold; color:var(--text-light);">⏳ Calcul en cours...</div>';
+
+  var fd = new FormData();
+  fd.append('action', 'getCharge');
+  fd.append('token', sessionStorage.getItem('google_token') || '');
+
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
+     if(res.success && res.data) {
+        renderCharge(res.data);
+     } else {
+        dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur : Lecture impossible</div>';
+     }
+  })
+  .catch(function(err) {
+     dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur réseau</div>';
+  });
+}
+
+function renderCharge(data) {
+  var dash = document.getElementById('charge-dashboard');
+  if(!data.length) {
+    dash.innerHTML = '<div style="text-align:center; font-style:italic;">Aucune donnée (onglet Charge A2:C9).</div>';
+    return;
+  }
+
+  // 1. Parsing et Maths
+  var parsedData = data.map(function(d) {
+    var rawLoad = parseFloat(d.charge.replace(',', '.')) || 0;
+    var modifs = d.modifs.toLowerCase();
+    
+    // Extraction des absences (ex: "+8")
+    var absMatch = modifs.match(/\+(\d+(?:[\.,]\d+)?)/);
+    var abs = absMatch ? parseFloat(absMatch[1].replace(',', '.')) : 0;
+    
+    // Extraction du temps partiel (ex: "60%")
+    var ptMatch = modifs.match(/(\d+)%/);
+    var pt = ptMatch ? parseFloat(ptMatch[1]) : 100;
+    if (pt === 0) pt = 100; // Sécurité
+
+    // Calculs finaux
+    var realWorkDays = rawLoad / (pt / 100);
+    var totalWait = realWorkDays + abs;
+
+    return {
+       name: d.nom,
+       baseLoad: rawLoad,
+       pt: pt,
+       abs: abs,
+       realWork: realWorkDays,
+       total: totalWait
+    };
+  });
+
+  // 2. Calibrage
+  var maxDays = Math.max.apply(Math, parsedData.map(function(d) { return d.total; }));
+  if(maxDays < 10) maxDays = 10; 
+
+  // 3. Rendu HTML
+  dash.innerHTML = parsedData.map(function(d) {
+     var workPct = (d.realWork / maxDays) * 100;
+     var absPct = (d.abs / maxDays) * 100;
+
+     // Codes couleur de charge
+     var colorClass = 'background: var(--green);';
+     if (d.total > 5) colorClass = 'background: var(--yellow); color: var(--dark);';
+     if (d.total > 10) colorClass = 'background: var(--red);';
+
+     // Badges d'infos
+     var labels = '<span class="stat-badge stat-total">Dispo j+' + d.total.toFixed(1) + '</span>';
+     if (d.abs > 0) labels += '<span class="stat-badge" style="color:var(--red);">✈️ +' + d.abs + 'j</span>';
+     if (d.pt < 100) labels += '<span class="stat-badge" style="color:var(--blue);">⏱️ ' + d.pt + '%</span>';
+
+     return '<div class="charge-row">' +
+              '<div class="charge-header">' +
+                '<div class="charge-name">' + d.name + '</div>' +
+                '<div class="charge-stats">' + labels + '</div>' +
+              '</div>' +
+              '<div class="charge-bar-container">' +
+                '<div class="charge-bar-work" style="width: ' + workPct + '%; ' + colorClass + '" title="Charge de travail calculée : ' + d.realWork.toFixed(1) + 'j">' + d.baseLoad + 'j</div>' +
+                (d.abs > 0 ? '<div class="charge-bar-abs" style="width: ' + absPct + '%;" title="Absence : ' + d.abs + 'j">+' + d.abs + '</div>' : '') +
+              '</div>' +
+            '</div>';
+  }).join('');
+}
 function populateAdminFilters(demandes) {
   var selectTech = document.getElementById('tech-filter'); if(selectTech) { var currentTech = selectTech.value; selectTech.innerHTML = '<option value="">Tous les techniciens</option>'; getTechList().forEach(function(t) { var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt); }); }
   var selectStatus = document.getElementById('status-filter'); if(selectStatus) { var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>'; ['En attente', 'Attribuée', "Manque d'infos"].forEach(function(s) { var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt); }); }
