@@ -812,11 +812,6 @@
         "Budget uniquement"
       ],
       "placeholder": "Ce choix aura un impact sur le temps de réponse du technicien affecté"
-    },
-    {
-      "id": "q_1780488415749",
-      "label": "Commentaires / Remarques / Précisions",
-      "type": "textarea"
     }
   ],
   "prod_cantipro3": [
