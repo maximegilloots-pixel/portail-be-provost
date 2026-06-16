@@ -335,6 +335,26 @@ tbody tr:hover{background:var(--blue-lighter)}
 .feature-box:hover { background: var(--white); border-color: var(--blue); box-shadow: var(--shadow); }
 .feature-box h4 { font-size: 13px; color: var(--blue-dark); margin-bottom: 8px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .feature-box p { font-size: 12px; color: var(--text); line-height: 1.5; margin: 0; }
+
+/* 🎓 TUTO ONBOARDING (Première connexion) */
+.tuto-overlay {
+  position: fixed; inset: 0; background: rgba(30, 38, 56, 0.85);
+  display: none; align-items: center; justify-content: center;
+  z-index: 999999; backdrop-filter: blur(4px);
+}
+.tuto-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+.tuto-card {
+  background: var(--white); width: 480px; max-width: 90vw;
+  border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(20px); opacity: 0; animation: slideUp 0.5s 0.2s ease forwards;
+}
+.tuto-header { font-size: 20px; font-weight: 900; color: var(--blue); margin-bottom: 12px; letter-spacing: -0.5px; }
+.tuto-body { font-size: 13px; color: var(--text); margin-bottom: 25px; line-height: 1.6; }
+.tuto-list { margin-top: 18px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tuto-list li { background: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--yellow); }
+.tuto-list strong { color: var(--blue-dark); display: block; margin-bottom: 3px; font-size: 14px;}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -386,7 +406,6 @@ tbody tr:hover{background:var(--blue-lighter)}
   <div class="card">
     <div class="card-title">🔄 Logigramme du Processus BE</div>
     <div class="flowchart">
-      
       <div class="flow-node">
         <div class="flow-icon">📝</div>
         <div class="flow-text">
@@ -430,7 +449,6 @@ tbody tr:hover{background:var(--blue-lighter)}
           <p>Le technicien termine l'étude (plan, chiffrage...) et vous transmet les éléments finaux directement.</p>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -453,101 +471,7 @@ tbody tr:hover{background:var(--blue-lighter)}
   </div>
 
   <button class="btn btn-primary" id="btn-doc-start" onclick="document.getElementById('tab-demande').click(); window.scrollTo({ top: 0, behavior: 'smooth' });">Créer une nouvelle demande →</button>
-/* 🎓 TUTO ONBOARDING (Première connexion) */
-.tuto-overlay {
-  position: fixed; inset: 0; background: rgba(30, 38, 56, 0.85);
-  display: none; align-items: center; justify-content: center;
-  z-index: 999999; backdrop-filter: blur(4px);
-}
-.tuto-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-.tuto-card {
-  background: var(--white); width: 480px; max-width: 90vw;
-  border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  transform: translateY(20px); opacity: 0; animation: slideUp 0.5s 0.2s ease forwards;
-}
-.tuto-header { font-size: 20px; font-weight: 900; color: var(--blue); margin-bottom: 12px; letter-spacing: -0.5px; }
-.tuto-body { font-size: 13px; color: var(--text); margin-bottom: 25px; line-height: 1.6; }
-.tuto-list { margin-top: 18px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.tuto-list li { background: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--yellow); }
-.tuto-list strong { color: var(--blue-dark); display: block; margin-bottom: 3px; font-size: 14px;}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 </section>
-
-<section class="section" id="section-demande">
-  <div class="s-label">Bureau d'Études</div>
-  <h2 class="s-title">Saisie de la demande</h2>
-  
-  <div id="be-comment-warning" style="display:none; background:rgba(192,57,43,0.1); border:1.5px solid var(--red); color:var(--red); padding:14px; border-radius:var(--radius); margin-bottom:16px; font-size:13px;">
-    <strong style="display:block; margin-bottom:4px; font-size:14px;">⚠️ RETOUR DU BUREAU D'ÉTUDES :</strong>
-    <span id="be-comment-text" style="font-weight:600;"></span>
-  </div>
-
-  <div class="wizard">
-    <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
-    <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
-    <div class="wz" id="wz3"><span class="wz-n">3</span>Pièces jointes</div>
-    <div class="wz" id="wz4"><span class="wz-n">4</span>Envoi</div>
-  </div>
-
-
-  <div class="fstep active" id="step1">
-    <div class="card">
-      <div class="card-title">Informations générales</div>
-      <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
-      <div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div>
-      <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
-      <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
-      <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
-      
-      <div id="infos-generales-dynamic-container"></div>
-      
-      <hr class="divider"><div class="card-title">Sélection du/des produit(s) <span class="req">*</span></div><div class="produits-grid" id="produits-grid"></div>
-      <hr class="divider"><div class="card-title">Commentaires</div><textarea id="f-commentaire" class="ftextarea"></textarea>
-      <div class="btn-row" style="justify-content:space-between;width:100%;">
-        <button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button>
-        <button class="btn btn-primary" onclick="goStep2()">Continuer vers le diagnostic →</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="fstep" id="step2">
-    <div id="diagnostic-container"></div>
-    <div class="btn-row" style="justify-content:space-between;width:100%;">
-      <div><button class="btn btn-outline" onclick="goStep(1)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
-      <button class="btn btn-primary" onclick="goStep(3)">Continuer vers les PJ →</button>
-    </div>
-  </div>
-
-  <div class="fstep" id="step3">
-    <div class="card">
-      <div class="card-title">Pièces jointes complémentaires (15 Mo maximum cumulé)</div>
-      <div class="dropzone" id="dropzone"><input type="file" id="file-input" multiple style="display:none;"><div class="dz-title">Glissez vos fichiers ici</div></div>
-      <div class="file-list" id="file-list"></div>
-      <div class="btn-row" style="justify-content:space-between;width:100%;">
-        <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
-        <div style="color:var(--red); font-size:11px; font-weight:bold;">
-          ⚠️ Les pièces jointes ne sont pas sauvegardées en pré-demande / brouillon.
-        </div>
-        <button class="btn btn-primary" onclick="goStep(4)">Vérifier et envoyer →</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="fstep" id="step4">
-    <div class="card">
-      <div class="card-title">Récapitulatif avant envoi</div><div id="recap-content"></div>
-      <hr class="divider">
-      <div class="info-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        La demande sera déposée définitivement au BE. Objet : <strong id="recap-obj"></strong>
-      </div>
-      <div class="btn-row" style="justify-content:space-between;width:100%;">
-        <button class="btn btn-outline" onclick="goStep(3)">← Retour</button>
-        <button class="btn btn-primary" id="btn-send" onclick="envoyerDemande()">🚀 Déposer définitivement au BE</button>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section class="section" id="section-suivi">
@@ -573,21 +497,7 @@ tbody tr:hover{background:var(--blue-lighter)}
 </div>
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
-// ==========================================
-// 🎓 GESTION DU TUTORIEL DE PREMIÈRE VISITE
-// ==========================================
-function verifierEtAfficherTuto() {
-  // On regarde dans le navigateur si la clé existe déjà
-  if (!localStorage.getItem('tuto_portail_vu_v1')) {
-    document.getElementById('tuto-modal').classList.add('show');
-  }
-}
 
-function fermerTuto() {
-  // On pose le marqueur pour ne plus jamais l'afficher
-  localStorage.setItem('tuto_portail_vu_v1', '1');
-  document.getElementById('tuto-modal').classList.remove('show');
-}
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu4GoY2az2rvQqIkCJpio2qDu29y_CFr89wIZUVUjbetnlZBPeCvBiWanypdG1_yxl/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
@@ -1505,7 +1415,19 @@ function buildRecap() {
   container.innerHTML = html;
   if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
 }
+// ==========================================
+// 🎓 GESTION DU TUTORIEL DE PREMIÈRE VISITE
+// ==========================================
+function verifierEtAfficherTuto() {
+  if (!localStorage.getItem('tuto_portail_vu_v1')) {
+    document.getElementById('tuto-modal').classList.add('show');
+  }
+}
 
+function fermerTuto() {
+  localStorage.setItem('tuto_portail_vu_v1', '1');
+  document.getElementById('tuto-modal').classList.remove('show');
+}
 // ==========================================
 // ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
 // ==========================================
