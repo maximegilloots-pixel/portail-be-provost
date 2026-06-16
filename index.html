@@ -358,6 +358,20 @@ tbody tr:hover{background:var(--blue-lighter)}
 </div>
 
 <div class="app-content" id="app-content">
+  <div class="tuto-overlay" id="tuto-modal">
+  <div class="tuto-card">
+    <div class="tuto-header">👋 Bienvenue sur votre nouveau Portail BE !</div>
+    <div class="tuto-body">
+      <p>C'est votre première visite ? Voici les nouveautés pour gagner du temps :</p>
+      <ul class="tuto-list">
+        <li><strong>💾 Sauvegarde rapide</strong> Vous êtes interrompu ? Cliquez sur "Enregistrer en pré-demande" pour mettre votre saisie en pause.</li>
+        <li><strong>📄 Duplication Express</strong> Dans l'onglet Suivi, un bouton "Dupliquer" vous permet de copier un ancien dossier en un clic.</li>
+        <li><strong>🔍 Recherche Intégrée</strong> Tapez un nom de client ou un N° EDEAL dans le tableau de bord pour retrouver vos dossiers.</li>
+      </ul>
+    </div>
+    <button class="btn btn-primary" onclick="fermerTuto()" style="width: 100%; justify-content: center; padding: 14px; font-size: 13px;">🚀 C'est noté, on y va !</button>
+  </div>
+</div>
 <nav class="tabs">
   <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
   <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
@@ -439,6 +453,25 @@ tbody tr:hover{background:var(--blue-lighter)}
   </div>
 
   <button class="btn btn-primary" id="btn-doc-start" onclick="document.getElementById('tab-demande').click(); window.scrollTo({ top: 0, behavior: 'smooth' });">Créer une nouvelle demande →</button>
+/* 🎓 TUTO ONBOARDING (Première connexion) */
+.tuto-overlay {
+  position: fixed; inset: 0; background: rgba(30, 38, 56, 0.85);
+  display: none; align-items: center; justify-content: center;
+  z-index: 999999; backdrop-filter: blur(4px);
+}
+.tuto-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+.tuto-card {
+  background: var(--white); width: 480px; max-width: 90vw;
+  border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(20px); opacity: 0; animation: slideUp 0.5s 0.2s ease forwards;
+}
+.tuto-header { font-size: 20px; font-weight: 900; color: var(--blue); margin-bottom: 12px; letter-spacing: -0.5px; }
+.tuto-body { font-size: 13px; color: var(--text); margin-bottom: 25px; line-height: 1.6; }
+.tuto-list { margin-top: 18px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tuto-list li { background: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--yellow); }
+.tuto-list strong { color: var(--blue-dark); display: block; margin-bottom: 3px; font-size: 14px;}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 </section>
 
 <section class="section" id="section-demande">
@@ -540,7 +573,21 @@ tbody tr:hover{background:var(--blue-lighter)}
 </div>
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
+// ==========================================
+// 🎓 GESTION DU TUTORIEL DE PREMIÈRE VISITE
+// ==========================================
+function verifierEtAfficherTuto() {
+  // On regarde dans le navigateur si la clé existe déjà
+  if (!localStorage.getItem('tuto_portail_vu_v1')) {
+    document.getElementById('tuto-modal').classList.add('show');
+  }
+}
 
+function fermerTuto() {
+  // On pose le marqueur pour ne plus jamais l'afficher
+  localStorage.setItem('tuto_portail_vu_v1', '1');
+  document.getElementById('tuto-modal').classList.remove('show');
+}
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu4GoY2az2rvQqIkCJpio2qDu29y_CFr89wIZUVUjbetnlZBPeCvBiWanypdG1_yxl/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
@@ -555,7 +602,13 @@ window.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(btnItem) { btnItem.addEventListener('click', function() { document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); }); btnItem.classList.add('active-filter'); filtrer(btnItem.getAttribute('data-filter')); }); });
   var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
   var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(fInput.files); }); }
-  if (sessionStorage.getItem('portail_auth') === '1') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); setupCommercialField(sessionStorage.getItem('user_name')); chargerConfigFormulaire(); }
+  if (sessionStorage.getItem('portail_auth') === '1') { 
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    setupCommercialField(sessionStorage.getItem('user_name')); 
+    chargerConfigFormulaire(); 
+    verifierEtAfficherTuto(); // 👈 LA FAMEUSE RETOUCHE EST ICI !
+  }
 // 🟢 ESPION GLOBAL : Passe les champs en vert dès qu'ils contiennent du texte
   document.addEventListener('input', function(e) {
     if (e.target.classList.contains('finput') || e.target.classList.contains('q-text-input') || e.target.classList.contains('ftextarea')) {
@@ -579,8 +632,23 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-function handleCredentialResponse(response) { var payload = jwtDecode(response.credential); if (payload.email && payload.email.endsWith('@provost.fr')) { sessionStorage.setItem('portail_auth', '1'); sessionStorage.setItem('user_name', payload.name); sessionStorage.setItem('google_token', response.credential); setupCommercialField(payload.name); document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-content').classList.add('visible'); chargerConfigFormulaire(); } else { document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; document.getElementById('login-err').style.display = 'block'; } }
-function chargerConfigFormulaire() {
+function handleCredentialResponse(response) { 
+  var payload = jwtDecode(response.credential); 
+  if (payload.email && payload.email.endsWith('@provost.fr')) { 
+    sessionStorage.setItem('portail_auth', '1'); 
+    sessionStorage.setItem('user_name', payload.name); 
+    sessionStorage.setItem('google_token', response.credential); 
+    setupCommercialField(payload.name); 
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    chargerConfigFormulaire(); 
+    verifierEtAfficherTuto(); // 👈 LIGNE AJOUTÉE ICI
+  } else { 
+    document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; 
+    document.getElementById('login-err').style.display = 'block'; 
+  } 
+}
+  function chargerConfigFormulaire() {
   // 1. Récupération dynamique des paramètres configurés dans l'admin
   var ghUser = localStorage.getItem('gh_user') || 'maximegilloots-pixel';
   var ghRepo = localStorage.getItem('gh_repo') || 'portail-be-provost';
