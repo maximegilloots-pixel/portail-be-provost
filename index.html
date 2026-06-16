@@ -180,4 +180,1155 @@ tbody tr:hover{background:var(--blue-lighter)}
 .feature-box p { font-size: 12px; color: var(--text); line-height: 1.5; margin: 0; }
 
 /* 🎓 TUTO ONBOARDING */
-.tuto-overlay { position: fixed; inset: 0; background: rgba(30, 38, 56, 0.85); display: none; align-items: center; justify-content: center; z
+.tuto-overlay { position: fixed; inset: 0; background: rgba(30, 38, 56, 0.85); display: none; align-items: center; justify-content: center; z-index: 999999; backdrop-filter: blur(4px); }
+.tuto-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+.tuto-card { background: var(--white); width: 480px; max-width: 90vw; border-radius: 16px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transform: translateY(20px); opacity: 0; animation: slideUp 0.5s 0.2s ease forwards; }
+.tuto-header { font-size: 20px; font-weight: 900; color: var(--blue); margin-bottom: 12px; letter-spacing: -0.5px; }
+.tuto-body { font-size: 13px; color: var(--text); margin-bottom: 25px; line-height: 1.6; }
+.tuto-list { margin-top: 18px; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tuto-list li { background: var(--bg); padding: 12px 16px; border-radius: var(--radius-sm); border-left: 4px solid var(--yellow); }
+.tuto-list strong { color: var(--blue-dark); display: block; margin-bottom: 3px; font-size: 14px;}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div style="font-size:16px; font-weight:900; color:var(--dark); letter-spacing:-0.5px;">🚀 Transfert de la demande au BE...</div>
+  <div style="font-size:12px; color:var(--text-light); margin-top:3px;">Veuillez patienter, synchronisation de la base Google Sheets.</div>
+  <div class="progress-bar-container"><div class="progress-bar-fill"></div></div>
+</div>
+
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-bar"></div>
+    <div class="login-logo">PROVOST</div>
+    <div class="login-sub">Portail d'Accès Sécurisé — Bureau d'Études</div>
+    <div id="g_id_onload" data-client_id="17936036373-bnj5d6ljm975rmpqu6sdb87819bdv6bc.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_select="false" data-itp_support="true"></div>
+    <div style="display: flex; justify-content: center; margin-bottom: 8px;"><div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large"></div></div>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<div class="app-content" id="app-content">
+
+  <div class="tuto-overlay" id="tuto-modal">
+    <div class="tuto-card">
+      <div class="tuto-header">👋 Bienvenue sur votre nouveau Portail BE !</div>
+      <div class="tuto-body">
+        <p>C'est votre première visite ? Voici les nouveautés pour gagner du temps :</p>
+        <ul class="tuto-list">
+          <li><strong>💾 Sauvegarde rapide</strong> Vous êtes interrompu ? Cliquez sur "Enregistrer en pré-demande" pour mettre votre saisie en pause.</li>
+          <li><strong>📄 Duplication Express</strong> Dans l'onglet Suivi, un bouton "Dupliquer" vous permet de copier un ancien dossier en un clic.</li>
+          <li><strong>🔍 Recherche Intégrée</strong> Tapez un nom de client ou un N° EDEAL dans le tableau de bord pour retrouver vos dossiers.</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary" onclick="fermerTuto()" style="width: 100%; justify-content: center; padding: 14px; font-size: 13px;">🚀 C'est noté, on y va !</button>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" id="tab-comment" data-tab="comment">Documentation</button>
+    <button class="tab" id="tab-demande" data-tab="demande">Nouvelle demande / Brouillons</button>
+    <button class="tab" id="tab-suivi" data-tab="suivi">Suivi des demandes</button>
+  </nav>
+
+  <section class="section active" id="section-comment">
+    <div class="s-label">Documentation & Aide</div>
+    <h2 class="s-title">Comment ça marche ?</h2>
+    <p class="s-desc">Découvrez le cycle de vie de vos demandes au Bureau d'Études et les outils à votre disposition.</p>
+    
+    <div class="card">
+      <div class="card-title">🔄 Logigramme du Processus BE</div>
+      <div class="flowchart">
+        <div class="flow-node">
+          <div class="flow-icon">📝</div>
+          <div class="flow-text">
+            <h4>1. Saisie de la demande</h4>
+            <p>Remplissez le formulaire technique en détaillant les rubriques au maximum. Vous pouvez enregistrer en "Pré-demande" à tout moment pour y revenir plus tard sans perdre vos données.</p>
+          </div>
+          <div class="flow-status"><span class="badge b-draft">Brouillon</span></div>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-node">
+          <div class="flow-icon">🚀</div>
+          <div class="flow-text">
+            <h4>2. Envoi au Bureau d'Études</h4>
+            <p>Joignez vos plans et photos (15 Mo max) puis validez. Le dossier entre dans la file d'attente du BE.</p>
+          </div>
+          <div class="flow-status"><span class="badge b-wait">En attente</span></div>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-node">
+          <div class="flow-icon">⚙️</div>
+          <div class="flow-text">
+            <h4>3. Prise en charge & Analyse</h4>
+            <p>Votre dossier est attribué. Si des éléments bloquants manquent, la demande passe en "Manque d'infos" avec un commentaire : le dossier vous est renvoyé pour correction.</p>
+          </div>
+          <div class="flow-status">
+            <span class="badge b-attr">Attribuée</span> 
+            <span class="badge b-urg" style="margin-left:4px; background:var(--red-bg); color:var(--red);">Manque d'infos</span>
+          </div>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-node" style="border-color: var(--green); background: var(--green-bg);">
+          <div class="flow-icon" style="border-color: var(--green); color: var(--green); background: var(--white);">✅</div>
+          <div class="flow-text">
+            <h4>4. Finalisation de l'étude</h4>
+            <p>Le technicien termine l'étude (plan, chiffrage...) et vous transmet les éléments finaux directement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💡 Fonctionnalités clés à votre disposition</div>
+      <div class="features-grid">
+        <div class="feature-box">
+          <h4>📄 Duplication de dossier</h4>
+          <p>Dans l'onglet "Suivi", cliquez sur <b>Dupliquer</b> pour copier un ancien dossier (sans ses PJ et son EDEAL) et recréer une demande similaire en 2 secondes.</p>
+        </div>
+        <div class="feature-box">
+          <h4>💾 Pré-demande (Sauvegarde)</h4>
+          <p>Interrompu pendant une saisie ? Cliquez sur <b>Enregistrer en pré-demande</b>. Vous retrouverez votre brouillon intact dans l'onglet de suivi.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🔍 Recherche & Filtres</h4>
+          <p>Retrouvez facilement un dossier en tapant le N° EDEAL ou le nom du client dans la barre de recherche intégrée à votre tableau de bord.</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-doc-start" onclick="document.getElementById('tab-demande').click(); window.scrollTo({ top: 0, behavior: 'smooth' });">Créer une nouvelle demande →</button>
+  </section>
+
+  <section class="section" id="section-demande">
+    <div class="s-label">Bureau d'Études</div>
+    <h2 class="s-title">Saisie de la demande</h2>
+    
+    <div id="be-comment-warning" style="display:none; background:rgba(192,57,43,0.1); border:1.5px solid var(--red); color:var(--red); padding:14px; border-radius:var(--radius); margin-bottom:16px; font-size:13px;">
+      <strong style="display:block; margin-bottom:4px; font-size:14px;">⚠️ RETOUR DU BUREAU D'ÉTUDES :</strong>
+      <span id="be-comment-text" style="font-weight:600;"></span>
+    </div>
+
+    <div class="wizard">
+      <div class="wz active" id="wz1"><span class="wz-n">1</span>Infos générales</div>
+      <div class="wz" id="wz2"><span class="wz-n">2</span>Diagnostic</div>
+      <div class="wz" id="wz3"><span class="wz-n">3</span>Pièces jointes</div>
+      <div class="wz" id="wz4"><span class="wz-n">4</span>Envoi</div>
+    </div>
+
+    <div class="fstep active" id="step1">
+      <div class="card">
+        <div class="card-title">Informations générales</div>
+        <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
+        <div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div>
+        <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
+        <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
+        <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
+        
+        <div id="infos-generales-dynamic-container"></div>
+        
+        <hr class="divider"><div class="card-title">Sélection du/des produit(s) <span class="req">*</span></div><div class="produits-grid" id="produits-grid"></div>
+        <hr class="divider"><div class="card-title">Commentaires</div><textarea id="f-commentaire" class="ftextarea"></textarea>
+        <div class="btn-row" style="justify-content:space-between;width:100%;">
+          <button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button>
+          <button class="btn btn-primary" onclick="goStep2()">Continuer vers le diagnostic →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fstep" id="step2">
+      <div id="diagnostic-container"></div>
+      <div class="btn-row" style="justify-content:space-between;width:100%;">
+        <div><button class="btn btn-outline" onclick="goStep(1)">← Retour</button><button class="btn btn-yellow" onclick="sauvegarderBrouillon()">💾 Enregistrer en pré-demande</button></div>
+        <button class="btn btn-primary" onclick="goStep(3)">Continuer vers les PJ →</button>
+      </div>
+    </div>
+
+    <div class="fstep" id="step3">
+      <div class="card">
+        <div class="card-title">Pièces jointes complémentaires (15 Mo maximum cumulé)</div>
+        <div class="dropzone" id="dropzone"><input type="file" id="file-input" multiple style="display:none;"><div class="dz-title">Glissez vos fichiers ici</div></div>
+        <div class="file-list" id="file-list"></div>
+        <div class="btn-row" style="justify-content:space-between;width:100%;">
+          <button class="btn btn-outline" onclick="goStep(2)">← Retour</button>
+          <div style="color:var(--red); font-size:11px; font-weight:bold;">
+            ⚠️ Les pièces jointes ne sont pas sauvegardées en pré-demande / brouillon.
+          </div>
+          <button class="btn btn-primary" onclick="goStep(4)">Vérifier et envoyer →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fstep" id="step4">
+      <div class="card">
+        <div class="card-title">Récapitulatif avant envoi</div><div id="recap-content"></div>
+        <hr class="divider">
+        <div class="info-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          La demande sera déposée définitivement au BE. Objet : <strong id="recap-obj"></strong>
+        </div>
+        <div class="btn-row" style="justify-content:space-between;width:100%;">
+          <button class="btn btn-outline" onclick="goStep(3)">← Retour</button>
+          <button class="btn btn-primary" id="btn-send" onclick="envoyerDemande()">🚀 Déposer définitivement au BE</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="section-suivi">
+    <div class="s-label">Tableau de bord</div><h2 class="s-title">Suivi des demandes</h2>
+    <div class="table-hd" style="flex-wrap: wrap;">
+      <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; flex:1;" id="filter-btn-container">
+        <button class="btn btn-sm btn-outline btn-filter active-filter" data-filter="tous">Toutes</button>
+        <button class="btn btn-sm btn-outline btn-filter" data-filter="Brouillon">Brouillons</button>
+        <button class="btn btn-sm btn-outline btn-filter" data-filter="En attente">En attente</button>
+        <button class="btn btn-sm btn-outline btn-filter" data-filter="Attribuée">Attribuées</button>
+        <button class="btn btn-sm btn-outline btn-filter" data-filter="Manque d'infos">Manque d'infos</button>
+        
+        <input type="text" id="user-search-input" placeholder="🔍 N° EDEAL ou Client..." style="padding:6px 14px; border:1px solid var(--border); border-radius:40px; font-family:'Be Vietnam Pro',sans-serif; font-size:12px; outline:none; min-width: 220px; margin-left: 10px;" oninput="filtrer(state.currentFilter || 'tous')">
+      </div>
+      
+      <div style="display:flex; gap:6px; align-items:center;">
+        <button class="refresh-btn" onclick="toggleSortDate()">📅 Trier par date (<span id="sort-dir">Récent</span>)</button>
+        <button class="refresh-btn" onclick="chargerSuivi()">🔄 Actualiser</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Date</th><th>Produit(s)</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead><tbody id="suivi-body"></tbody></table></div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu4GoY2az2rvQqIkCJpio2qDu29y_CFr89wIZUVUjbetnlZBPeCvBiWanypdG1_yxl/exec';
+var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
+var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous', rebuildDiagnosticRequired: true };
+
+function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
+function setupCommercialField(name) { var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; } }
+
+function verifierEtAfficherTuto() {
+  if (!localStorage.getItem('tuto_portail_vu_v1')) {
+    document.getElementById('tuto-modal').classList.add('show');
+  }
+}
+
+function fermerTuto() {
+  localStorage.setItem('tuto_portail_vu_v1', '1');
+  document.getElementById('tuto-modal').classList.remove('show');
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.tabs .tab').forEach(function(tabBtn) { tabBtn.addEventListener('click', function() { showTab(tabBtn.getAttribute('data-tab')); }); });
+  var btnStart = document.getElementById('btn-doc-start'); if(btnStart) { btnStart.addEventListener('click', function() { showTab('demande'); }); }
+  document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(btnItem) { btnItem.addEventListener('click', function() { document.querySelectorAll('#filter-btn-container .btn-filter').forEach(function(b){ b.classList.remove('active-filter'); }); btnItem.classList.add('active-filter'); filtrer(btnItem.getAttribute('data-filter')); }); });
+  var dz = document.getElementById('dropzone'); if(dz) { dz.addEventListener('dragover', function(e){e.preventDefault();}); dz.addEventListener('drop', function(e){e.preventDefault(); addFiles(e.dataTransfer.files);}); dz.addEventListener('click', function() { document.getElementById('file-input').click(); }); }
+  var fInput = document.getElementById('file-input'); if(fInput) { fInput.addEventListener('change', function() { addFiles(fInput.files); }); }
+  
+  if (sessionStorage.getItem('portail_auth') === '1') { 
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    setupCommercialField(sessionStorage.getItem('user_name')); 
+    chargerConfigFormulaire(); 
+    verifierEtAfficherTuto(); 
+  }
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('finput') || e.target.classList.contains('q-text-input') || e.target.classList.contains('ftextarea')) {
+      if (e.target.value.trim() !== '') {
+        e.target.classList.add('filled');
+      } else {
+        e.target.classList.remove('filled');
+      }
+    }
+  });
+
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('fselect') || e.target.classList.contains('q-text-input')) {
+      if (e.target.value !== '') {
+        e.target.classList.add('filled');
+      } else {
+        e.target.classList.remove('filled');
+      }
+    }
+  });
+});
+
+function handleCredentialResponse(response) { 
+  var payload = jwtDecode(response.credential); 
+  if (payload.email && payload.email.endsWith('@provost.fr')) { 
+    sessionStorage.setItem('portail_auth', '1'); 
+    sessionStorage.setItem('user_name', payload.name); 
+    sessionStorage.setItem('google_token', response.credential); 
+    setupCommercialField(payload.name); 
+    document.getElementById('login-screen').style.display = 'none'; 
+    document.getElementById('app-content').classList.add('visible'); 
+    chargerConfigFormulaire(); 
+    verifierEtAfficherTuto();
+  } else { 
+    document.getElementById('login-err').textContent = "Accès refusé aux emails hors @provost.fr"; 
+    document.getElementById('login-err').style.display = 'block'; 
+  } 
+}
+
+function chargerConfigFormulaire() {
+  var ghUser = localStorage.getItem('gh_user') || 'maximegilloots-pixel';
+  var ghRepo = localStorage.getItem('gh_repo') || 'portail-be-provost';
+  var ghToken = localStorage.getItem('gh_token') || '';
+
+  console.log("Portail : Tentative de synchronisation avec " + ghUser + "/" + ghRepo);
+
+  var apiUrl = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/config.json';
+  var headers = {};
+  if (ghToken) { headers['Authorization'] = 'token ' + ghToken; }
+
+  fetch(apiUrl, { headers: headers, cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) {
+        throw new Error("Erreur API GitHub (Statut " + r.status + ")");
+      }
+      return r.json();
+    })
+    .then(function(info) {
+      var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
+      var cfg = JSON.parse(decodedContent);
+      
+      RawConfig = cfg; 
+      if (cfg && cfg.liste_produits) {
+        PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); 
+      }
+      initFormulaire();
+      console.log("🎉 Portail : Formulaire synchronisé instantanément avec GitHub !");
+    })
+    .catch(function(err) {
+      console.warn("⚠️ Mode dégradé : Échec API GitHub, tentative via le lien public brut...", err);
+      var backupUrl = 'https://raw.githubusercontent.com/' + ghUser + '/' + ghRepo + '/main/config.json?v=' + Date.now();
+      fetch(backupUrl)
+        .then(function(r2){ return r2.json(); })
+        .then(function(cfg) {
+          RawConfig = cfg;
+          if (cfg && cfg.liste_produits) PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; });
+          initFormulaire();
+        })
+        .catch(function() {
+          initFormulaire();
+        });
+    });
+}
+
+var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
+var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
+
+function initFormulaire() {
+  var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
+  PRODUITS.forEach(function(p) {
+    var boxEl = document.createElement('div'); boxEl.className = 'produit-cb'; boxEl.setAttribute('data-id', p.id);
+    boxEl.innerHTML = '<div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>';
+    boxEl.addEventListener('click', function() { toggleProduit(p.id); }); grid.appendChild(boxEl);
+  });
+  buildInfosGeneralesDynamic(); 
+}
+
+function toggleProduit(id) { var c = document.querySelector('.produit-cb[data-id="' + id + '"]'); if(c) c.classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); state.rebuildDiagnosticRequired = true; }
+
+function buildInfosGeneralesDynamic() {
+  var container = document.getElementById('infos-generales-dynamic-container'); if(!container) return; container.innerHTML = '';
+  var questions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+  questions.forEach(function(q) {
+    var qDiv = document.createElement('div'); qDiv.innerHTML = '<hr class="divider">';
+    
+    var titleEl = document.createElement('div');
+    titleEl.className = 'card-title';
+    titleEl.style.width = '100%';
+    titleEl.innerHTML = '<span>' + q.label + '</span>';
+    
+    if (q.placeholder && q.placeholder.trim() !== '') {
+      var textTooltip = document.createElement('div');
+      textTooltip.className = 'q-text-tooltip-container';
+      textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
+      textTooltip.addEventListener('click', function(e) { e.stopPropagation(); });
+      titleEl.appendChild(textTooltip);
+    }
+    qDiv.appendChild(titleEl);
+    
+    if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
+    var fid = 'info_' + q.id;
+    if(q.type==='text' || q.type==='textarea') {
+      var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
+      qDiv.appendChild(inp);
+    } else if(q.type === 'dropdown') {
+      var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
+      sel.innerHTML = '<option value="">Choisir une option...</option>' + (q.options || []).map(function(o){
+        var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
+        return '<option value="' + optText + '">' + optText + '</option>';
+      }).join('');
+      qDiv.appendChild(sel);
+    } else if(q.type === 'scale') {
+      var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
+      var options = q.options || ['1', '2', '3', '4', '5'];
+      options.forEach(function(num) {
+        var item = document.createElement('div'); item.className = 'q-scale-item'; item.setAttribute('data-field', fid); item.setAttribute('data-val', num);
+        item.innerHTML = '<div class="q-scale-circle">' + num + '</div>';
+        item.addEventListener('click', function() {
+          document.querySelectorAll('.q-scale-item[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); });
+          item.classList.add('selected');
+        });
+        scaleWrapper.appendChild(item);
+      });
+      qDiv.appendChild(scaleWrapper);
+    } else {
+      var optsDiv = document.createElement('div'); optsDiv.className='q-options';
+      (q.options||[]).forEach(function(o){
+        var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
+        var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
+        var div=document.createElement('div'); div.className='q-option'; div.setAttribute('data-field', fid); div.setAttribute('data-val', optText); div.setAttribute('data-initial-val', optText);
+        
+        div.innerHTML = '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
+        
+        if (optImg) {
+          var tooltipContainer = document.createElement('div');
+          tooltipContainer.className = 'q-tooltip-container';
+          tooltipContainer.innerHTML = '<span class="q-tooltip-icon">🖼️ Voir le schéma</span><div class="q-tooltip-content"><img src="' + optImg + '" class="q-tooltip-img" alt="Illustration"></div>';
+          tooltipContainer.addEventListener('click', function(e) { e.stopPropagation(); });
+          div.appendChild(tooltipContainer);
+        }
+        optsDiv.appendChild(div);
+        
+        var otherInput = null;
+        if (optText.toLowerCase().indexOf('autre') !== -1) {
+          otherInput = document.createElement('input');
+          otherInput.type = 'text';
+          otherInput.className = 'q-text-input other-input-field';
+          otherInput.setAttribute('data-field', fid);
+          otherInput.placeholder = 'Veuillez préciser...';
+          otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
+          
+          otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
+          otherInput.addEventListener('input', function() {
+            if (otherInput.value.trim() !== '') {
+              div.setAttribute('data-val', optText + ' ' + otherInput.value.trim());
+              otherInput.classList.add('filled');
+            } else {
+              div.setAttribute('data-val', optText);
+              otherInput.classList.remove('filled');
+            }
+          });
+          optsDiv.appendChild(otherInput);
+        }
+        
+        div.addEventListener('click', function() {
+          if(q.type==='radio') { 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){
+              x.classList.remove('selected');
+              x.setAttribute('data-val', x.getAttribute('data-initial-val'));
+            }); 
+            document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){
+              x.style.display = 'none'; x.value = ''; x.classList.remove('filled');
+            });
+          }
+          
+          div.classList.toggle('selected');
+          
+          if (otherInput) {
+            if (div.classList.contains('selected')) {
+              otherInput.style.display = 'block';
+              otherInput.focus();
+            } else {
+              otherInput.style.display = 'none';
+              otherInput.value = '';
+              div.setAttribute('data-val', optText);
+            }
+          }
+        });
+      });
+      qDiv.appendChild(optsDiv);
+    }
+    container.appendChild(qDiv);
+  });
+}
+  
+function goStep(n) { 
+  document.querySelectorAll('.fstep').forEach(function(s){s.classList.remove('active')}); 
+  document.getElementById('step'+n).classList.add('active'); 
+  ['wz1','wz2','wz3','wz4'].forEach(function(id,i){ 
+    var el=document.getElementById(id); 
+    if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); 
+  }); 
+  if(n===4) buildRecap(); 
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goStep2() { if(!document.getElementById('f-edeal').value.trim() || !document.getElementById('f-client').value.trim()){ toast('N° EDEAL et Client obligatoires','err'); return; } if(!state.selectedProduits.length){ toast('Sélectionnez un produit','err'); return; } var container = document.getElementById('diagnostic-container'); if(!container || container.innerHTML === '' || state.rebuildDiagnosticRequired) { buildDiagnostic(); state.rebuildDiagnosticRequired = false; } goStep(2); }
+var QUESTIONS_PROPLUS = [{id:'q_charge_ur', label:'Charge UR (kg/m²)', type:'text', placeholder:'ex : 500'},{id:'q_charge_r', label:'Charge Roulante (kg)', type:'text', placeholder:'ex : 1000'},{id:'q_fleche', label:'Flèche', type:'radio', options:['1/250 (Stockage)','1/300 (Bureau, plus de confort)','Autre :']},{id:'q_description', label:"Description de l'exploitation", type:'text', placeholder:'Ex : Stockage, bureaux...'},{id:'q_priorite', label:"Priorité sur l'implantation poteaux", type:'radio', options:['La moins chère','Avec le moins de poteau','Autre :']},{id:'q_nb_pers', label:'Nombre de personnes sur la plateforme', type:'radio', options:['Moins de 21','21 à 100','101 à 300','301 à 500']},{id:'q_recouvrement', label:'Type de recouvrement', type:'checkbox', multi:true, options:['Agglo P4 BRUT','Agglo P4 Sous Face Blanche','Caillebotis','Plancher tôlé','Autre :']},{id:'q_hauteur', label:'Hauteur (mm) sur plancher (A) ou sous structure (B)', type:'text', placeholder:'Indiquer la hauteur et préciser A ou B'},{id:'q_finition', label:'Finition', type:'radio', options:['RAL 7016 (Standard)','RAL 5019 (Ancien standard)','GALVA A CHAUD','Autre :']},{id:'q_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
+var QUESTIONS_INSTALL_EXT = [{id:'qe_adresse', label:"Adresse exacte de l'implantation", type:'text', placeholder:'Adresse complète du site'},{id:'qe_salin', label:'Environnement salin ?', type:'radio', options:['Oui','Non']},{id:'qe_toiture', label:'Toiture à prévoir ?', type:'radio', options:['Oui','Non']},{id:'qe_sol', type:'checkbox', multi:true, options:['Béton','Bitume','Plots bétons','Autre :']},{id:'qe_commentaires', label:'Commentaires', type:'textarea', placeholder:'Informations complémentaires...'}];
+function getQuestionsListForProduct(pid) { if (RawConfig && RawConfig[pid] && RawConfig[pid].length) return RawConfig[pid]; if (pid === 'proplus_lp3') return QUESTIONS_PROPLUS; if (pid === 'proplus_lp3_2n') return QUESTIONS_LP3_2N || QUESTIONS_PROPLUS; if (pid === 'install_ext') return QUESTIONS_INSTALL_EXT; return []; }
+
+function buildDiagnostic() {
+  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
+  state.selectedProduits.forEach(function(pid) {
+    var prod = PRODUITS.find(function(p){return p.id===pid}); var questions = getQuestionsListForProduct(pid);
+    var block = document.createElement('div'); block.className = 'card'; block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod?prod.label:pid) + '</div>';
+    questions.forEach(function(q) {
+      var qDiv = document.createElement('div'); 
+      qDiv.style.marginBottom = '28px'; 
+      
+      var titleEl = document.createElement('div');
+      titleEl.className = 'q-title';
+      titleEl.style.display = 'flex';
+      titleEl.style.alignItems = 'center';
+      titleEl.style.width = '100%';
+      titleEl.innerHTML = '<span>' + q.label + '</span>';
+      
+      if (q.placeholder && q.placeholder.trim() !== '') {
+        var textTooltip = document.createElement('div');
+        textTooltip.className = 'q-text-tooltip-container';
+        textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
+        textTooltip.addEventListener('click', function(e) { e.stopPropagation(); });
+        titleEl.appendChild(textTooltip);
+      }
+      qDiv.appendChild(titleEl);
+      
+      if(q.image) { qDiv.innerHTML += '<div class="q-img-wrapper"><img src="' + q.image + '" class="q-img-render" alt="Illustration"></div>'; }
+      var fid = pid+'_'+q.id;
+      if(q.type==='text' || q.type==='textarea') {
+        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
+        qDiv.appendChild(inp);
+      } else if(q.type === 'dropdown') {
+        var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
+        sel.innerHTML = '<option value="">Choisir une option...</option>' + (q.options || []).map(function(o){
+          var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
+          return '<option value="' + optText + '">' + optText + '</option>';
+        }).join('');
+        qDiv.appendChild(sel);
+      } else if(q.type === 'scale') {
+        var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
+        var options = q.options || ['1', '2', '3', '4', '5'];
+        options.forEach(function(num) {
+          var item = document.createElement('div'); item.className = 'q-scale-item'; item.setAttribute('data-field', fid); item.setAttribute('data-val', num);
+          item.innerHTML = '<div class="q-scale-circle">' + num + '</div>';
+          item.addEventListener('click', function() {
+            document.querySelectorAll('.q-scale-item[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); });
+            item.classList.add('selected');
+          });
+          scaleWrapper.appendChild(item);
+        });
+        qDiv.appendChild(scaleWrapper);
+      } else {
+        var optsDiv = document.createElement('div'); optsDiv.className = 'q-options';
+        (q.options||[]).forEach(function(o){
+          var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
+          var optImg = (typeof o === 'object' && o !== null) ? (o.image || '') : '';
+          var optDiv = document.createElement('div'); optDiv.className = 'q-option'; optDiv.setAttribute('data-field', fid); optDiv.setAttribute('data-val', optText); optDiv.setAttribute('data-initial-val', optText);
+          
+          optDiv.innerHTML= '<div class="' + ((q.type === 'checkbox') ? 'opt-sq' : 'opt-dot') + '"></div><span>' + optText + '</span>';
+          
+          if (optImg) {
+            var tooltipContainer = document.createElement('div');
+            tooltipContainer.className = 'q-tooltip-container';
+            tooltipContainer.innerHTML = '<span class="q-tooltip-icon">🖼️ Voir le schéma</span><div class="q-tooltip-content"><img src="' + optImg + '" class="q-tooltip-img" alt="Illustration"></div>';
+            tooltipContainer.addEventListener('click', function(e) { e.stopPropagation(); });
+            optDiv.appendChild(tooltipContainer);
+          }
+          optsDiv.appendChild(optDiv);
+          
+          var otherInput = null;
+          if (optText.toLowerCase().indexOf('autre') !== -1) {
+            otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
+            otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
+            otherInput.addEventListener('input', function() {
+              if (otherInput.value.trim() !== '') { optDiv.setAttribute('data-val', optText + ' ' + otherInput.value.trim()); otherInput.classList.add('filled'); } else { optDiv.setAttribute('data-val', optText); optDiv.setAttribute('data-remove'); }
+            });
+            optsDiv.appendChild(otherInput);
+          }
+          
+          optDiv.addEventListener('click', function() {
+            if(q.type==='radio') { 
+              document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(x){ x.classList.remove('selected'); x.setAttribute('data-val', x.getAttribute('data-initial-val')); }); 
+              document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){ x.style.display = 'none'; x.value = ''; x.classList.remove('filled'); });
+            }
+            optDiv.classList.toggle('selected');
+            if (otherInput) { if (optDiv.classList.contains('selected')) { otherInput.style.display = 'block'; otherInput.focus(); } else { otherInput.style.display = 'none'; otherInput.value = ''; optDiv.setAttribute('data-val', optText); } }
+          });
+        });
+        qDiv.appendChild(optsDiv);
+      }
+      block.appendChild(qDiv);
+    });
+    container.appendChild(block);
+  });
+}
+  
+function collectFormData() {
+  var data = { edeal: document.getElementById('f-edeal').value.trim(), commercial: document.getElementById('f-commercial').value.trim(), client: document.getElementById('f-client').value.trim(), ville: document.getElementById('f-ville').value.trim(), dateChantier: document.getElementById('f-date').value.trim(), commentaire: document.getElementById('f-commentaire').value.trim(), selectedProduits: state.selectedProduits, produits: state.selectedProduits.map(function(pid){ var p = PRODUITS.find(function(x){return x.id===pid;}); return p ? p.label : pid; }), infos: {}, diagnostic: {} };
+  var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+  
+  infoQuestions.forEach(function(q) { 
+    var fid = 'info_' + q.id; 
+    if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+      var el = document.getElementById(fid); data.infos[q.label] = el ? el.value.trim() : ""; 
+    } else if (q.type === 'scale') {
+      var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected');
+      data.infos[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
+    } else { 
+      var vals = []; 
+      document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ vals.push(o.getAttribute('data-val') || ""); }); 
+      data.infos[q.label] = vals; 
+    } 
+  });
+  
+  state.selectedProduits.forEach(function(pid) { 
+    var prodData = {}; var questions = getQuestionsListForProduct(pid); 
+    questions.forEach(function(q) { 
+      var fid = pid+'_'+q.id; 
+      if (q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+        var el = document.getElementById(fid); prodData[q.label] = el ? el.value.trim() : ""; 
+      } else if (q.type === 'scale') {
+        var selectedScale = document.querySelector('.q-scale-item[data-field="' + fid + '"].selected');
+        prodData[q.label] = selectedScale ? selectedScale.getAttribute('data-val') : "";
+      } else { 
+        var opVals = []; 
+        document.querySelectorAll('.q-option[data-field="' + fid + '"].selected').forEach(function(o){ opVals.push(o.getAttribute('data-val') || ""); }); 
+        prodData[q.label] = opVals; 
+      } 
+    }); 
+    data.diagnostic[pid] = prodData; 
+  });
+  return data;
+}
+
+function sauvegarderBrouillon() {
+  var edeal = document.getElementById('f-edeal').value.trim(); if(!edeal){ toast("Le N° EDEAL est obligatoire.", "err"); return; } if(state.selectedFiles.length > 0) { alert("⚠️ Les PJ ne sont pas supportées en brouillon."); return; }
+  var fData = collectFormData(); fData.isBrouillon = true; document.getElementById('loading-overlay').style.display = 'flex';
+  var fd = new FormData(); fd.append('action', 'deposerDemande'); fd.append('data', JSON.stringify(fData)); fd.append('token', sessionStorage.getItem('google_token') || '');
+  fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd}).then(function(r){return r.json();}).then(function(res) { document.getElementById('loading-overlay').style.display = 'none'; if(res.success){ toast("✅ Pré-demande enregistrée !", "ok"); resetForm(); showTab('suivi'); } else { toast("Échec", "err"); } }).catch(function(){ document.getElementById('loading-overlay').style.display = 'none'; toast("Erreur réseau","err"); });
+}
+
+function dupliquerDemande(edeal) {
+  toast("⏳ Préparation de la copie...", "ok");
+  
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
+  fd.append('token', sessionStorage.getItem('google_token') || '');
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(!res.success || !res.formData) { toast("⚠️ Demande introuvable", "err"); return; }
+    var fd = res.formData; 
+    
+    fd.edeal = ''; 
+    state.loadedDraft = null; 
+    
+    var warningEl = document.getElementById('be-comment-warning');
+    if (warningEl) warningEl.style.display = 'none';
+
+    var champsDeBase = {
+      'f-edeal': fd.edeal,
+      'f-client': fd.client,
+      'f-ville': fd.ville,
+      'f-date': fd.dateChantier,
+      'f-commentaire': fd.commentaire
+    };
+    
+    Object.keys(champsDeBase).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.value = champsDeBase[id] || '';
+        if (el.value.trim() !== '') el.classList.add('filled');
+        else el.classList.remove('filled');
+      }
+    });
+    
+    document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    document.querySelectorAll('.q-scale-item').forEach(function(el){el.classList.remove('selected')});
+    
+    if(fd.infos) {
+      var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+      infoQuestions.forEach(function(q) { 
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; 
+        if(q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        } 
+      });
+    }
+    
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
+    try {
+      buildDiagnostic(); 
+      state.rebuildDiagnosticRequired = false;
+    } catch(e) { console.error("Erreur buildDiagnostic:", e); }
+    
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'||q.type==='dropdown'){ 
+          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        }
+      });
+    });
+    
+    state.selectedFiles = []; 
+    try { renderFiles(); } catch(e) { console.error(e); }
+    
+    showTab('demande'); 
+    goStep(1); 
+    toast("📋 Demande dupliquée ! Saisissez le nouveau N° EDEAL.", "ok");
+  })
+  .catch(function(err) { 
+    console.error("Erreur critique duplication :", err); 
+    toast("❌ Erreur lors de la duplication", "err"); 
+  });
+}
+
+function reprendreBrouillon(edeal) {
+  toast("⏳ Chargement du dossier...", "ok");
+  
+  var infoSuivi = state.allDemandes.find(function(x) { return x.edeal === edeal; }) || {};
+  
+  var fd = new FormData();
+  fd.append('action', 'getDemande');
+  fd.append('edeal', edeal);
+  fd.append('token', sessionStorage.getItem('google_token') || '');
+  
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(!res.success || !res.formData) { toast("⚠️ Demande introuvable", "err"); return; }
+    var fd = res.formData; state.loadedDraft = fd;
+    
+    var warningEl = document.getElementById('be-comment-warning');
+    var textEl = document.getElementById('be-comment-text');
+    if (infoSuivi.statut === "Manque d'infos" && infoSuivi.commentaireBE && infoSuivi.commentaireBE !== "—") {
+      if (warningEl && textEl) {
+        textEl.textContent = infoSuivi.commentaireBE;
+        warningEl.style.display = 'block';
+      }
+    } else {
+      if (warningEl) warningEl.style.display = 'none';
+    }
+
+    var champsDeBase = {
+      'f-edeal': fd.edeal,
+      'f-client': fd.client,
+      'f-ville': fd.ville,
+      'f-date': fd.dateChantier,
+      'f-commentaire': fd.commentaire
+    };
+    
+    Object.keys(champsDeBase).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.value = champsDeBase[id] || '';
+        if (el.value.trim() !== '') el.classList.add('filled');
+      }
+    });
+    
+    document.querySelectorAll('.q-option').forEach(function(el){el.classList.remove('selected')});
+    document.querySelectorAll('.q-scale-item').forEach(function(el){el.classList.remove('selected')});
+    
+    if(fd.infos) {
+      var infoQuestions = (RawConfig && RawConfig.infos_generales && RawConfig.infos_generales.length) ? RawConfig.infos_generales : DEFAULT_INFOS_GENERALES;
+      infoQuestions.forEach(function(q) { 
+        var fid = 'info_' + q.id; var val = fd.infos[q.label]; if(val === undefined) return; 
+        if(q.type === 'text' || q.type === 'textarea' || q.type === 'dropdown') { 
+          var el = document.getElementById(fid); if(el) { el.value = val; el.classList.add('filled'); } 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        } 
+      });
+    }
+    
+    document.querySelectorAll('.produit-cb').forEach(function(el){el.classList.remove('checked'); });
+    state.selectedProduits = fd.selectedProduits || Object.keys(fd.diagnostic || {}); 
+    state.selectedProduits.forEach(function(pid){ var c=document.querySelector('.produit-cb[data-id="' + pid + '"]'); if(c) { c.classList.add('checked'); } });
+    
+    try {
+      buildDiagnostic(); 
+      state.rebuildDiagnosticRequired = false;
+    } catch(e) { console.error("Erreur buildDiagnostic:", e); }
+    
+    if(fd.diagnostic) state.selectedProduits.forEach(function(pid){
+      var pd = fd.diagnostic[pid] || {}; var questions = getQuestionsListForProduct(pid);
+      questions.forEach(function(q){
+        var fid = pid+'_'+q.id; var val = pd[q.label]; if(val === undefined) return;
+        if(q.type==='text'||q.type==='textarea'||q.type==='dropdown'){ 
+          var el=document.getElementById(fid); if(el){el.value=val; el.classList.add('filled');} 
+        } else if (q.type === 'scale') {
+          var scaleEl = document.querySelector('.q-scale-item[data-field="' + fid + '"][data-val="' + val + '"]');
+          if(scaleEl) scaleEl.classList.add('selected');
+        } else { 
+          (Array.isArray(val)?val:[val]).forEach(function(v){ 
+            document.querySelectorAll('.q-option[data-field="' + fid + '"]').forEach(function(optEl){ 
+              var initVal = optEl.getAttribute('data-initial-val') || optEl.getAttribute('data-val') || '';
+              if(optEl.getAttribute('data-val') === v || (initVal.toLowerCase().indexOf('autre') !== -1 && String(v).indexOf(initVal) === 0)) { 
+                optEl.classList.add('selected'); 
+                
+                if (initVal.toLowerCase().indexOf('autre') !== -1) {
+                  optEl.setAttribute('data-val', v);
+                  var nextField = optEl.nextElementSibling;
+                  if (nextField && nextField.classList.contains('other-input-field')) {
+                    nextField.style.display = 'block'; 
+                    var extraText = String(v).substring(initVal.length).trim();
+                    nextField.value = extraText; 
+                    if(extraText !== '') nextField.classList.add('filled');
+                  }
+                }
+              } 
+            }); 
+          }); 
+        }
+      });
+    });
+    
+    state.selectedFiles = []; 
+    if (res.fichiers && res.fichiers.length) {
+      res.fichiers.forEach(function(f) {
+        if (f.b64 && f.b64.trim() !== "" && f.b64 !== "SUPPRIME_30J") {
+          state.selectedFiles.push({ name: f.nom, size: 0, isFromServer: true, b64: f.b64, type: f.type || 'application/octet-stream' });
+        }
+      });
+    }
+    try { renderFiles(); } catch(e) { console.error(e); }
+    
+    showTab('demande'); 
+    goStep(1); 
+    toast("📋 Dossier chargé.", "ok");
+  })
+  .catch(function(err) { 
+    console.error("Erreur critique reprise :", err); 
+    toast("❌ Erreur lors de la reprise", "err"); 
+  });
+}
+
+function supprimerBrouillon(edeal) {
+  var confirmation = confirm("⚠️ Attention : Voulez-vous vraiment supprimer définitivement la pré-demande " + edeal + " ? Cette action est irréversible.");
+  if (!confirmation) return;
+  toast("⏳ Suppression du brouillon...", "ok");
+  var fd = new FormData();
+  fd.append('action', 'supprimerBrouillon');
+  fd.append('edeal', edeal);
+  fd.append('token', sessionStorage.getItem('google_token') || '');
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
+    if (res && res.success) {
+      toast("🗑️ Brouillon supprimé avec succès.", "ok");
+      chargerSuivi();
+    } else { toast("⚠️ Impossible de supprimer le brouillon.", "err"); }
+  }).catch(function(err) { console.error(err); toast("❌ Erreur réseau lors de la suppression.", "err"); });
+}
+
+function envoyerDemande() {
+  var fData = collectFormData(); 
+  fData.isBrouillon = false;
+  
+  var infoSuivi = state.allDemandes.find(function(x){ return x.edeal === fData.edeal; }) || {};
+  if (infoSuivi.statut === "Manque d'infos") {
+    fData.actualiserDateDepot = true;
+    fData.statutPrecedent = "Manque d'infos";
+  }
+
+  document.getElementById('loading-overlay').style.display = 'flex'; 
+  
+  var localFiles = state.selectedFiles.filter(function(f){ return !f.isFromServer; });
+  var serverFiles = state.selectedFiles.filter(function(f){ return f.isFromServer; });
+
+  genererPDFBase64(fData).then(function(pdfBase64) {
+    var promises = localFiles.map(function(file) { 
+      return new Promise(function(resolve) { 
+        var r = new FileReader(); 
+        r.onload = function(e) { 
+          resolve({nom: file.name, type: file.type||'application/octet-stream', b64: e.target.result.split(',')[1]}); 
+        }; 
+        r.readAsDataURL(file); 
+      }); 
+    });
+    
+    Promise.all(promises).then(function(newFiles) {
+      var fd = new FormData(); 
+      fd.append('action', 'deposerDemande'); 
+      fd.append('data', JSON.stringify(fData)); 
+      fd.append('pdfBase64', pdfBase64); 
+      fd.append('token', sessionStorage.getItem('google_token') || ''); 
+      
+      newFiles.forEach(function(f) { 
+        fd.append('file_' + f.nom + '|' + f.type, f.b64); 
+      });
+      
+      serverFiles.forEach(function(f) {
+        fd.append('file_' + f.name + '|' + f.type, f.b64);
+      });
+      
+      fetch(APPS_SCRIPT_URL, {method: 'POST', body: fd})
+      .then(function(r){ return r.json(); })
+      .then(function(res){ 
+        document.getElementById('loading-overlay').style.display = 'none'; 
+        if(res.success){ 
+          var warningEl = document.getElementById('be-comment-warning');
+          if (warningEl) warningEl.style.display = 'none';
+          
+          toast('Dossier complété et renvoyé au BE ! ✓', 'ok'); 
+          resetForm(); 
+          showTab('suivi'); 
+        } else { 
+          alert("⚠️ Rejet Sheets."); 
+        } 
+      })
+      .catch(function(err){ 
+        document.getElementById('loading-overlay').style.display = 'none'; 
+        alert("Erreur : " + err.message); 
+      });
+    });
+  });
+}
+
+function parseShortDateToTime(s) { if(!s || s === '—') return 0; try { var parts = s.split(' '); var dParts = parts[0].split('/'); if(dParts.length < 3) return 0; var tParts = parts[1] ? parts[1].split(':') : [0,0]; return new Date(parseInt(dParts[2]), parseInt(dParts[1]) - 1, parseInt(dParts[0]), parseInt(tParts[0]), parseInt(tParts[1])).getTime(); } catch(e) { return 0; } }
+function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr; }
+function toggleSortDate() { state.sortAsc = !state.sortAsc; document.getElementById('sort-dir').textContent = state.sortAsc ? 'Ancien' : 'Récent'; filtrer(state.currentFilter || 'tous'); }
+function renderFiles() { var list = document.getElementById('file-list'); if(!list) return; list.innerHTML = ''; state.selectedFiles.forEach(function(f, i) { list.appendChild(document.createElement('div')).className = 'file-item'; list.lastChild.innerHTML = '<span style="flex:1;">' + f.name + '</span><button class="file-rm" onclick="state.selectedFiles.splice(' + i + ',1);renderFiles();">×</button>'; }); }
+function addFiles(files) { var max = 15*1024*1024; var tot = state.selectedFiles.reduce(function(a,f){return a+f.size;},0); for(var i=0; i<files.length; i++){ if(tot+files[i].size>max){ alert("⚠️ Limite dépassée (15 Mo max)."); return; } if(!state.selectedFiles.find(function(x){return x.name===files[i].name})){ state.selectedFiles.push(files[i]); tot+=files[i].size; } } renderFiles(); }
+
+function filtrer(statut) { 
+  state.currentFilter = statut; 
+  var searchInput = document.getElementById('user-search-input');
+  var query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  var list = statut === 'tous' ? state.allDemandes : state.allDemandes.filter(function(d){ return d.statut===statut; }); 
+  
+  if (query !== '') {
+    list = list.filter(function(d) {
+      return (d.edeal && d.edeal.toLowerCase().includes(query)) || 
+             (d.client && d.client.toLowerCase().includes(query));
+    });
+  }
+
+  list.sort(function(a, b) { 
+    return state.sortAsc ? parseShortDateToTime(formatShortDate(a.date)) - parseShortDateToTime(formatShortDate(b.date)) : parseShortDateToTime(formatShortDate(b.date)) - parseShortDateToTime(formatShortDate(a.date)); 
+  }); 
+  
+  renderSuivi(list); 
+}
+
+function showTab(tab) { document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); if (tab === 'suivi') chargerSuivi(); }
+
+function chargerSuivi() {
+  var sbody = document.getElementById('suivi-body'); if(!sbody) return;
+  sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
+  var fd = new FormData(); fd.append('action', 'getSuivi'); fd.append('token', sessionStorage.getItem('google_token') || '');
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
+  .then(function(r){ return r.json(); }).then(function(res) {
+    if(res && res.success) {
+      var raw = res.demandes || []; var current = (sessionStorage.getItem('user_name') || '').toLowerCase().trim(); state.allDemandes = raw.filter(function(d) { return (d.commercial || '').toLowerCase().trim() === current; }); filtrer(state.currentFilter || 'tous');
+    } else { sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ REJET SERVEUR GOOGLE</td></tr>'; }
+  }).catch(function(err) { console.error("Détail de l'erreur réseau de lecture :", err); sbody.innerHTML = '<tr><td colspan="9" style="color:var(--red); text-align:center; font-weight:bold; padding:20px;">⚠️ ERREUR RESEAU DE LECTURE</td></tr>'; });
+}
+
+function renderSuivi(demandes) {
+  var body = document.getElementById('suivi-body'); 
+  if (!body) return; 
+  if (!demandes.length) { 
+    body.innerHTML = '<tr class="empty-td"><td colspan="9">Aucune demande enregistrée.</td></tr>'; 
+    return; 
+  }
+  
+  body.innerHTML = demandes.map(function(d) {
+    var isEditable = (d.statut === 'Brouillon' || d.statut === "Manque d'infos");
+    var btns = '<div style="display:flex; gap:6px; flex-wrap:wrap;">';
+    
+    if (isEditable) {
+      btns += '<button class="btn btn-sm btn-primary" onclick="reprendreBrouillon(\'' + d.edeal + '\')">✏️ Reprendre</button>';
+      btns += '<button class="btn btn-sm btn-outline" style="border-color:var(--red); color:var(--red); padding:5px 10px;" title="Supprimer" onclick="supprimerBrouillon(\'' + d.edeal + '\')">🗑️</button>';
+    }
+    
+    btns += '<button class="btn btn-sm btn-outline" style="border-color:var(--blue); color:var(--blue); padding:5px 10px;" onclick="dupliquerDemande(\'' + d.edeal + '\')" title="Copier cette demande">📄 Dupliquer</button>';
+    btns += '</div>';
+    
+    var bClass = d.statut === 'Brouillon' ? 'b-draft' : (d.statut === 'En attente' ? 'b-wait' : (d.statut === 'Attribuée' ? 'b-attr' : 'b-urg'));
+    
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + formatShortDate(d.date) + '</td><td>' + d.produits + '</td><td><span class="badge ' + bClass + '">' + d.statut + '</span></td><td>' + (d.attribueA||'—') + '</td><td>' + (d.commentaireBE||'—') + '</td><td>' + btns + '</td></tr>';
+  }).join('');
+}
+
+function resetForm() { 
+  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); 
+  document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); 
+  document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
+  
+  var warningEl = document.getElementById('be-comment-warning');
+  if (warningEl) warningEl.style.display = 'none';
+  
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); 
+}
+
+function genererPDFBase64(fData) {
+  return new Promise(function(resolve) {
+    var dateStr = new Date().toLocaleDateString('fr-FR'); var produits = (fData.produits||[]).join(', '); var infos = fData.infos || {}; var diag  = fData.diagnostic || {};
+    
+    function row(label, val) { 
+      var txtValeur = val; if (Array.isArray(val)) { txtValeur = val.length > 0 ? val.join(', ') : ''; }
+      if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') { return ''; }
+      return '<div style="display:flex;padding:4px 8px;border-bottom:1px solid #e4e8f0;font-size:10px"><div style="width:40%;font-weight:600;color:#2d4b8c;flex-shrink:0">' + label + '</div><div style="flex:1;color:#232d46;font-weight:600;background:rgba(42,125,82,0.04);padding:1px 6px;border-radius:3px;white-space:pre-wrap;">' + String(txtValeur) + '</div></div>'; 
+    }
+    
+    function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
+    
+    var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += row(lbl, v); });
+    var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+    
+    Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { rows += row(label, pd[label]); }); if (rows) sections += section(labelProduit, rows); });
+    
+    var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
+    var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
+  });
+}
+
+function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
+
+function buildRecap() {
+  var container = document.getElementById('recap-content');
+  var obj = document.getElementById('recap-obj');
+  if (!container) return;
+  var fData = collectFormData();
+  var html = '';
+
+  function row(label, val) {
+    var txtValeur = val;
+    var isEmpty = false;
+    if (Array.isArray(val)) { txtValeur = val.length > 0 ? val.join(', ') : ''; }
+    if (txtValeur === undefined || txtValeur === null || String(txtValeur).trim() === '') {
+      txtValeur = '— (Non renseigné)';
+      isEmpty = true;
+    }
+    var styleValeur = isEmpty ? 'color: #e67e22; font-style: italic; font-weight: 600;' : 'color: var(--dark);';
+    return '<div style="display:flex;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">' +
+      '<div style="width:40%;font-weight:600;color:var(--blue);flex-shrink:0">' + label + '</div>' +
+      '<div style="flex:1; white-space:pre-wrap; ' + styleValeur + '">' + txtValeur + '</div></div>';
+  }
+
+  html += row('N° EDEAL', fData.edeal);
+  html += row('Client', fData.client);
+  html += row('Commercial', fData.commercial);
+  html += row('Département / Ville', fData.ville);
+  html += row('Date chantier', fData.dateChantier);
+  html += row('Produit(s)', fData.produits ? fData.produits.join(', ') : '');
+  html += row('Commentaire', fData.commentaire);
+
+  Object.keys(fData.infos || {}).forEach(function(label) { html += row(label, fData.infos[label]); });
+
+  Object.keys(fData.diagnostic || {}).forEach(function(pid) {
+    var pd = fData.diagnostic[pid];
+    var prod = PRODUITS.find(function(p) { return p.id === pid; });
+    var labelProduit = prod ? prod.label : pid;
+    html += '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;text-transform:uppercase">' + labelProduit + '</div>';
+    Object.keys(pd).forEach(function(label) { html += row(label, pd[label]); });
+  });
+
+  container.innerHTML = html;
+  if (obj) obj.textContent = (fData.edeal || '?') + ' — ' + (fData.client || '?');
+}
+
+// ==========================================
+// ⬆️ GESTION DU BOUTON "REMONTER EN HAUT"
+// ==========================================
+var btnRemonter = document.getElementById("btnRemonter");
+if(btnRemonter) {
+  function checkScroll() {
+    var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (scrollPos > 300) { btnRemonter.classList.add("show"); } else { btnRemonter.classList.remove("show"); }
+  }
+  window.addEventListener("scroll", checkScroll);
+  document.addEventListener("scroll", checkScroll);
+  btnRemonter.addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); });
+}
+</script>
+
+<button id="btnRemonter" title="Remonter en haut" aria-label="Remonter en haut">
+  <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+</body>
+</html>
