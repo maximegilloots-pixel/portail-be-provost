@@ -802,14 +802,15 @@
   ],
   "infos_generales": [
     {
-      "id": "q_1784296212984",
+      "id": "q_1784296287749",
       "label": "Éléments souhaités",
       "type": "radio",
       "options": [
         "Plan uniquement",
         "Budget uniquement",
         "Dossier allégé (Plan + MR)",
-        "Dossier complet (Plan + MR + Synthèse)"
+        "Dossier complet (Plan + MR + Synthèse)",
+        "Autre :"
       ],
       "placeholder": "Ce choix aura un impact sur le temps de réponse du technicien affecté"
     }
