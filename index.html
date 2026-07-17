@@ -241,6 +241,61 @@ tbody tr:hover{background:var(--blue-lighter)}
     <p class="s-desc">Découvrez le cycle de vie de vos demandes au Bureau d'Études et les outils à votre disposition.</p>
     
     <div class="card">
+      <div class="card-title">🔄 Logigramme du Processus BE</div>
+      <div class="flowchart">
+        <div class="flow-node">
+          <div class="flow-icon">📝</div>
+          <div class="flow-text">
+            <h4>1. Saisie de la demande</h4>
+            <p>Remplissez le formulaire technique en détaillant les rubriques au maximum. Vous pouvez enregistrer en "Pré-demande" à tout moment pour y revenir plus tard sans perdre vos données.</p>
+          </div>
+          <div class="flow-status"><span class="badge b-draft">Brouillon</span></div>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-node">
+          <div class="flow-icon">🚀</div>
+          <div class="flow-text">
+            <h4>2. Envoi au Bureau d'Études</h4>
+            <p>Joignez vos plans et photos (15 Mo max) puis validez. Le dossier arrive au BE pour traitement.</p>
+          </div>
+          <div class="flow-status"><span class="badge b-wait">En attente</span></div>
+        </div>
+        
+        <div class="flow-arrow">↓</div>
+        
+        <div class="flow-node">
+          <div class="flow-icon">⚙️</div>
+          <div class="flow-text">
+            <h4>3. Analyse et attribution</h4>
+            <p>Si des éléments bloquants manquent, la demande passe en "Manque d'infos" avec un commentaire : le dossier vous est renvoyé pour correction. Si le dossier est complet, votre dossier est attribué à un technicien qui prendra contact avec vous.</p>
+          </div>
+          <div class="flow-status">
+            <span class="badge b-attr">Attribuée</span> 
+            <span class="badge b-urg" style="margin-left:4px; background:var(--red-bg); color:var(--red);">Manque d'infos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💡 Fonctionnalités clés à votre disposition</div>
+      <div class="features-grid">
+        <div class="feature-box">
+          <h4>📄 Duplication de dossier</h4>
+          <p>Dans l'onglet "Suivi", cliquez sur <b>Dupliquer</b> pour copier un ancien dossier (sans ses PJ et son numéro EDEAL) et recréer une demande similaire en un clic.</p>
+        </div>
+        <div class="feature-box">
+          <h4>💾 Pré-demande (Sauvegarde)</h4>
+          <p>Interrompu pendant une saisie ? Cliquez sur <b>Enregistrer en pré-demande</b>. Vous retrouverez votre brouillon intact dans l'onglet de suivi.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🔍 Recherche & Filtres</h4>
+          <p>Retrouvez facilement un dossier en tapant le N° EDEAL ou le nom du client dans la barre de recherche intégrée à votre tableau de bord.</p>
+        </div>
+      </div>
+    </div>
 
     <button class="btn btn-primary" id="btn-doc-start" onclick="document.getElementById('tab-demande').click(); window.scrollTo({ top: 0, behavior: 'smooth' });">Créer une nouvelle demande →</button>
   </section>
