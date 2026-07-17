@@ -603,13 +603,64 @@ var DEFAULT_INFOS_GENERALES = [
 ];
 
 function initFormulaire() {
-  var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
-  PRODUITS.forEach(function(p) {
-    var boxEl = document.createElement('div'); boxEl.className = 'produit-cb'; boxEl.setAttribute('data-id', p.id);
-    boxEl.innerHTML = '<div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>';
-    boxEl.addEventListener('click', function() { toggleProduit(p.id); }); grid.appendChild(boxEl);
+  var grid = document.getElementById('produits-grid'); if (!grid) return; grid.innerHTML = '';
+  var cats = (RawConfig && RawConfig.categories) ? RawConfig.categories : [];
+  var listProds = PRODUITS || [];
+  
+  // Tableau de suivi pour éviter les doublons et traquer les orphelins
+  var prodsInCats = [];
+  cats.forEach(function(cat) { (cat.produits || []).forEach(function(pid) { prodsInCats.push(pid); }); });
+  
+  // 1. Génération des Rubriques Parentes Colorées
+  cats.forEach(function(cat) {
+    var box = document.createElement('div');
+    box.style.cssText = 'grid-column: 1 / -1; border: 2.5px solid ' + cat.color + '; border-radius: var(--radius); padding: 20px; margin-bottom: 16px; background: rgba(255,255,255,0.9); box-shadow: var(--shadow);';
+    box.innerHTML = '<div style="font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:0.7px; margin-bottom:14px; color:' + cat.color + '; display:flex; align-items:center; gap:6px;">📦 ' + cat.label + '</div>';
+    
+    var subGrid = document.createElement('div');
+    subGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;';
+    
+    var hasProducts = false;
+    (cat.produits || []).forEach(function(pid) {
+      var p = listProds.find(function(x) { return x.id === pid; });
+      if (p) {
+        hasProducts = true;
+        subGrid.appendChild(createProductCheckboxElement(p));
+      }
+    });
+    
+    if (hasProducts) {
+      box.appendChild(subGrid);
+      grid.appendChild(box);
+    }
   });
+  
+  // 2. Génération des Produits Orphelins (sans catégorie affectée)
+  var orphelins = listProds.filter(function(p) { return prodsInCats.indexOf(p.id) === -1; });
+  if (orphelins.length > 0) {
+    var orphBox = document.createElement('div');
+    orphBox.style.cssText = 'grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;';
+    orphelins.forEach(function(p) {
+      orphBox.appendChild(createProductCheckboxElement(p));
+    });
+    grid.appendChild(orphBox);
+  }
+  
   buildInfosGeneralesDynamic(); 
+}
+
+// 🟢 Fonction Helper unitaire pour injecter les cases à cocher dynamiquement
+function createProductCheckboxElement(p) {
+  var boxEl = document.createElement('div'); boxEl.className = 'produit-cb'; boxEl.setAttribute('data-id', p.id);
+  if (state.selectedProduits.indexOf(p.id) !== -1) boxEl.classList.add('checked');
+  boxEl.innerHTML = '<div class="cb-box"><span class="cb-check">✓</span></div><span>' + p.label + '</span>';
+  boxEl.addEventListener('click', function() { 
+    boxEl.classList.toggle('checked'); 
+    state.selectedProduits = []; 
+    document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); 
+    state.rebuildDiagnosticRequired = true; 
+  });
+  return boxEl;
 }
 
 function toggleProduit(id) { var c = document.querySelector('.produit-cb[data-id="' + id + '"]'); if(c) c.classList.toggle('checked'); state.selectedProduits=[]; document.querySelectorAll('.produit-cb.checked').forEach(function(e){ state.selectedProduits.push(e.getAttribute('data-id')); }); state.rebuildDiagnosticRequired = true; }
