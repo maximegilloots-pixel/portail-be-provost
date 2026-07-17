@@ -2271,22 +2271,21 @@
       ]
     },
     {
-      "id": "q_1784270644501",
+      "id": "q_1784270688307",
       "label": "Socle sous fixes",
       "type": "radio",
       "options": [
         "Non (Solution économique)",
-        "Oui",
-        "Autre :"
+        "Oui"
       ]
     },
     {
-      "id": "q_pro_rails_planchers_fixes",
+      "id": "q_1784270703833",
       "label": "Rails et planchers sous meubles fixes",
       "type": "radio",
       "options": [
-        "Oui",
-        "Non"
+        "Non (Solution économique)",
+        "Oui"
       ]
     },
     {
