@@ -403,7 +403,7 @@ tbody tr:hover{background:var(--blue-lighter)}
 <script>
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznHCvc3fOeGDMtOvu93hjEtSDpcLT6-1jDtmr-EezFdzcdNpN_UpfrgbwGDZQryLHN/exec';
 var CONFIG_URL = 'https://raw.githubusercontent.com/maximegilloots-pixel/portail-be-provost/main/config.json';
-var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous', rebuildDiagnosticRequired: true };
+var QUESTIONS_LP3_2N = null, RawConfig = null, state = { selectedFiles: [], selectedProduits: [], formData: {}, allDemandes: [], loadedDraft: null, sortAsc: false, currentFilter: 'tous', rebuildDiagnosticRequired: true, isDirty: false };
 
 function jwtDecode(token) { try { var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) { base64 += '='; } var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); return JSON.parse(jsonPayload); } catch (e) { return {}; } }
 function setupCommercialField(name) { var comm = document.getElementById('f-commercial'); if (comm) { comm.value = name; comm.classList.add('filled'); comm.readOnly = true; } }
@@ -455,6 +455,28 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// 🚨 SÉCURITÉ ANTI-FERMETURE : Détection des modifications dans le formulaire
+document.addEventListener('input', function(e) {
+  if (e.target.closest('#section-demande')) state.isDirty = true;
+});
+document.addEventListener('change', function(e) {
+  if (e.target.closest('#section-demande')) state.isDirty = true;
+});
+document.addEventListener('click', function(e) {
+  // Si le commercial clique sur un produit, une option, une échelle de note ou dépose un fichier
+  if (e.target.closest('.produit-cb') || e.target.closest('.q-option') || e.target.closest('.q-scale-item') || e.target.closest('.dropzone')) {
+    state.isDirty = true;
+  }
+});
+
+// Interception de la fermeture de l'onglet ou du rechargement de la page
+window.addEventListener('beforeunload', function(e) {
+  if (state.isDirty) {
+    e.preventDefault();
+    e.returnValue = ''; // Déclenche le pop-up de sécurité standard et propre du navigateur
+  }
+});
+  
 function handleCredentialResponse(response) { 
   var payload = jwtDecode(response.credential); 
   if (payload.email && payload.email.endsWith('@provost.fr')) { 
@@ -1253,6 +1275,9 @@ function genererPDFBase64(fData) {
     var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
     var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
+  state.isDirty = false; 
+  
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); 
 }
 
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
