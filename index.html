@@ -544,7 +544,15 @@ function chargerConfigFormulaire() {
 }
 
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
-var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type(-- Hauteur (mm) sur plancher (A) ou sous structure (B) ': 'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
+  
+var DEFAULT_INFOS_GENERALES = [
+  {id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},
+  {id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},
+  {id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},
+  {id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},
+  {id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},
+  {id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}
+];
 
 function initFormulaire() {
   var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
