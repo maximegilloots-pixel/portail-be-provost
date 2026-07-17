@@ -9,12 +9,57 @@
 <style>
 /* 💡 DESIGN DE LA PASTILLE D'AIDE (?) EN ROUGE ET SA BULLE FLASH */
 /* ✏️ Remplace cette classe pour coller la bulle à gauche */
+/* 🔴 CORRECTIF TOTAL : Pastille d'aide à gauche et bulle flottante masquée par défaut */
 .q-text-tooltip-container { 
   position: relative; 
-  margin-right: 8px; /* Crée le petit espace parfait avec le texte à sa droite */
+  margin-right: 8px; 
   display: inline-flex; 
   align-items: center; 
-  z-index: 15; 
+  z-index: 99; 
+}
+.q-text-tooltip-icon { 
+  width: 20px; 
+  height: 20px; 
+  background: var(--red-bg); 
+  color: var(--red); 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 11px; 
+  font-weight: 900; 
+  cursor: help; 
+  transition: var(--tr); 
+  border: 1px solid rgba(192,57,43,0.15); 
+}
+.q-text-tooltip-container:hover .q-text-tooltip-icon { 
+  background: var(--red); 
+  color: var(--white); 
+  box-shadow: 0 2px 8px rgba(192,57,43,0.25); 
+}
+.q-text-tooltip-content { 
+  position: absolute; 
+  bottom: 130%; 
+  left: 0; /* 🟢 Aligné à gauche puisque l'icône est à gauche désormais */
+  background: var(--white) !important; 
+  color: var(--dark) !important; 
+  border: 1px solid var(--border); 
+  border-radius: var(--radius-sm); 
+  padding: 12px 16px; 
+  box-shadow: var(--shadow-lg); 
+  display: none; 
+  width: 280px; 
+  font-size: 12px; 
+  font-weight: 500; 
+  font-style: normal; 
+  text-transform: none !important; /* 🟢 Force le texte à rester minuscule même dans un titre majuscule */
+  letter-spacing: normal; 
+  line-height: 1.4; 
+  white-space: pre-wrap; 
+  z-index: 99999; 
+}
+.q-text-tooltip-container:hover .q-text-tooltip-content { 
+  display: block !important; 
 }
 
 /* 🚀 BOOST DE L'ESPACEMENT */
