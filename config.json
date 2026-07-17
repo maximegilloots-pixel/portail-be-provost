@@ -2299,13 +2299,14 @@
       "type": "text"
     },
     {
-      "id": "q_pro_calage_sol_mauvais",
+      "id": "q_1784270544966",
       "label": "Calage supplémentaire en cas de sol mauvais",
       "type": "radio",
       "options": [
-        "Oui",
-        "Non"
-      ]
+        "Non",
+        "Oui"
+      ],
+      "placeholder": "Par défaut, calage moyen prévu : 14 mm"
     },
     {
       "id": "q_pro_finition_chariots",
