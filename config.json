@@ -4333,5 +4333,17 @@
       "id": "prod_protub",
       "label": "PROTUB"
     }
+  ],
+  "categories": [
+    {
+      "id": "cat_1784297045680",
+      "label": "Plateforme",
+      "color": "#b33206",
+      "produits": [
+        "proplus_lp3",
+        "proplus_lp3_2n",
+        "proplus_lp3_erp"
+      ]
+    }
   ]
 }
