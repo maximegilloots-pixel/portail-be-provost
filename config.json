@@ -4239,15 +4239,15 @@
   "liste_produits": [
     {
       "id": "install_ext",
-      "label": "Installation extérieure"
+      "label": "INSTALLATION EXTERIEURE"
     },
     {
       "id": "proplus_lp3",
-      "label": "Proplus LP3"
+      "label": "PROPLUS LP3"
     },
     {
       "id": "proplus_lp3_2n",
-      "label": "Proplus LP3 - 2 Niveaux"
+      "label": "PROPLUS LP3 - 2 NIVEAUX"
     },
     {
       "id": "prod_1779436061922",
