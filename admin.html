@@ -125,6 +125,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
       <button class="btn btn-outline" onclick="exporter()">⬇️ Backup JSON</button>
     </div>
   </div>
+
+  <!-- 📁 NOUVELLE INTERFACE : Gestion des Rubriques Parentes -->
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-title">📁 Rubriques & Familles de produits (Cases colorées User)</div>
+    <p style="font-size: 11px; color: var(--text-light); margin-bottom: 12px;">Créez des blocs thématiques colorés pour regrouper vos produits sur le portail commercial.</p>
+    <div id="categories-admin-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;"></div>
+    <button class="btn btn-outline btn-sm" style="border-color: var(--blue); color: var(--blue);" onclick="ouvrirModalRubrique()">+ Créer une famille / rubrique</button>
+  </div>
 </section>
 
 <section class="section" id="section-suivi">
@@ -185,28 +193,20 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 </section>
 </div>
 
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <div class="modal-title" id="modal-title">Éditer question</div>
-    <div class="frow"><label class="flabel">Libellé</label><input class="finput" id="m-label"></div>
+<!-- 🎨 POP-UP : Configuration d'une rubrique colorée -->
+<div class="modal-bg" id="rubrique-modal-bg">
+  <div class="modal" style="width: 420px;">
+    <div class="modal-title" id="rub-modal-title">Configurer la rubrique</div>
+    <div class="frow"><label class="flabel">Nom de la famille</label><input class="finput" id="rub-label" placeholder="Ex : Plateformes"></div>
+    <div class="frow"><label class="flabel">Couleur de la case (User)</label><input type="color" class="finput" id="rub-color" value="#2d4b8c" style="height: 40px; padding: 2px; cursor: pointer;"></div>
     <div class="frow">
-      <label class="flabel">Type de réponse (Format Google Forms)</label>
-      <select class="fselect" id="m-type" onchange="toggleOptsSection()">
-        <option value="text">Texte</option>
-        <option value="textarea">Zone texte</option>
-        <option value="dropdown">Menu déroulant 🆕</option>
-        <option value="scale">Échelle linéaire (1-5) 🆕</option>
-        <option value="radio">Choix unique</option>
-        <option value="checkbox">Choix multiple</option>
-      </select>
+      <label class="flabel">Sélectionner les produits à inclure</label>
+      <div id="rub-products-checkboxes" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; border: 1.5px solid var(--border); padding: 10px; border-radius: 7px; background: var(--bg);"></div>
     </div>
-    <div id="m-opts-section"><label class="flabel">Options</label><div class="opts-list" id="m-opts-list"></div><button class="add-opt" onclick="addOpt()">+ Option</button></div>
-    <div class="frow"><label class="flabel">Illustration Image (Optionnelle)</label><input type="file" id="m-image-file" accept="image/*" class="finput" onchange="handleImageUpload(this)"><div id="m-image-preview" style="margin-top:5px;font-size:11px;"></div></div>
-    <div class="frow">
-      <label class="flabel">Aide / Placeholder</label>
-      <textarea class="ftextarea" id="m-hint" placeholder="Consignes d'aide pour le commercial (sauts de lignes et tirets autorisés)..." style="min-height: 80px; resize: vertical;"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="sauverRubrique()">Enregistrer la rubrique</button>
+      <button class="btn btn-outline" onclick="document.getElementById('rubrique-modal-bg').classList.remove('open')">Annuler</button>
     </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="saveModal()">Enregistrer</button><button class="btn btn-outline" onclick="closeModal()">Annuler</button></div>
   </div>
 </div>
 
@@ -311,7 +311,7 @@ function renderProduitTabs() {
   btnGen.textContent = 'Infos Générales (Étape 1)';
   btnGen.onclick = function() { currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions(); }; container.appendChild(btnGen);
   
-  (formData.liste_produits || []).forEach(function(p) {
+  (formData.liste_produits || []).forEach(function(p, idx) {
     var isActive = (currentProduit === p.id);
     var wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:inline-flex; align-items:center; gap:6px; margin-right:4px; margin-bottom:4px; padding:2px 4px 2px 12px; border:1.5px solid var(--border); border-radius:40px; transition:var(--tr);';
@@ -322,6 +322,16 @@ function renderProduitTabs() {
     txtSpan.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; wrapper.appendChild(txtSpan);
     
     if (isActive) {
+      // 🔼 Flèche Monter l'ordre de la section
+      var btnUp = document.createElement('button'); btnUp.textContent = '▲'; btnUp.title = 'Déplacer à gauche';
+      btnUp.style.cssText = 'background:transparent; border:none; color:#fff; cursor:pointer; font-size:9px; padding:0 2px;';
+      btnUp.onclick = function() { deplacerSection(p.id, -1); }; wrapper.appendChild(btnUp);
+
+      // 🔽 Flèche Descendre l'ordre de la section
+      var btnDown = document.createElement('button'); btnDown.textContent = '▼'; btnDown.title = 'Déplacer à droite';
+      btnDown.style.cssText = 'background:transparent; border:none; color:#fff; cursor:pointer; font-size:9px; padding:0 2px;';
+      btnDown.onclick = function() { deplacerSection(p.id, 1); }; wrapper.appendChild(btnDown);
+      
       var btnClone = document.createElement('button'); btnClone.textContent = '👯'; btnClone.title = 'Dupliquer cette section';
       btnClone.style.cssText = 'background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:50%; width:18px; height:18px; font-size:9px; cursor:pointer; font-weight:900;';
       btnClone.onclick = function() { dupliquerSection(p.id); }; wrapper.appendChild(btnClone);
@@ -332,6 +342,80 @@ function renderProduitTabs() {
     }
     container.appendChild(wrapper);
   });
+}
+// 📁 ENGINE DE RUBRICAGE ADMIN
+var editingRubriqueId = null;
+
+function renderCategoriesManagement() {
+  var container = document.getElementById('categories-admin-container'); if (!container) return; container.innerHTML = '';
+  if (!formData.categories) formData.categories = [];
+  if (!formData.categories.length) { container.innerHTML = '<p style="font-style:italic; color:var(--text-light); font-size:11px;">Aucune rubrique configurée.</p>'; return; }
+  
+  formData.categories.forEach(function(cat) {
+    var div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); border-left:5px solid ' + cat.color;
+    var linkedNames = (cat.produits || []).map(function(pid) { var p = formData.liste_produits.find(function(x){return x.id===pid;}); return p ? p.label : pid; }).join(', ');
+    
+    div.innerHTML = '<div style="flex:1;"><strong>' + cat.label + '</strong> <span style="font-size:11px; color:var(--text-light); font-weight:500;">(' + (linkedNames || 'Aucun produit rattaché') + ')</span></div>' +
+                    '<div style="display:flex; gap:4px;"><button class="save-row" style="background:var(--blue);" onclick="ouvrirModalRubrique(\'' + cat.id + '\')">✏️</button>' +
+                    '<button class="save-row" style="background:var(--red);" onclick="supprimerRubrique(\'' + cat.id + '\')">🗑️</button></div>';
+    container.appendChild(div);
+  });
+}
+
+function ouvrirModalRubrique(id) {
+  editingRubriqueId = id || null;
+  var cat = formData.categories.find(function(c) { return c.id === id; }) || { label: '', color: '#2d4b8c', produits: [] };
+  
+  document.getElementById('rub-label').value = cat.label;
+  document.getElementById('rub-color').value = cat.color;
+  
+  var cbContainer = document.getElementById('rub-products-checkboxes'); cbContainer.innerHTML = '';
+  (formData.liste_produits || []).forEach(function(p) {
+    var isChecked = cat.produits.indexOf(p.id) !== -1 ? 'checked' : '';
+    cbContainer.innerHTML += '<label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer;"><input type="checkbox" value="' + p.id + '" ' + isChecked + '> ' + p.label + '</label>';
+  });
+  
+  document.getElementById('rubrique-modal-bg').classList.add('open');
+}
+
+function sauverRubrique() {
+  var label = document.getElementById('rub-label').value.trim();
+  var color = document.getElementById('rub-color').value;
+  if (!label) { alert("Nom obligatoire"); return; }
+  
+  var checkedProducts = [];
+  document.querySelectorAll('#rub-products-checkboxes input:checked').forEach(function(cb) { checkedProducts.push(cb.value); });
+  
+  if (editingRubriqueId) {
+    var cat = formData.categories.find(function(c) { return c.id === editingRubriqueId; });
+    if (cat) { cat.label = label; cat.color = color; cat.produits = checkedProducts; }
+  } else {
+    formData.categories.push({ id: 'cat_' + Date.now(), label: label, color: color, produits: checkedProducts });
+  }
+  
+  document.getElementById('rubrique-modal-bg').classList.remove('open');
+  renderCategoriesManagement();
+  toast("Rubrique enregistrée", "ok");
+}
+
+function supprimerRubrique(id) {
+  if (confirm("Supprimer cette rubrique ? (Les produits ne seront pas effacés)")) {
+    formData.categories = formData.categories.filter(function(c) { return c.id !== id; });
+    renderCategoriesManagement();
+  }
+}
+// ↕️ MOTEUR DE TRI : Inverse les positions dans l'index du tableau JSON
+function deplacerSection(id, direction) {
+  var index = formData.liste_produits.findIndex(function(p) { return p.id === id; });
+  if (index === -1) return;
+  var newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= formData.liste_produits.length) return;
+  var temp = formData.liste_produits[index];
+  formData.liste_produits[index] = formData.liste_produits[newIndex];
+  formData.liste_produits[newIndex] = temp;
+  renderProduitTabs();
+  toast("Ordre modifié (sauvegardez pour publier)", "ok");
 }
 
 // 🛡️ LES FONCTIONS MANQUANTES RÉCUPÉRÉES ICI :
