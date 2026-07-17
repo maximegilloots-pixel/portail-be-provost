@@ -4342,7 +4342,9 @@
       "produits": [
         "proplus_lp3",
         "proplus_lp3_2n",
-        "proplus_lp3_erp"
+        "proplus_lp3_erp",
+        "prod_niveau_uni",
+        "prod_allee_circulation"
       ]
     },
     {
@@ -4350,11 +4352,51 @@
       "label": "Densifié",
       "color": "#7118a0",
       "produits": [
-        "prod_1779436061922",
-        "prod_cantipro3",
         "prod_dynamique_lourd_pl3",
         "prod_accumulation_pl3",
         "prod_shuttle_pl3"
+      ]
+    },
+    {
+      "id": "cat_1784297268736",
+      "label": "Rayonnage",
+      "color": "#15ac0d",
+      "produits": [
+        "prod_1779436061922",
+        "prod_prorack_plus",
+        "prod_prospace_plus",
+        "prod_proclass_362",
+        "prod_icare",
+        "prod_probar_manuel",
+        "prod_protub"
+      ]
+    },
+    {
+      "id": "cat_1784297309751",
+      "label": "Mobile",
+      "color": "#ff80ff",
+      "produits": [
+        "prod_proroll"
+      ]
+    },
+    {
+      "id": "cat_1784297341190",
+      "label": "Cloisons",
+      "color": "#ffff80",
+      "produits": [
+        "prod_cloisons_m85",
+        "prod_cloisons_modul_plus"
+      ]
+    },
+    {
+      "id": "cat_1784297383950",
+      "label": "Stockage spéçifique",
+      "color": "#2d4b8c",
+      "produits": [
+        "prod_rack_touret",
+        "prod_dyn_leger_cadres",
+        "prod_nautirack",
+        "prod_proart_propal3"
       ]
     }
   ]
