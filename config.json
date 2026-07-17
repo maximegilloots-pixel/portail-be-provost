@@ -802,14 +802,14 @@
   ],
   "infos_generales": [
     {
-      "id": "q_1780488389919",
+      "id": "q_1784296212984",
       "label": "Éléments souhaités",
       "type": "radio",
       "options": [
-        "Dossier complet (Plan + MR + Synthèse)",
+        "Plan uniquement",
+        "Budget uniquement",
         "Dossier allégé (Plan + MR)",
-        "Plan uniquement (complément d'un devis OAD Web)",
-        "Budget uniquement"
+        "Dossier complet (Plan + MR + Synthèse)"
       ],
       "placeholder": "Ce choix aura un impact sur le temps de réponse du technicien affecté"
     }
