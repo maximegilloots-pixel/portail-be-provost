@@ -346,22 +346,46 @@ function renderProduitTabs() {
 // 📁 ENGINE DE RUBRICAGE ADMIN
 var editingRubriqueId = null;
 
+// 📁 ENGINE DE RUBRICAGE ADMIN (Version avec Tri Intégré)
+var editingRubriqueId = null;
+
 function renderCategoriesManagement() {
   var container = document.getElementById('categories-admin-container'); if (!container) return; container.innerHTML = '';
   if (!formData.categories) formData.categories = [];
   if (!formData.categories.length) { container.innerHTML = '<p style="font-style:italic; color:var(--text-light); font-size:11px;">Aucune rubrique configurée.</p>'; return; }
   
-  formData.categories.forEach(function(cat) {
+  formData.categories.forEach(function(cat, idx) {
     var div = document.createElement('div');
     div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); border-left:5px solid ' + cat.color;
     var linkedNames = (cat.produits || []).map(function(pid) { var p = formData.liste_produits.find(function(x){return x.id===pid;}); return p ? p.label : pid; }).join(', ');
     
+    // 🟢 AJOUT : Injection des boutons de tri ▲ et ▼ directement dans la ligne
     div.innerHTML = '<div style="flex:1;"><strong>' + cat.label + '</strong> <span style="font-size:11px; color:var(--text-light); font-weight:500;">(' + (linkedNames || 'Aucun produit rattaché') + ')</span></div>' +
-                    '<div style="display:flex; gap:4px;"><button class="save-row" style="background:var(--blue);" onclick="ouvrirModalRubrique(\'' + cat.id + '\')">✏️</button>' +
-                    '<button class="save-row" style="background:var(--red);" onclick="supprimerRubrique(\'' + cat.id + '\')">🗑️</button></div>';
+                    '<div style="display:flex; gap:4px;">' +
+                    '<button class="save-row" style="background:var(--blue); padding:5px 9px; font-weight:900;" title="Monter" onclick="deplacerCategorie(\'' + cat.id + '\', -1)">▲</button>' +
+                    '<button class="save-row" style="background:var(--blue); padding:5px 9px; font-weight:900;" title="Descendre" onclick="deplacerCategorie(\'' + cat.id + '\', 1)">▼</button>' +
+                    '<button class="save-row" style="background:var(--blue);" title="Modifier" onclick="ouvrirModalRubrique(\'' + cat.id + '\')">✏️</button>' +
+                    '<button class="save-row" style="background:var(--red);" title="Supprimer" onclick="supprimerRubrique(\'' + cat.id + '\')">🗑️</button></div>';
     container.appendChild(div);
   });
 }
+
+// ↕️ MOTEUR DE TRI DES RUBRIQUES : Inverse les positions des familles dans la BDD JSON
+function deplacerCategorie(id, direction) {
+  var index = formData.categories.findIndex(function(c) { return c.id === id; });
+  if (index === -1) return;
+  var newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= formData.categories.length) return;
+  
+  var temp = formData.categories[index];
+  formData.categories[index] = formData.categories[newIndex];
+  formData.categories[newIndex] = temp;
+  
+  renderCategoriesManagement();
+  toast("Ordre des rubriques modifié (sauvegardez pour publier)", "ok");
+}
+
+function ouvrirModalRubrique(id) {
 
 function ouvrirModalRubrique(id) {
   editingRubriqueId = id || null;
