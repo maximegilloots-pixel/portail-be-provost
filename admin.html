@@ -21,7 +21,7 @@
 .stat-total { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
   
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
+:root{--blue:#2d4b8c;--blue-dark:#1a2f5e;--blue-light:rgba(45,75,140,0.08);--blue-lighter:rgba(45,75,140,0.04);--yellow:#fab423;--dark:#232d46;--text:#3a4255;--text-light:#8a93a8;--border:#e4e8f0;--white:#fff;--bg:#f5f7fb;--green:#2a7d52;--green-bg:rgba(42,125,82,0.09);--red:#c0392b;--red-bg:rgba(192,57,43,0.09);--radius:10px;--shadow:0 2px 12px rgba(35,45,70,0.08);--tr:all 0.2s ease}
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;padding:20px}
 .admin-header{background:var(--blue);color:#fff;padding:18px 24px;border-radius:var(--radius);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
 .admin-header h1{font-size:18px;font-weight:900;letter-spacing:-0.5px}
@@ -142,6 +142,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
       <div class="card-title">Gestion des demandes</div>
       <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
         <button class="btn btn-outline" onclick="chargerSuivi()">🔄 Actualiser</button>
+        <button class="btn btn-primary" style="background:var(--green); border-color:var(--green);" onclick="sauvegarderTout()">💾 Sauvegarder tout</button>
         <button class="btn btn-outline" style="border-color:var(--red); color:var(--red);" onclick="declencherPurgeManuelle()">🗑️ Purger les PJ > 30 jours</button>
         <select id="tech-filter" class="fselect" style="width:150px; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border);" onchange="appliquerFiltres()">
           <option value="">Tous les techniciens</option>
@@ -166,12 +167,12 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
       <div class="card-title">📊 Charge BE Prévisionnelle</div>
       <p style="font-size: 11px; color: var(--text-light); margin-bottom: 16px; line-height: 1.4;">Calcul en temps réel intégrant le % de temps partiel et additionnant les absences pour obtenir le délai de prise en main.</p>
       
-      <div id="charge-dashboard" style="display: flex; flex-direction: column;">
-        </div>
+      <div id="charge-dashboard" style="display: flex; flex-direction: column;"></div>
     </div>
 
   </div>
 </section>
+
 <section class="section" id="section-parametres">
   <div class="card">
     <div class="card-title">Configuration GitHub</div>
@@ -210,6 +211,27 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
   </div>
 </div>
 
+<!-- ✉️ POP-UP : Édition et Envoi du Mail au Technicien -->
+<div class="modal-bg" id="mail-modal-bg">
+  <div class="modal" style="width: 500px;">
+    <div class="modal-title">✉️ Envoyer le dossier au technicien</div>
+    <input type="hidden" id="mail-edeal-hidden">
+    <input type="hidden" id="mail-index-hidden">
+    <div class="frow">
+      <label class="flabel">Destinataire (Email)</label>
+      <input class="finput" id="mail-to" placeholder="exemple@provost.fr">
+    </div>
+    <div class="frow">
+      <label class="flabel">Message (Modifiable avant envoi)</label>
+      <textarea class="ftextarea" id="mail-body" style="min-height:180px;"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-confirm-mail" onclick="confirmerEnvoiMail()">🚀 Envoyer le mail</button>
+      <button class="btn btn-outline" onclick="document.getElementById('mail-modal-bg').classList.remove('open')">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="detail-modal">
   <div class="modal" style="width:680px; max-height:85vh">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -222,12 +244,10 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
-
-
-
-var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6T-45kODslsoBOIGNZ7Xsxj-Tyew3s1d8a_SdW33R8Sh87TxGs2WEEXzDwHIJsDaf/exec';
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznHCvc3fOeGDMtOvu93hjEtSDpcLT6-1jDtmr-EezFdzcdNpN_UpfrgbwGDZQryLHN/exec';
 var formData = {}, currentProduit = 'infos_generales', editingIndex = -1, allDemandes = [], tempImageUrl = "", lastOpenedDemande = null;
 var DEFAULT_MAIL_TEXT = "Bonjour,\n\nCette demande Bureau d'Études vous a été attribuée...";
+var sentMailsTracker = {}; // Permet de conserver visuellement l'état des mails envoyés durant la session active
 
 function getTechMap() { var raw = localStorage.getItem('tech_list') || ""; var map = {}; raw.split('\n').forEach(function(line) { var parts = line.split(';'); var name = parts[0] ? parts[0].trim() : ""; if (name) { map[name] = parts[1] ? parts[1].trim() : ""; } }); return map; }
 function getTechList() { var map = getTechMap(); var list = Object.keys(map); return list.length > 0 ? list : []; }
@@ -258,7 +278,6 @@ function initChampsProduits() {
     formData.liste_produits = formData.liste_produits.filter(function(p){ return p && p.id !== 'infos_generales'; }); 
   } 
   
-  // 🛡️ CORRECTION : N'injecte les questions par défaut que si la rubrique Infos Générales n'existe PAS du tout
   if (!formData.hasOwnProperty('infos_generales') || !Array.isArray(formData.infos_generales)) { 
     console.warn("Admin : Création de la structure infos_generales");
     formData.infos_generales = JSON.parse(JSON.stringify(DEFAULT_INFOS_GENERALES)); 
@@ -322,17 +341,14 @@ function renderProduitTabs() {
     txtSpan.onclick = function() { currentProduit = p.id; renderProduitTabs(); renderQuestions(); }; wrapper.appendChild(txtSpan);
     
     if (isActive) {
-      // 🔼 Flèche Monter l'ordre de la section
       var btnUp = document.createElement('button'); btnUp.textContent = '▲'; btnUp.title = 'Déplacer à gauche';
       btnUp.style.cssText = 'background:transparent; border:none; color:#fff; cursor:pointer; font-size:9px; padding:0 2px;';
       btnUp.onclick = function() { deplacerSection(p.id, -1); }; wrapper.appendChild(btnUp);
 
-      // 🔽 Flèche Descendre l'ordre de la section
       var btnDown = document.createElement('button'); btnDown.textContent = '▼'; btnDown.title = 'Déplacer à droite';
       btnDown.style.cssText = 'background:transparent; border:none; color:#fff; cursor:pointer; font-size:9px; padding:0 2px;';
       btnDown.onclick = function() { deplacerSection(p.id, 1); }; wrapper.appendChild(btnDown);
       
-      // ✏️ NOUVEAU : Bouton pour Renommer la section
       var btnRen = document.createElement('button'); btnRen.textContent = '✏️'; btnRen.title = 'Renommer cette section';
       btnRen.style.cssText = 'background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:50%; width:18px; height:18px; font-size:8px; cursor:pointer; font-weight:900; display:flex; align-items:center; justify-content:center;';
       btnRen.onclick = function() { renommerSection(p.id); }; wrapper.appendChild(btnRen);
@@ -349,27 +365,17 @@ function renderProduitTabs() {
   });
 }
 
-// ✏️ RENOMMER UNE RUBRIQUE PRODUIT
 function renommerSection(id) {
   if (!formData || !formData.liste_produits) return;
   var prod = formData.liste_produits.find(function(p) { return p.id === id; });
   if (!prod) return;
-  
   var nouveauNom = prompt("Nouveau nom pour cette section :", prod.label);
   if (!nouveauNom || nouveauNom.trim() === "") return;
-  
   prod.label = nouveauNom.trim();
   toast("🎉 Section renommée !", "ok");
-  
   renderProduitTabs();
-  // Met à jour la liste des rubriques parentes en bas si elle existe
   if (typeof renderCategoriesManagement === "function") renderCategoriesManagement(); 
 }
-// 📁 ENGINE DE RUBRICAGE ADMIN
-var editingRubriqueId = null;
-
-// 📁 ENGINE DE RUBRICAGE ADMIN (Version avec Tri Intégré)
-var editingRubriqueId = null;
 
 function renderCategoriesManagement() {
   var container = document.getElementById('categories-admin-container'); if (!container) return; container.innerHTML = '';
@@ -381,7 +387,6 @@ function renderCategoriesManagement() {
     div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--bg); border-left:5px solid ' + cat.color;
     var linkedNames = (cat.produits || []).map(function(pid) { var p = formData.liste_produits.find(function(x){return x.id===pid;}); return p ? p.label : pid; }).join(', ');
     
-    // 🟢 AJOUT : Injection des boutons de tri ▲ et ▼ directement dans la ligne
     div.innerHTML = '<div style="flex:1;"><strong>' + cat.label + '</strong> <span style="font-size:11px; color:var(--text-light); font-weight:500;">(' + (linkedNames || 'Aucun produit rattaché') + ')</span></div>' +
                     '<div style="display:flex; gap:4px;">' +
                     '<button class="save-row" style="background:var(--blue); padding:5px 9px; font-weight:900;" title="Monter" onclick="deplacerCategorie(\'' + cat.id + '\', -1)">▲</button>' +
@@ -392,17 +397,14 @@ function renderCategoriesManagement() {
   });
 }
 
-// ↕️ MOTEUR DE TRI DES RUBRIQUES : Inverse les positions des familles dans la BDD JSON
 function deplacerCategorie(id, direction) {
   var index = formData.categories.findIndex(function(c) { return c.id === id; });
   if (index === -1) return;
   var newIndex = index + direction;
   if (newIndex < 0 || newIndex >= formData.categories.length) return;
-  
   var temp = formData.categories[index];
   formData.categories[index] = formData.categories[newIndex];
   formData.categories[newIndex] = temp;
-  
   renderCategoriesManagement();
   toast("Ordre des rubriques modifié (sauvegardez pour publier)", "ok");
 }
@@ -410,7 +412,6 @@ function deplacerCategorie(id, direction) {
 function ouvrirModalRubrique(id) {
   editingRubriqueId = id || null;
   var cat = formData.categories.find(function(c) { return c.id === id; }) || { label: '', color: '#2d4b8c', produits: [] };
-  
   document.getElementById('rub-label').value = cat.label;
   document.getElementById('rub-color').value = cat.color;
   
@@ -419,7 +420,6 @@ function ouvrirModalRubrique(id) {
     var isChecked = cat.produits.indexOf(p.id) !== -1 ? 'checked' : '';
     cbContainer.innerHTML += '<label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer;"><input type="checkbox" value="' + p.id + '" ' + isChecked + '> ' + p.label + '</label>';
   });
-  
   document.getElementById('rubrique-modal-bg').classList.add('open');
 }
 
@@ -427,7 +427,6 @@ function sauverRubrique() {
   var label = document.getElementById('rub-label').value.trim();
   var color = document.getElementById('rub-color').value;
   if (!label) { alert("Nom obligatoire"); return; }
-  
   var checkedProducts = [];
   document.querySelectorAll('#rub-products-checkboxes input:checked').forEach(function(cb) { checkedProducts.push(cb.value); });
   
@@ -437,7 +436,6 @@ function sauverRubrique() {
   } else {
     formData.categories.push({ id: 'cat_' + Date.now(), label: label, color: color, produits: checkedProducts });
   }
-  
   document.getElementById('rubrique-modal-bg').classList.remove('open');
   renderCategoriesManagement();
   toast("Rubrique enregistrée", "ok");
@@ -449,7 +447,7 @@ function supprimerRubrique(id) {
     renderCategoriesManagement();
   }
 }
-// ↕️ MOTEUR DE TRI : Inverse les positions dans l'index du tableau JSON
+
 function deplacerSection(id, direction) {
   var index = formData.liste_produits.findIndex(function(p) { return p.id === id; });
   if (index === -1) return;
@@ -462,7 +460,6 @@ function deplacerSection(id, direction) {
   toast("Ordre modifié (sauvegardez pour publier)", "ok");
 }
 
-// 🛡️ LES FONCTIONS MANQUANTES RÉCUPÉRÉES ICI :
 function ajouterNouveauProduit() { 
   var nom = prompt("Nom de la section :"); if (!nom) return; var id = "prod_" + Date.now();
   if (!formData.liste_produits) formData.liste_produits = []; formData.liste_produits.push({ id: id, label: nom }); formData[id] = []; 
@@ -479,7 +476,6 @@ function chargerDepuisGitHub() {
     formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[], categories:[]}; 
     initChampsProduits(); renderProduitTabs(); renderQuestions(); renderCategoriesManagement(); return;
   }
-
   var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
   var headers = { 'Accept': 'application/vnd.github.v3+json' }; if (gh.token) { headers['Authorization'] = 'token ' + gh.token; }
 
@@ -489,13 +485,7 @@ function chargerDepuisGitHub() {
       if (!info.content) throw new Error("Fichier vide.");
       var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
       formData = JSON.parse(decodedContent); 
-      
-      initChampsProduits(); 
-      renderProduitTabs(); 
-      renderQuestions();
-      
-      // 🟢 AJOUT TECHNIQUE ICI : On force l'affichage des rubriques dès que le JSON est chargé
-      renderCategoriesManagement(); 
+      initChampsProduits(); renderProduitTabs(); renderQuestions(); renderCategoriesManagement(); 
     })
     .catch(function(err) {
       alert("⚠️ ÉCHEC DE SYNCHRONISATION TECHNIQUE :\n" + err.message);
@@ -503,6 +493,7 @@ function chargerDepuisGitHub() {
       initChampsProduits(); renderProduitTabs(); renderQuestions(); renderCategoriesManagement();
     }); 
 }
+
 function sauvegarder() { 
   var gh = getGHConfig(); 
   if (!gh.token || !gh.user || !gh.repo) { alert("❌ Configuration GitHub manquante."); return; }
@@ -573,7 +564,7 @@ function saveModal() {
 
 function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); }
 function showTab(tab, e) { document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')}); document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')}); document.getElementById('section-'+tab).classList.add('active'); if (e && e.target) { e.target.classList.add('active'); } else { var btn = document.querySelector('.tab[onclick*="' + tab + '"]'); if (btn) btn.classList.add('active'); } if(tab==='suivi') chargerSuivi(); if(tab==='parametres') chargerPermanente(); }
-// On modifie chargerSuivi pour qu'elle déclenche aussi la mise à jour des graphiques
+
 function chargerSuivi() { 
   var token = sessionStorage.getItem('google_token') || ''; 
   fetch(APPS_SCRIPT_URL+'?action=getSuivi&token='+encodeURIComponent(token))
@@ -583,106 +574,45 @@ function chargerSuivi() {
     populateAdminFilters(allDemandes); 
     appliquerFiltres(); 
   }); 
-  
-  // 📊 On actualise aussi la charge BE sur la droite !
   chargerChargeBE();
 }
 
-// ==========================================
-// 📊 MOTEUR DU DASHBOARD DE CHARGE BE
-// ==========================================
 function chargerChargeBE() {
-  var dash = document.getElementById('charge-dashboard');
-  if(!dash) return;
+  var dash = document.getElementById('charge-dashboard'); if(!dash) return;
   dash.innerHTML = '<div style="text-align:center; padding:20px; font-weight:bold; color:var(--text-light);">⏳ Calcul en cours...</div>';
-
-  var fd = new FormData();
-  fd.append('action', 'getCharge');
-  fd.append('token', sessionStorage.getItem('google_token') || '');
+  var fd = new FormData(); fd.append('action', 'getCharge'); fd.append('token', sessionStorage.getItem('google_token') || '');
 
   fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd })
   .then(function(r) { return r.json(); })
   .then(function(res) {
-     if(res.success && res.data) {
-        renderCharge(res.data);
-     } else {
-        dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur : Lecture impossible</div>';
-     }
+     if(res.success && res.data) { renderCharge(res.data); } 
+     else { dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur : Lecture impossible</div>'; }
   })
-  .catch(function(err) {
-     dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur réseau</div>';
-  });
+  .catch(function() { dash.innerHTML = '<div style="color:var(--red); text-align:center; font-weight:bold;">⚠️ Erreur réseau</div>'; });
 }
 
 function renderCharge(data) {
-  var dash = document.getElementById('charge-dashboard');
-  if(!data.length) {
-    dash.innerHTML = '<div style="text-align:center; font-style:italic;">Aucune donnée (onglet Charge A2:C9).</div>';
-    return;
-  }
-
-  // 1. Parsing et Maths
+  var dash = document.getElementById('charge-dashboard'); if(!data.length) { dash.innerHTML = '<div style="text-align:center; font-style:italic;">Aucune donnée (onglet Charge A2:C9).</div>'; return; }
   var parsedData = data.map(function(d) {
-    var rawLoad = parseFloat(d.charge.replace(',', '.')) || 0;
-    var modifs = d.modifs.toLowerCase();
-    
-    // Extraction des absences (ex: "+8")
-    var absMatch = modifs.match(/\+(\d+(?:[\.,]\d+)?)/);
-    var abs = absMatch ? parseFloat(absMatch[1].replace(',', '.')) : 0;
-    
-    // Extraction du temps partiel (ex: "60%")
-    var ptMatch = modifs.match(/(\d+)%/);
-    var pt = ptMatch ? parseFloat(ptMatch[1]) : 100;
-    if (pt === 0) pt = 100; // Sécurité
-
-    // Calculs finaux
-    var realWorkDays = rawLoad / (pt / 100);
-    var totalWait = realWorkDays + abs;
-
-    return {
-       name: d.nom,
-       baseLoad: rawLoad,
-       pt: pt,
-       abs: abs,
-       realWork: realWorkDays,
-       total: totalWait
-    };
+    var rawLoad = parseFloat(d.charge.replace(',', '.')) || 0; var modifs = d.modifs.toLowerCase();
+    var absMatch = modifs.match(/\+(\d+(?:[\.,]\d+)?)/); var abs = absMatch ? parseFloat(absMatch[1].replace(',', '.')) : 0;
+    var ptMatch = modifs.match(/(\d+)%/); var pt = ptMatch ? parseFloat(ptMatch[1]) : 100; if (pt === 0) pt = 100;
+    var realWorkDays = rawLoad / (pt / 100); var totalWait = realWorkDays + abs;
+    return { name: d.nom, baseLoad: rawLoad, pt: pt, abs: abs, realWork: realWorkDays, total: totalWait };
   });
-
-  // 2. Calibrage
-  var maxDays = Math.max.apply(Math, parsedData.map(function(d) { return d.total; }));
-  if(maxDays < 10) maxDays = 10; 
-
-  // 3. Rendu HTML
+  var maxDays = Math.max.apply(Math, parsedData.map(function(d) { return d.total; })); if(maxDays < 10) maxDays = 10; 
   dash.innerHTML = parsedData.map(function(d) {
-     var workPct = (d.realWork / maxDays) * 100;
-     var absPct = (d.abs / maxDays) * 100;
-
-     // Codes couleur de charge
-     var colorClass = 'background: var(--green);';
-     if (d.total > 5) colorClass = 'background: var(--yellow); color: var(--dark);';
-     if (d.total > 10) colorClass = 'background: var(--red);';
-
-     // Badges d'infos
-     var labels = '<span class="stat-badge stat-total">Dispo j+' + d.total.toFixed(1) + '</span>';
-     if (d.abs > 0) labels += '<span class="stat-badge" style="color:var(--red);">✈️ +' + d.abs + 'j</span>';
-     if (d.pt < 100) labels += '<span class="stat-badge" style="color:var(--blue);">⏱️ ' + d.pt + '%</span>';
-
-     return '<div class="charge-row">' +
-              '<div class="charge-header">' +
-                '<div class="charge-name">' + d.name + '</div>' +
-                '<div class="charge-stats">' + labels + '</div>' +
-              '</div>' +
-              '<div class="charge-bar-container">' +
-                '<div class="charge-bar-work" style="width: ' + workPct + '%; ' + colorClass + '" title="Charge de travail calculée : ' + d.realWork.toFixed(1) + 'j">' + d.baseLoad + 'j</div>' +
-                (d.abs > 0 ? '<div class="charge-bar-abs" style="width: ' + absPct + '%;" title="Absence : ' + d.abs + 'j">+' + d.abs + '</div>' : '') +
-              '</div>' +
-            '</div>';
+     var workPct = (d.realWork / maxDays) * 100; var absPct = (d.abs / maxDays) * 100;
+     var colorClass = 'background: var(--green);'; if (d.total > 5) colorClass = 'background: var(--yellow); color: var(--dark);'; if (d.total > 10) colorClass = 'background: var(--red);';
+     var labels = '<span class="stat-badge stat-total">Dispo j+' + d.total.toFixed(1) + '</span>'; if (d.abs > 0) labels += '<span class="stat-badge" style="color:var(--red);">✈️ +' + d.abs + 'j</span>'; if (d.pt < 100) labels += '<span class="stat-badge" style="color:var(--blue);">⏱️ ' + d.pt + '%</span>';
+     return '<div class="charge-row"><div class="charge-header"><div class="charge-name">' + d.name + '</div><div class="charge-stats">' + labels + '</div></div><div class="charge-bar-container"><div class="charge-bar-work" style="width: ' + workPct + '%; ' + colorClass + '" title="Charge de travail calculée : ' + d.realWork.toFixed(1) + 'j">' + d.baseLoad + 'j</div>' + (d.abs > 0 ? '<div class="charge-bar-abs" style="width: ' + absPct + '%;" title="Absence : ' + d.abs + 'j">+' + d.abs + '</div>' : '') + '</div></div>';
   }).join('');
 }
+
 function populateAdminFilters(demandes) {
   var selectTech = document.getElementById('tech-filter'); if(selectTech) { var currentTech = selectTech.value; selectTech.innerHTML = '<option value="">Tous les techniciens</option>'; getTechList().forEach(function(t) { var opt = document.createElement('option'); opt.value = t; opt.textContent = t; if(t === currentTech) opt.selected = true; selectTech.appendChild(opt); }); }
-  var selectStatus = document.getElementById('status-filter'); if(selectStatus) { var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>'; ['En attente', 'Attribuée', "Manque d'infos"].forEach(function(s) { var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt); }); }
+  var selectStatus = document.getElementById('status-filter'); if(selectStatus) { var currentStatus = selectStatus.value; selectStatus.innerHTML = '<option value="">Tous les statuts</option>'; 
+  ['En attente', 'Attribuée', "Manque d'infos", 'Décliné'].forEach(function(s) { var opt = document.createElement('option'); opt.value = s; opt.textContent = s; if(s === currentStatus) opt.selected = true; selectStatus.appendChild(opt); }); }
   var selectComm = document.getElementById('commercial-filter'); if(selectComm) { var currentComm = selectComm.value; selectComm.innerHTML = '<option value="">Tous les commerciaux</option>'; var comms = []; demandes.forEach(function(d) { if(d.commercial && d.commercial.trim() !== '' && comms.indexOf(d.commercial.trim()) === -1) comms.push(d.commercial.trim()); }); comms.sort().forEach(function(c) { var opt = document.createElement('option'); opt.value = c; opt.textContent = c; if(c === currentComm) opt.selected = true; selectComm.appendChild(opt); }); }
 }
 
@@ -692,21 +622,94 @@ function appliquerFiltres() {
   renderSuivi(filtered);
 }
 
+function markDirty(i) {
+  var btn = document.getElementById('btn-save-' + i);
+  if (btn) {
+    btn.style.background = 'var(--yellow)';
+    btn.style.color = 'var(--dark)';
+    btn.textContent = '⚠️ À sauver';
+    btn.classList.add('is-dirty');
+  }
+}
+
 function renderSuivi(demandes) {
   var body=document.getElementById('admin-suivi-body'); var filtrées = demandes.filter(function(d) { return d.statut !== 'Brouillon'; });
   if(!filtrées.length){ body.innerHTML='<tr><td colspan="9" style="text-align:center;padding:20px;">Aucune demande correspondante</td></tr>'; return; } var techs = getTechList();
   body.innerHTML=filtrées.map(function(d,i){
-    var optsStatus = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
+    var optsStatus = ['En attente','Attribuée',"Manque d'infos", 'Décliné'].map(function(s){ return '<option value="' + s + '" ' + (d.statut===s?'selected':'') + '>' + s + '</option>'; }).join('');
     var optsTechs = ['','—'].concat(techs).map(function(t){ return '<option value="' + t + '" ' + (d.attribueA===t?'selected':'') + '>' + (t||'Non attribué') + '</option>'; }).join('');
-    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td><td><select class="st-select" id="st-' + i + '">' + optsStatus + '</select></td><td><select class="st-select" style="width:120px;" id="ass-' + i + '">' + optsTechs + '</select></td><td><input class="assign-input" style="width:140px;" id="com-' + i + '" value="' + d.commentaireBE + '"></td><td><button class="save-row" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> <button class="save-row" style="background:var(--blue);margin-left:4px" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button> <button class="save-row" style="background:var(--yellow);color:var(--dark);margin-left:4px;font-weight:bold;" onclick="envoyerMailDossier(\'' + d.edeal + '\', ' + i + ')">✉️ Mail</button></td></tr>';
+    
+    var isMailSent = sentMailsTracker[d.edeal] ? true : false;
+    var mailBtnStyle = isMailSent ? 'background:var(--green);color:#fff;' : 'background:var(--yellow);color:var(--dark);font-weight:bold;';
+    var mailBtnText = isMailSent ? '✅ Envoyé' : '✉️ Mail';
+
+    return '<tr><td class="td-edeal">' + d.edeal + '</td><td>' + d.client + '</td><td>' + d.commercial + '</td><td>' + d.produits + '</td><td>' + formatShortDate(d.date) + '</td>' +
+    '<td><select class="st-select" id="st-' + i + '" onchange="markDirty(' + i + ')">' + optsStatus + '</select></td>' +
+    '<td><select class="st-select" style="width:120px;" id="ass-' + i + '" onchange="markDirty(' + i + ')">' + optsTechs + '</select></td>' +
+    '<td><input class="assign-input" style="width:140px; padding:4px 8px; border:1.5px solid var(--border); border-radius:6px; font-family:\'Be Vietnam Pro\',sans-serif; font-size:11px;" id="com-' + i + '" value="' + (d.commentaireBE||'') + '" oninput="markDirty(' + i + ')"></td>' +
+    '<td><div style="display:flex; gap:4px;">' +
+    '<button class="save-row" id="btn-save-' + i + '" data-edeal="' + d.edeal + '" onclick="saveLine(' + i + ', \'' + d.edeal + '\')">✓ Sauver</button> ' +
+    '<button class="save-row" style="background:var(--blue);" onclick="ouvrirDemande(\'' + d.edeal + '\')">📂 Voir</button> ' +
+    '<button class="save-row" id="btn-mail-' + i + '" style="' + mailBtnStyle + '" onclick="ouvrirMailModal(\'' + d.edeal + '\', ' + i + ')">' + mailBtnText + '</button>' +
+    '</div></td></tr>';
   }).join('');
 }
 
-function saveLine(i,edeal) { var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('st-'+i).value,attribueA:document.getElementById('ass-'+i).value,commentaireBE:document.getElementById('com-'+i).value})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ toast('✓ Mis à jour','ok'); chargerSuivi(); }); }
+function saveLine(i, edeal) { 
+  var btn = document.getElementById('btn-save-' + i); if(btn) btn.textContent = '⏳...';
+  var newStatut = document.getElementById('st-'+i).value;
+  var newAttrib = document.getElementById('ass-'+i).value;
+  var newCom = document.getElementById('com-'+i).value;
+  var fd = new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal, statut:newStatut, attribueA:newAttrib, commentaireBE:newCom})); fd.append('token', sessionStorage.getItem('google_token')||''); 
+  
+  return fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(){ 
+    if(btn) { btn.style.background = 'var(--green)'; btn.style.color = '#fff'; btn.textContent = '✓ Sauvé'; btn.classList.remove('is-dirty'); }
+    var d = allDemandes.find(function(x) { return x.edeal === edeal; }); if(d) { d.statut = newStatut; d.attribueA = newAttrib; d.commentaireBE = newCom; }
+    toast('✓ Mis à jour','ok'); 
+  }); 
+}
+
+function sauvegarderTout() {
+  var dirtyBtns = document.querySelectorAll('.is-dirty'); if(dirtyBtns.length === 0) { toast("Rien à sauvegarder", "ok"); return; }
+  toast("⏳ Sauvegarde de " + dirtyBtns.length + " ligne(s)...", "ok");
+  var promises = [];
+  dirtyBtns.forEach(function(btn) {
+    var i = btn.id.replace('btn-save-', ''); var edeal = btn.getAttribute('data-edeal');
+    promises.push(saveLine(i, edeal));
+  });
+  Promise.all(promises).then(function() { toast("✅ Toutes les lignes ont été sauvegardées !", "ok"); chargerChargeBE(); }).catch(function(){ toast("❌ Erreur de sauvegarde", "err"); });
+}
+
 function declencherPurgeManuelle() { if(!confirm("⚠️ ATTENTION PURGE TECHNIQUE\n\nVoulez-vous forcer la suppression immédiate de l'ensemble des fichiers joints de plus de 30 jours stockés sur Google Sheets ?")) return; var fd = new FormData(); fd.append('action', 'lancerPurgeManuelle'); fd.append('token', sessionStorage.getItem('google_token')||''); toast("⏳ Exécution de la purge...", "ok"); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if (res.success) { alert("✨ BILAN DE LA PURGE :\n\n" + res.message); chargerSuivi(); } else { toast("Erreur", "err"); } }).catch(function(err){ alert("Erreur : " + err.message); }); }
+
 function ouvrirDemande(edeal) { document.getElementById('detail-edeal').textContent=edeal; document.getElementById('detail-body').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-light)">Chargement...</div>'; document.getElementById('detail-modal').classList.add('open'); var token = sessionStorage.getItem('google_token')||''; fetch(APPS_SCRIPT_URL+'?action=getDemande&edeal='+encodeURIComponent(edeal)+'&token='+encodeURIComponent(token)).then(function(r){return r.json();}).then(function(res){ if(!res.success){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur</p>';return;} lastOpenedDemande = res; renderDetail(res); }).catch(function(){document.getElementById('detail-body').innerHTML='<p style="color:var(--red)">Erreur réseau</p>';}); }
 
-function envoyerMailDossier(edeal, index) { var techSelect = document.getElementById('ass-' + index); var currentTech = techSelect ? techSelect.value.trim() : ''; var defaultEmail = ''; if (currentTech && currentTech !== '—' && currentTech !== '') { var map = getTechMap(); defaultEmail = map[currentTech] || ''; } var email = prompt("✉️ Entrez l'adresse email du technicien :", defaultEmail); if (!email) return; email = email.trim(); if (email.indexOf('@') === -1) { alert("Adresse e-mail invalide."); return; } var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; toast("⏳ Transfert...", "ok"); var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email, body: customBody})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✉️ Envoyé !", "ok"); } else { alert("❌ Erreur"); } }).catch(function(err){ alert("Erreur réseau"); }); }
+function ouvrirMailModal(edeal, index) {
+  var techSelect = document.getElementById('ass-' + index); var currentTech = techSelect ? techSelect.value.trim() : ''; var defaultEmail = ''; 
+  if (currentTech && currentTech !== '—' && currentTech !== '') { var map = getTechMap(); defaultEmail = map[currentTech] || ''; }
+  document.getElementById('mail-edeal-hidden').value = edeal;
+  document.getElementById('mail-index-hidden').value = index;
+  document.getElementById('mail-to').value = defaultEmail;
+  var customBody = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; document.getElementById('mail-body').value = customBody;
+  document.getElementById('mail-modal-bg').classList.add('open');
+}
+
+function confirmerEnvoiMail() {
+  var edeal = document.getElementById('mail-edeal-hidden').value; var index = document.getElementById('mail-index-hidden').value; var email = document.getElementById('mail-to').value.trim(); var body = document.getElementById('mail-body').value;
+  if (!email || email.indexOf('@') === -1) { alert("Adresse e-mail invalide."); return; } 
+  var btnConfirm = document.getElementById('btn-confirm-mail'); btnConfirm.textContent = "⏳ Envoi en cours...";
+  var btnList = document.getElementById('btn-mail-' + index); if(btnList) btnList.textContent = "⏳...";
+  
+  var fd = new FormData(); fd.append('action', 'envoyerMailTech'); fd.append('data', JSON.stringify({edeal: edeal, email: email, body: body})); fd.append('token', sessionStorage.getItem('google_token')||''); 
+  fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ 
+    btnConfirm.textContent = "🚀 Envoyer le mail";
+    if(res && res.success) { 
+      toast("✉️ Envoyé !", "ok"); document.getElementById('mail-modal-bg').classList.remove('open');
+      sentMailsTracker[edeal] = true;
+      if(btnList) { btnList.style.background = 'var(--green)'; btnList.style.color = '#fff'; btnList.textContent = '✅ Envoyé'; }
+    } else { alert("❌ Erreur serveur"); if(btnList) btnList.textContent = "✉️ Mail"; } 
+  }).catch(function(){ btnConfirm.textContent = "🚀 Envoyer le mail"; alert("Erreur réseau"); if(btnList) btnList.textContent = "✉️ Mail"; });
+}
 
 function renderDetail(res) {
   var html=''; var fd=res.formData||{}; var infos=fd.infos||{}; var currentSuivi = allDemandes.find(function(x){ return x.edeal === res.edeal; }) || {};
@@ -720,7 +723,7 @@ function renderDetail(res) {
   if(res.pdfBase64){ var cleanPdfB64 = String(res.pdfBase64).trim(); if (cleanPdfB64 === "SUPPRIME_30J" || cleanPdfB64 === "") { html+='<div style="margin-bottom:8px; color:var(--text-light); font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">❌ <s style="color:var(--text-light); font-weight:600;">' + res.pdfNom + '</s> <span style="color:var(--red); font-weight:700; font-size:11px;">(Supprimé car > 30 jours)</span><button class="save-row" style="background:var(--blue); padding:4px 10px; margin-left:10px;" onclick="actionRegenererPDF(\'' + res.edeal + '\')">🔄 Regénérer le PDF</button></div>'; } else { html+='<div style="margin-bottom:8px"><button class="btn btn-primary btn-sm" onclick="telecharger(\'' + res.pdfBase64 + '\', \'' + res.pdfNom + '\', \'application/pdf\')">⬇️ ' + res.pdfNom + '</button></div>'; } }
   (res.fichiers||[]).forEach(function(f){ var cleanFileB64 = String(f.b64).trim(); if (cleanFileB64 === "SUPPRIME_30J" || cleanFileB64 === "") { html+='<div style="margin-bottom:6px; color:var(--text-light); font-size:12px;">❌ <s>' + f.nom + '</s> <span style="color:var(--text-light); font-size:10px;">(PJ purgée définitivement)</span></div>'; } else { html+='<div style="margin-bottom:6px"><button class="btn btn-outline btn-sm" onclick="telecharger(\'' + f.b64 + '\', \'' + f.nom + '\', \'' + f.type + '\')">📎 ' + f.nom + '</button></div>'; } });
   
-  var optStatut = ['En attente','Attribuée',"Manque d'infos"].map(function(s){ return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>'; }).join('');
+  var optStatut = ['En attente','Attribuée',"Manque d'infos", 'Décliné'].map(function(s){ return '<option value="' + s + '" ' + (currentSuivi.statut === s ? 'selected' : '') + '>' + s + '</option>'; }).join(''); 
   var optTechs = ['','—'].concat(getTechList()).map(function(t){ return '<option value="' + t + '" ' + (currentSuivi.attribueA === t ? 'selected' : '') + '>' + (t||'Non attribué') + '</option>'; }).join('');
   html+='</div><hr style="border:none;border-top:1.5px solid var(--border);margin:16px 0"><div class="card-title">Mise à jour du dossier</div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><label class="flabel">Statut</label><select class="fselect" id="det-statut">' + optStatut + '</select></div><div><label class="flabel">Technicien BE Référent</label><select class="fselect" id="det-attrib">' + optTechs + '</select></div></div>';
@@ -736,19 +739,17 @@ function actionRegenererPDF(edeal) {
   
   var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += Array.isArray(v) ? row(lbl, v.join(', ')) : row(lbl, v); });
   var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
-  
   Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = prodsList.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { var v = pd[label]; rows += Array.isArray(v) ? row(label, v.join(', ')) : row(label, v); }); if (rows) sections += section(labelProduit, rows); });
   
   var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
   var pdfBase64 = btoa(unescape(encodeURIComponent(tagStart + sections + '</body></html>')));
   
   toast("⏳ Régénération...", "ok");
-  var fd = new FormData(); fd.append('action', 'regenererPDF'); fd.append('data', JSON.stringify({edeal: edeal, pdfBase64: pdfBase64})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res){ if(res && res.success) { toast("✅ PDF restauré !", "ok"); document.getElementById('detail-modal').classList.remove('open'); chargerSuivi(); } else { alert("Erreur Google."); } }).catch(function(err){ alert("Erreur : " + err.message); });
+  var fd = new FormData(); fd.append('action', 'regenererPDF'); fd.append('data', JSON.stringify({edeal: edeal, pdfBase64: pdfBase64})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd }).then(function(r){ return r.json(); }).then(function(res) { if(res && res.success) { toast("✅ PDF restauré !", "ok"); document.getElementById('detail-modal').classList.remove('open'); chargerSuivi(); } else { alert("Erreur Google."); } }).catch(function(err){ alert("Erreur : " + err.message); });
 }
 
 function detailSection(title,rows){if(!rows)return'';return'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:#fff;background:var(--blue);padding:4px 10px;border-radius:4px 4px 0 0;text-transform:uppercase;letter-spacing:.5px">'+title+'</div><div style="border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px">'+rows+'</div></div>';}
 function detailRow(label,val){if(!val||val===''||val==='undefined')return'';return'<div style="display:flex;padding:5px 10px;border-bottom:1px solid var(--border);font-size:12px"><div style="width:40%;font-weight:600;color:var(--blue);font-size:11px;flex-shrink:0">'+label+'</div><div style="flex:1;color:var(--dark)">'+val+'</div></div>';}
-function formatShortDate(dateStr) { if (!dateStr || String(dateStr).trim() === "" || String(dateStr).trim() === "—") return '—'; var clean = String(dateStr).trim(); if (clean.indexOf('GMT') !== -1 || clean.indexOf('T') !== -1) { var d = new Date(clean); if (!isNaN(d.getTime())) { return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); } } var parts = dateStr.split(':'); if (parts.length >= 2) { return parts[0] + ':' + parts[1].substring(0,2); } return dateStr; }
 function telecharger(b64,nom,type){ if (!b64 || String(b64).trim() === "SUPPRIME_30J") { alert("⚠️ Fichier non disponible."); return; } try{ if(type==='application/pdf'||nom.toLowerCase().endsWith('.pdf')){ try{var html=decodeURIComponent(escape(atob(b64)));var win=window.open('','_blank');if(win){win.document.write(html);win.document.close();setTimeout(function(){win.print();},600);return;}}catch(e){} } var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);}); var blob=new Blob([bytes],{type:type||'application/octet-stream'}); var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;a.click();}catch(err){alert('Erreur : '+err.message);} }
 function saveDetail(edeal){ var fd=new FormData(); fd.append('action','updateSuivi'); fd.append('data',JSON.stringify({edeal:edeal,statut:document.getElementById('det-statut').value,attribueA:document.getElementById('det-attrib').value,commentaireBE:document.getElementById('det-comment').value})); fd.append('token', sessionStorage.getItem('google_token')||''); fetch(APPS_SCRIPT_URL,{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(res){toast(res.success?'✓ Sauvegardé !':'Erreur','ok'); chargerSuivi(); document.getElementById('detail-modal').classList.remove('open'); }).catch(function(){toast('Erreur réseau','err');}); }
 function toast(msg,type){var el=document.getElementById('toast');if(!el)return;document.getElementById('toast-msg').textContent=msg;el.className='toast show '+(type||'');setTimeout(function(){el.classList.remove('show');},3000);}
@@ -756,40 +757,22 @@ function chargerPermanente(){ chargerDepuisGitHub(); }
 function exporter(){ var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formData, null, 2)); var downloadAnchor = document.createElement('a'); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "config_backup.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove(); }
 if(sessionStorage.getItem('admin_auth')==='1') window.addEventListener('DOMContentLoaded', chargerPermanente);
 
-// 👯 DUPLICATION UNITAIRE D'UNE RUBRIQUE PRODUIT
 function dupliquerSection(oldId) {
   if (!formData || !formData.liste_produits) { alert("⚠️ Configuration non chargée."); return; }
-  var originalProd = formData.liste_produits.find(function(p) { return p.id === oldId; });
-  if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
-  
-  var newLabel = prompt("Nom de la nouvelle section dupliquée :", originalProd.label + " - copie");
-  if (!newLabel) return; 
-  
-  var newId = oldId + "_" + Date.now();
-  formData.liste_produits.push({ id: newId, label: newLabel });
-  
+  var originalProd = formData.liste_produits.find(function(p) { return p.id === oldId; }); if (!originalProd) { alert("⚠️ Section d'origine introuvable."); return; }
+  var newLabel = prompt("Nom de la nouvelle section dupliquée :", originalProd.label + " - copie"); if (!newLabel) return; 
+  var newId = oldId + "_" + Date.now(); formData.liste_produits.push({ id: newId, label: newLabel });
   if (formData[oldId]) { formData[newId] = JSON.parse(JSON.stringify(formData[oldId])); } else { formData[newId] = []; }
-  
-  toast("🎉 Section dupliquée !", "ok");
-  currentProduit = newId; renderProduitTabs(); renderQuestions();
+  toast("🎉 Section dupliquée !", "ok"); currentProduit = newId; renderProduitTabs(); renderQuestions();
 }
 
-// 🗑️ SUPPRESSION UNITAIRE D'UNE RUBRIQUE PRODUIT
 function supprimerSection(id) {
   if (!formData || !formData.liste_produits) return;
-  var prod = formData.liste_produits.find(function(p) { return p.id === id; });
-  if (!prod) return;
-  
-  var confirmation = confirm("⚠️ ATTENTION DANGER ⚠️\n\nVoulez-vous supprimer définitivement la section \"" + prod.label + "\" et TOUTES ses questions ?");
-  if (!confirmation) return;
-  
-  formData.liste_produits = formData.liste_produits.filter(function(p) { return p.id !== id; });
-  if (formData[id]) { delete formData[id]; }
-  
-  alert("🗑️ Section supprimée.");
-  currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions();
+  var prod = formData.liste_produits.find(function(p) { return p.id === id; }); if (!prod) return;
+  var confirmation = confirm("⚠️ ATTENTION DANGER ⚠️\n\nVoulez-vous supprimer définitivement la section \"" + prod.label + "\" et TOUTES ses questions ?"); if (!confirmation) return;
+  formData.liste_produits = formData.liste_produits.filter(function(p) { return p.id !== id; }); if (formData[id]) { delete formData[id]; }
+  alert("🗑️ Section supprimée."); currentProduit = 'infos_generales'; renderProduitTabs(); renderQuestions();
 }
-
 </script>
 </body>
 </html>
