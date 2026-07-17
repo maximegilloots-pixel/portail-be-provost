@@ -332,10 +332,10 @@ tbody tr:hover{background:var(--blue-lighter)}
     <div class="fstep active" id="step1">
       <div class="card">
         <div class="card-title">Informations générales</div>
-        <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="ex : 26GIMA054" oninput="this.value=this.value.toUpperCase()"></div>
+        <div class="frow"><label class="flabel">N° EDEAL <span class="req">*</span></label><input id="f-edeal" class="finput" placeholder="001XXXX2600XX" oninput="this.value=this.value.toUpperCase()"></div>
         <div class="frow"><label class="flabel">Nom du client <span class="req">*</span></label><input id="f-client" class="finput"></div>
         <div class="frow"><label class="flabel">Nom du commercial <span class="req">*</span></label><input id="f-commercial" class="finput"></div>
-        <div class="frow"><label class="flabel">Département / Ville <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59 — Lille"></div>
+        <div class="frow"><label class="flabel">Département de livraison <span class="req">*</span></label><input id="f-ville" class="finput" placeholder="ex : 59"></div>
         <div class="frow"><label class="flabel">Date chantier souhaitée</label><input id="f-date" class="finput"></div>
         
         <div id="infos-generales-dynamic-container"></div>
@@ -1326,7 +1326,7 @@ function genererPDFBase64(fData) {
     function section(title, rows) { if (!rows) return ''; return '<div style="margin-bottom:12px;page-break-inside:avoid"><div style="font-size:10px;font-weight:700;color:#fff;background:#2d4b8c;padding:4px 10px;text-transform:uppercase;letter-spacing:.5px">' + title + '</div><div style="border:1px solid #e4e8f0;border-top:none">' + rows + '</div></div>'; }
     
     var infoRows = ''; Object.keys(infos).forEach(function(lbl) { var v = infos[lbl]; infoRows += row(lbl, v); });
-    var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département / Ville', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
+    var sections = section('Informations générales', row('N° EDEAL', fData.edeal) + row('Client', fData.client) + row('Commercial', fData.commercial) + row('Département de livraison', fData.ville) + row('Date chantier', fData.dateChantier) + row('Produit(s)', produits) + infoRows + row('Commentaire', fData.commentaire));
     
     Object.keys(diag).forEach(function(pid) { var pd = diag[pid]; var rows = ''; var pFound = PRODUITS.find(function(p) { return p.id === pid; }); var labelProduit = pFound ? pFound.label : pid; Object.keys(pd).forEach(function(label) { rows += row(label, pd[label]); }); if (rows) sections += section(labelProduit, rows); });
     
