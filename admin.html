@@ -332,6 +332,11 @@ function renderProduitTabs() {
       btnDown.style.cssText = 'background:transparent; border:none; color:#fff; cursor:pointer; font-size:9px; padding:0 2px;';
       btnDown.onclick = function() { deplacerSection(p.id, 1); }; wrapper.appendChild(btnDown);
       
+      // ✏️ NOUVEAU : Bouton pour Renommer la section
+      var btnRen = document.createElement('button'); btnRen.textContent = '✏️'; btnRen.title = 'Renommer cette section';
+      btnRen.style.cssText = 'background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:50%; width:18px; height:18px; font-size:8px; cursor:pointer; font-weight:900; display:flex; align-items:center; justify-content:center;';
+      btnRen.onclick = function() { renommerSection(p.id); }; wrapper.appendChild(btnRen);
+      
       var btnClone = document.createElement('button'); btnClone.textContent = '👯'; btnClone.title = 'Dupliquer cette section';
       btnClone.style.cssText = 'background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:50%; width:18px; height:18px; font-size:9px; cursor:pointer; font-weight:900;';
       btnClone.onclick = function() { dupliquerSection(p.id); }; wrapper.appendChild(btnClone);
@@ -342,6 +347,23 @@ function renderProduitTabs() {
     }
     container.appendChild(wrapper);
   });
+}
+
+// ✏️ RENOMMER UNE RUBRIQUE PRODUIT
+function renommerSection(id) {
+  if (!formData || !formData.liste_produits) return;
+  var prod = formData.liste_produits.find(function(p) { return p.id === id; });
+  if (!prod) return;
+  
+  var nouveauNom = prompt("Nouveau nom pour cette section :", prod.label);
+  if (!nouveauNom || nouveauNom.trim() === "") return;
+  
+  prod.label = nouveauNom.trim();
+  toast("🎉 Section renommée !", "ok");
+  
+  renderProduitTabs();
+  // Met à jour la liste des rubriques parentes en bas si elle existe
+  if (typeof renderCategoriesManagement === "function") renderCategoriesManagement(); 
 }
 // 📁 ENGINE DE RUBRICAGE ADMIN
 var editingRubriqueId = null;
