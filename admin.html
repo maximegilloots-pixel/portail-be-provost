@@ -138,6 +138,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
 <section class="section" id="section-suivi">
   <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
     
+    <!-- 🟢 LE TABLEAU RESTAURÉ ET SÉCURISÉ -->
     <div class="card" style="flex: 1; min-width: 650px; margin-bottom: 0;">
       <div class="card-title">Gestion des demandes</div>
       <div style="display:flex;gap:8px;margin-bottom:14px; flex-wrap:wrap; align-items:center;">
@@ -155,9 +156,22 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
         </select>
         <input id="filter-input" placeholder="Recherche par N° EDEAL ou Client..." style="padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;flex:1;" oninput="appliquerFiltres()">
       </div>
+      
       <div class="table-wrap">
         <table>
-          <thead><tr><th>N° EDEAL</th><th>Client</th><th>Commercial</th><th>Produit(s)</th><th>Date dépôt</th><th>Statut</th><th>Attribué à</th><th>Commentaire BE</th><th>Action</th></tr></thead>
+          <thead>
+            <tr>
+              <th>N° EDEAL</th>
+              <th>Client</th>
+              <th>Commercial</th>
+              <th>Produit(s)</th>
+              <th>Date dépôt</th>
+              <th>Statut</th>
+              <th>Attribué à</th>
+              <th>Commentaire BE</th>
+              <th>Action</th>
+            </tr>
+          </thead>
           <tbody id="admin-suivi-body"></tbody>
         </table>
       </div>
@@ -166,7 +180,6 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <div class="card" style="width: 340px; flex-shrink: 0; margin-bottom: 0;">
       <div class="card-title">📊 Charge BE Prévisionnelle</div>
       <p style="font-size: 11px; color: var(--text-light); margin-bottom: 16px; line-height: 1.4;">Calcul en temps réel intégrant le % de temps partiel et additionnant les absences pour obtenir le délai de prise en main.</p>
-      
       <div id="charge-dashboard" style="display: flex; flex-direction: column;"></div>
     </div>
 
