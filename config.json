@@ -4374,7 +4374,7 @@
     {
       "id": "cat_1784297309751",
       "label": "Mobile",
-      "color": "#ff80ff",
+      "color": "#ff0080",
       "produits": [
         "prod_proroll"
       ]
@@ -4382,7 +4382,7 @@
     {
       "id": "cat_1784297341190",
       "label": "Cloisons",
-      "color": "#ffff80",
+      "color": "#0080ff",
       "produits": [
         "prod_cloisons_m85",
         "prod_cloisons_modul_plus"
