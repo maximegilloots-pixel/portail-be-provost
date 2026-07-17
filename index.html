@@ -476,17 +476,15 @@ document.addEventListener('change', function(e) {
   if (e.target.closest('#section-demande')) state.isDirty = true;
 });
 document.addEventListener('click', function(e) {
-  // Si le commercial clique sur un produit, une option, une échelle de note ou dépose un fichier
   if (e.target.closest('.produit-cb') || e.target.closest('.q-option') || e.target.closest('.q-scale-item') || e.target.closest('.dropzone')) {
     state.isDirty = true;
   }
 });
 
-// Interception de la fermeture de l'onglet ou du rechargement de la page
 window.addEventListener('beforeunload', function(e) {
   if (state.isDirty) {
     e.preventDefault();
-    e.returnValue = ''; // Déclenche le pop-up de sécurité standard et propre du navigateur
+    e.returnValue = ''; 
   }
 });
   
@@ -512,32 +510,25 @@ function chargerConfigFormulaire() {
   var ghRepo = localStorage.getItem('gh_repo') || 'portail-be-provost';
   var ghToken = localStorage.getItem('gh_token') || '';
 
-  console.log("Portail : Tentative de synchronisation avec " + ghUser + "/" + ghRepo);
-
   var apiUrl = 'https://api.github.com/repos/' + ghUser + '/' + ghRepo + '/contents/config.json';
   var headers = {};
   if (ghToken) { headers['Authorization'] = 'token ' + ghToken; }
 
   fetch(apiUrl, { headers: headers, cache: 'no-store' })
     .then(function(r) {
-      if (!r.ok) {
-        throw new Error("Erreur API GitHub (Statut " + r.status + ")");
-      }
+      if (!r.ok) { throw new Error("Erreur API GitHub (Statut " + r.status + ")"); }
       return r.json();
     })
     .then(function(info) {
       var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
       var cfg = JSON.parse(decodedContent);
-      
       RawConfig = cfg; 
       if (cfg && cfg.liste_produits) {
         PRODUITS = cfg.liste_produits.filter(function(p){ return p.id !== 'infos_generales'; }); 
       }
       initFormulaire();
-      console.log("🎉 Portail : Formulaire synchronisé instantanément avec GitHub !");
     })
     .catch(function(err) {
-      console.warn("⚠️ Mode dégradé : Échec API GitHub, tentative via le lien public brut...", err);
       var backupUrl = 'https://raw.githubusercontent.com/' + ghUser + '/' + ghRepo + '/main/config.json?v=' + Date.now();
       fetch(backupUrl)
         .then(function(r2){ return r2.json(); })
@@ -553,7 +544,7 @@ function chargerConfigFormulaire() {
 }
 
 var PRODUITS = [{id:'proplus_lp3', label:'Proplus LP3'},{id:'proplus_lp3_2n', label:'Proplus LP3 - 2 Niveaux'},{id:'install_ext', label:'Installation extérieure'}];
-var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type:'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
+var DEFAULT_INFOS_GENERALES = [{id:'contraintes', label:'Contraintes normatives', type:'checkbox', options:['Intervention cabinet de contrôle','Sprinklage','Autre :']},{id:'acces', label:'Accès pour montage', type:'radio', options:['Sans contraintes particulières','Contraint (photo)']},{id:'zone', label:'Zone de montage', type:'radio', options:['Zone dégagée','Zone encombrée (photo)']},{id:'elements', label:'Éléments souhaités', type(-- Hauteur (mm) sur plancher (A) ou sous structure (B) ': 'radio', options:['Dossier complet','Dossier allégé']},{id:'plan', label:'Plan obligatoire', type:'checkbox', options:['OK']},{id:'photos', label:'Photos & Vidéos', type:'checkbox', options:['OK']}];
 
 function initFormulaire() {
   var grid = document.getElementById('produits-grid'); if(!grid) return; grid.innerHTML = '';
@@ -691,7 +682,6 @@ function goStep(n) {
     if(el) el.className='wz '+(i+1<n?'done':(i+1===n?'active':'')); 
   }); 
   if(n===4) buildRecap(); 
-  
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -789,7 +779,6 @@ function buildDiagnostic() {
         });
         qDiv.appendChild(optsDiv);
       }
-      block.appendChild(qDiv);
     });
     container.appendChild(block);
   });
@@ -1220,14 +1209,12 @@ function filtrer(statut) {
 var targetTabAfterWarning = null; // Stocke l'onglet visé par le commercial
 
 function showTab(tab) {
-  // Si le formulaire est modifié, qu'on est sur l'onglet demande et qu'on clique ailleurs
   if (state.isDirty && document.getElementById('section-demande').classList.contains('active') && tab !== 'demande') {
-    targetTabAfterWarning = tab; // On retient où il voulait aller
-    document.getElementById('custom-exit-modal').classList.add('show'); // On ouvre la belle modale
-    return; // On stoppe le changement d'onglet immédiat
+    targetTabAfterWarning = tab; 
+    document.getElementById('custom-exit-modal').classList.add('show'); 
+    return; 
   }
 
-  // Code de changement d'onglet d'origine
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); 
   document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); 
   var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); 
@@ -1235,24 +1222,22 @@ function showTab(tab) {
   if (tab === 'suivi') chargerSuivi(); 
 }
 
-// 🟢 FONCTIONS DE LA MODALE PROPRES ET ISOLÉES
 function saveAndExitFromModal() {
   document.getElementById('custom-exit-modal').classList.remove('show');
-  state.isDirty = false; // On coupe la sécurité pour éviter une boucle
-  sauvegarderBrouillon(); // On lance ta fonction de sauvegarde
+  state.isDirty = false; 
+  sauvegarderBrouillon(); 
 }
 
 function exitWithoutSavingFromModal() {
   document.getElementById('custom-exit-modal').classList.remove('show');
-  state.isDirty = false; // On coupe la sécurité
-  resetForm(); // On nettoie les champs en cache
+  state.isDirty = false; 
+  resetForm(); 
   if (targetTabAfterWarning) {
-    showTab(targetTabAfterWarning); // On l'emmène enfin là où il voulait aller
+    showTab(targetTabAfterWarning); 
   }
   targetTabAfterWarning = null;
 }
 
-function chargerSuivi() {
 function chargerSuivi() {
   var sbody = document.getElementById('suivi-body'); if(!sbody) return;
   sbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-light);">⏳ Synchronisation sécurisée avec Google Sheets en cours...</td></tr>';
@@ -1311,7 +1296,7 @@ function resetForm() {
   document.querySelectorAll('.q-scale-item.selected').forEach(function(s){ s.classList.remove('selected'); });
   document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
   
-  state.isDirty = false; // 🟢 Désactive la sécurité anti-fermeture lors du reset
+  state.isDirty = false; 
   state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; 
   
   var warningEl = document.getElementById('be-comment-warning'); if (warningEl) warningEl.style.display = 'none';
