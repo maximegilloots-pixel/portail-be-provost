@@ -4367,7 +4367,6 @@
         "prod_prospace_plus",
         "prod_proclass_362",
         "prod_icare",
-        "prod_probar_manuel",
         "prod_protub"
       ]
     },
@@ -4397,6 +4396,23 @@
         "prod_dyn_leger_cadres",
         "prod_nautirack",
         "prod_proart_propal3"
+      ]
+    },
+    {
+      "id": "cat_1784297505889",
+      "label": "Extérieur",
+      "color": "#808080",
+      "produits": [
+        "install_ext"
+      ]
+    },
+    {
+      "id": "cat_1784297531548",
+      "label": "Cantilever",
+      "color": "#2d4b8c",
+      "produits": [
+        "prod_cantipro3",
+        "prod_probar_manuel"
       ]
     }
   ]
