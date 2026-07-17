@@ -1219,6 +1219,8 @@ function filtrer(statut) {
 
 var targetTabAfterWarning = null; // Stocke l'onglet visé par le commercial
 
+var targetTabAfterWarning = null; // Stocke l'onglet visé par le commercial
+
 function showTab(tab) {
   // Si le formulaire est modifié, qu'on est sur l'onglet demande et qu'on clique ailleurs
   if (state.isDirty && document.getElementById('section-demande').classList.contains('active') && tab !== 'demande') {
@@ -1227,11 +1229,29 @@ function showTab(tab) {
     return; // On stoppe le changement d'onglet immédiat
   }
 
-  function saveAndExitFromModal() {
+  // Code d'origine de changement d'onglet
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); }); 
+  document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); }); 
+  var sec = document.getElementById('section-'+tab); if(sec) sec.classList.add('active'); 
+  var tabHeader = document.getElementById('tab-'+tab); if(tabHeader) tabHeader.classList.add('active'); 
+  if (tab === 'suivi') chargerSuivi(); 
+}
+
+// 🟢 FONCTIONS DE LA MODALE CORRECTEMENT POSITIONNÉES HORS DE SHOWTAB
+function saveAndExitFromModal() {
   document.getElementById('custom-exit-modal').classList.remove('show');
   state.isDirty = false; // On coupe la sécurité pour éviter une boucle
-  sauvegarderBrouillon(); // On lance ta fonction de sauvegarde Sheets d'origine
-  // Note: sauvegarderBrouillon() fait déjà un resetForm() et bascule vers l'onglet suivi automatiquement !
+  sauvegarderBrouillon(); // On lance ta fonction de sauvegarde
+}
+
+function exitWithoutSavingFromModal() {
+  document.getElementById('custom-exit-modal').classList.remove('show');
+  state.isDirty = false; // On coupe la sécurité
+  resetForm(); // On nettoie les champs en cache
+  if (targetTabAfterWarning) {
+    showTab(targetTabAfterWarning); // On l'emmène enfin là où il voulait aller
+  }
+  targetTabAfterWarning = null;
 }
 
 function exitWithoutSavingFromModal() {
@@ -1290,14 +1310,32 @@ function renderSuivi(demandes) {
 }
 
 function resetForm() { 
-  ['f-edeal','f-client','f-ville','f-date','f-commentaire'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; }); 
+  ['f-edeal','f-client','f-ville','f-date','f-commercial'].forEach(function(id){ 
+    var el = document.getElementById(id); 
+    if(el && !el.readOnly) { el.value = ''; el.classList.remove('filled'); }
+    else if(el && el.id === 'f-edeal' || el.id === 'f-client' || el.id === 'f-ville' || el.id === 'f-date') { el.value = ''; el.classList.remove('filled'); }
+  }); 
+  
+  document.querySelectorAll('#infos-generales-dynamic-container input, #infos-generales-dynamic-container textarea, #infos-generales-dynamic-container select, #diagnostic-container input, #diagnostic-container textarea, #diagnostic-container select').forEach(function(el) {
+    el.value = ''; el.classList.remove('filled');
+  });
+
   document.querySelectorAll('.q-option.selected').forEach(function(o){ o.classList.remove('selected'); }); 
+  
+  document.querySelectorAll('.opt-autre-txt').forEach(function(inp) {
+    inp.value = ''; inp.style.display = 'none';
+  });
+
+  document.querySelectorAll('.q-scale-item.selected').forEach(function(s){ s.classList.remove('selected'); });
   document.querySelectorAll('.produit-cb.checked').forEach(function(e){ e.classList.remove('checked'); }); 
   
-  var warningEl = document.getElementById('be-comment-warning');
-  if (warningEl) warningEl.style.display = 'none';
+  state.isDirty = false; // 🟢 Désactive la sécurité anti-fermeture lors du reset
+  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; 
   
-  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); 
+  var warningEl = document.getElementById('be-comment-warning'); if (warningEl) warningEl.style.display = 'none';
+  var diagCont = document.getElementById('diagnostic-container'); if(diagCont) diagCont.innerHTML = '';
+  
+  renderFiles(); goStep(1); 
 }
 
 function genererPDFBase64(fData) {
@@ -1320,9 +1358,6 @@ function genererPDFBase64(fData) {
     var tagStart = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px}.hd{border-bottom:3px solid #2d4b8c;padding-bottom:10px;margin-bottom:16px;display:flex;justify-content:space-between}.logo{font-size:16px;font-weight:900;color:#2d4b8c}.ref{font-size:14px;font-weight:700;color:#fab423}</style></head><body><div class="hd"><div><div class="logo">PROVOST — Bureau d\'Études</div><div class="ref">' + fData.edeal + '</div></div><div style="text-align:right;font-size:10px;color:#8a93a8">Généré le ' + dateStr + '<br>' + fData.commercial + '</div></div>';
     var tagEnd = '</body></html>'; resolve(btoa(unescape(encodeURIComponent(tagStart + sections + tagEnd))));
   });
-  state.isDirty = false; 
-  
-  state.selectedFiles = []; state.selectedProduits = []; state.loadedDraft = null; state.rebuildDiagnosticRequired = true; renderFiles(); goStep(1); 
 }
 
 function toast(msg, type) { var el = document.getElementById('toast'); if(!el) return; document.getElementById('toast-msg').textContent = msg; el.className = 'toast show ' + (type || ''); setTimeout(function(){ el.classList.remove('show'); }, 3500); }
