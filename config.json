@@ -4336,6 +4336,14 @@
   ],
   "categories": [
     {
+      "id": "cat_1784297505889",
+      "label": "Extérieur",
+      "color": "#808080",
+      "produits": [
+        "install_ext"
+      ]
+    },
+    {
       "id": "cat_1784297045680",
       "label": "Plateforme",
       "color": "#b33206",
@@ -4345,16 +4353,6 @@
         "proplus_lp3_erp",
         "prod_niveau_uni",
         "prod_allee_circulation"
-      ]
-    },
-    {
-      "id": "cat_1784297128293",
-      "label": "Densifié",
-      "color": "#7118a0",
-      "produits": [
-        "prod_dynamique_lourd_pl3",
-        "prod_accumulation_pl3",
-        "prod_shuttle_pl3"
       ]
     },
     {
@@ -4368,6 +4366,25 @@
         "prod_proclass_362",
         "prod_icare",
         "prod_protub"
+      ]
+    },
+    {
+      "id": "cat_1784297531548",
+      "label": "Cantilever",
+      "color": "#2d4b8c",
+      "produits": [
+        "prod_cantipro3",
+        "prod_probar_manuel"
+      ]
+    },
+    {
+      "id": "cat_1784297128293",
+      "label": "Densifié",
+      "color": "#7118a0",
+      "produits": [
+        "prod_dynamique_lourd_pl3",
+        "prod_accumulation_pl3",
+        "prod_shuttle_pl3"
       ]
     },
     {
@@ -4396,23 +4413,6 @@
         "prod_dyn_leger_cadres",
         "prod_nautirack",
         "prod_proart_propal3"
-      ]
-    },
-    {
-      "id": "cat_1784297505889",
-      "label": "Extérieur",
-      "color": "#808080",
-      "produits": [
-        "install_ext"
-      ]
-    },
-    {
-      "id": "cat_1784297531548",
-      "label": "Cantilever",
-      "color": "#2d4b8c",
-      "produits": [
-        "prod_cantipro3",
-        "prod_probar_manuel"
       ]
     }
   ]
