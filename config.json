@@ -4238,16 +4238,16 @@
   ],
   "liste_produits": [
     {
+      "id": "install_ext",
+      "label": "Installation extérieure"
+    },
+    {
       "id": "proplus_lp3",
       "label": "Proplus LP3"
     },
     {
       "id": "proplus_lp3_2n",
       "label": "Proplus LP3 - 2 Niveaux"
-    },
-    {
-      "id": "install_ext",
-      "label": "Installation extérieure"
     },
     {
       "id": "prod_1779436061922",
@@ -4343,6 +4343,18 @@
         "proplus_lp3",
         "proplus_lp3_2n",
         "proplus_lp3_erp"
+      ]
+    },
+    {
+      "id": "cat_1784297128293",
+      "label": "Densifié",
+      "color": "#7118a0",
+      "produits": [
+        "prod_1779436061922",
+        "prod_cantipro3",
+        "prod_dynamique_lourd_pl3",
+        "prod_accumulation_pl3",
+        "prod_shuttle_pl3"
       ]
     }
   ]
