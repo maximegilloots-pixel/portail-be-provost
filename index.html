@@ -820,8 +820,16 @@ function buildDiagnostic() {
     var prod = (PRODUITS || []).find(function(p){ return p && p.id === pid; }); 
     var questions = getQuestionsListForProduct(pid);
     
-    var block = document.createElement('div'); block.className = 'card'; 
-    block.innerHTML = '<div class="q-produit-header" style="font-weight:700; color:var(--blue); margin-bottom:10px;">' + (prod ? prod.label : pid) + '</div>';
+    var block = document.createElement('div'); 
+    block.className = 'card'; 
+    
+    // 🎨 BORDURE ET ESPACEMENT RENFORCÉS POUR CRÉER LA SCISSION
+    block.style.cssText = 'border: 2px solid var(--blue-dark); margin-bottom: 45px; padding-top: 24px; overflow: hidden; box-shadow: var(--shadow-lg);';
+    
+    // 🎨 BANDEAU DE TITRE PREMIUM : Fond Bleu foncé, texte blanc et liseré Jaune Provost
+    block.innerHTML = '<div class="q-produit-header" style="background: var(--blue-dark); color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; padding: 14px 24px; margin-top: -24px; margin-left: -24px; margin-right: -24px; margin-bottom: 28px; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; border-bottom: 4px solid var(--yellow);">' +
+                      '<span>📋 RUBRIQUE TECHNIQUE : ' + (prod ? prod.label : pid) + '</span>' +
+                      '</div>';
     
     if (!questions || !questions.length) {
       block.innerHTML += '<p style="font-style:italic; color:var(--text-light); font-size:12px; padding:10px 0;">Aucune question spécifique pour ce produit.</p>';
@@ -837,7 +845,6 @@ function buildDiagnostic() {
       titleEl.style.display = 'flex'; titleEl.style.alignItems = 'center'; titleEl.style.width = '100%';
       titleEl.innerHTML = '<span>' + (q.label || '') + '</span>';
       
-      // 🟢 Sécurité de conversion String() pour éviter le blocage technique
       if (q.placeholder && String(q.placeholder).trim() !== '') {
         var textTooltip = document.createElement('div'); textTooltip.className = 'q-text-tooltip-container';
         textTooltip.innerHTML = '<div class="q-text-tooltip-icon">?</div><div class="q-text-tooltip-content">' + q.placeholder + '</div>';
@@ -889,7 +896,6 @@ function buildDiagnostic() {
           }
           optsDiv.appendChild(optDiv);
           
-          // 🟢 Sécurité String() pour empêcher le plantage sur la détection du mot "autre"
           if (String(optText).toLowerCase().indexOf('autre') !== -1) {
             otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
             otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
