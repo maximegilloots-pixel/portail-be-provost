@@ -432,8 +432,8 @@ function chargerDepuisGitHub() {
   if(document.getElementById('mail-body-config')) { document.getElementById('mail-body-config').value = localStorage.getItem('mail_body') || DEFAULT_MAIL_TEXT; }
   
   if (!gh.user || !gh.repo) {
-    formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-    initChampsProduits(); renderProduitTabs(); renderQuestions(); return;
+    formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[], categories:[]}; 
+    initChampsProduits(); renderProduitTabs(); renderQuestions(); renderCategoriesManagement(); return;
   }
 
   var apiUrl = 'https://api.github.com/repos/' + gh.user + '/' + gh.repo + '/contents/config.json';
@@ -444,15 +444,21 @@ function chargerDepuisGitHub() {
     .then(function(info) {
       if (!info.content) throw new Error("Fichier vide.");
       var decodedContent = decodeURIComponent(escape(atob(info.content.replace(/\s/g, ''))));
-      formData = JSON.parse(decodedContent); initChampsProduits(); renderProduitTabs(); renderQuestions();
+      formData = JSON.parse(decodedContent); 
+      
+      initChampsProduits(); 
+      renderProduitTabs(); 
+      renderQuestions();
+      
+      // 🟢 AJOUT TECHNIQUE ICI : On force l'affichage des rubriques dès que le JSON est chargé
+      renderCategoriesManagement(); 
     })
     .catch(function(err) {
       alert("⚠️ ÉCHEC DE SYNCHRONISATION TECHNIQUE :\n" + err.message);
-      formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[]}; 
-      initChampsProduits(); renderProduitTabs(); renderQuestions(); 
+      formData = {infos_generales:[], proplus_lp3:[], proplus_lp3_2n:[], install_ext:[], categories:[]}; 
+      initChampsProduits(); renderProduitTabs(); renderQuestions(); renderCategoriesManagement();
     }); 
 }
-
 function sauvegarder() { 
   var gh = getGHConfig(); 
   if (!gh.token || !gh.user || !gh.repo) { alert("❌ Configuration GitHub manquante."); return; }
