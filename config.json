@@ -2271,12 +2271,13 @@
       ]
     },
     {
-      "id": "q_pro_socle_fixes",
+      "id": "q_1784270644501",
       "label": "Socle sous fixes",
       "type": "radio",
       "options": [
+        "Non (Solution économique)",
         "Oui",
-        "Non"
+        "Autre :"
       ]
     },
     {
