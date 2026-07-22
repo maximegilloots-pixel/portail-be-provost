@@ -811,7 +811,32 @@ function getQuestionsListForProduct(pid) {
   return [];
 }
 function buildDiagnostic() {
-  var container = document.getElementById('diagnostic-container'); if(!container) return; container.innerHTML = '';
+  var container = document.getElementById('diagnostic-container'); if(!container) return; 
+
+  // 🛡️ 1. MÉMOIRE TAMPON : Aspiration des réponses avant destruction de l'écran
+  var savedAnswers = {};
+  
+  // Aspiration des champs textes et des listes déroulantes
+  container.querySelectorAll('.q-text-input:not(.other-input-field), .fselect').forEach(function(el) {
+    if (el.id) savedAnswers[el.id] = el.value;
+  });
+
+  // Aspiration des cases cochées (Radios, Checkbox, Échelles)
+  container.querySelectorAll('.q-option.selected, .q-scale-item.selected').forEach(function(el) {
+    var fid = el.getAttribute('data-field');
+    var val = el.getAttribute('data-val');
+    if (!savedAnswers[fid]) savedAnswers[fid] = [];
+    savedAnswers[fid].push(val);
+  });
+
+  // Aspiration des champs texte "Autre" remplis
+  container.querySelectorAll('.other-input-field.filled').forEach(function(el) {
+    var fid = el.getAttribute('data-field');
+    savedAnswers[fid + '_other'] = el.value;
+  });
+
+  // 💥 2. ON VIDE LE CONTENEUR ET ON RECONSTRUIT LA STRUCTURE
+  container.innerHTML = '';
   
   if (!state.selectedProduits || !state.selectedProduits.length) {
     container.innerHTML = '<div class="card"><p style="font-style:italic; color:var(--text-light);">Aucun produit sélectionné à l\'étape 1.</p></div>';
@@ -824,11 +849,8 @@ function buildDiagnostic() {
     
     var block = document.createElement('div'); 
     block.className = 'card'; 
-    
-    // 🎨 Bordure et espacement renforcés pour créer la scission
     block.style.cssText = 'border: 2px solid var(--blue-dark); margin-bottom: 45px; padding-top: 24px; overflow: hidden; box-shadow: var(--shadow-lg);';
     
-    // 🎨 Bandeau épuré : Juste l'icône et le nom du produit Provost
     block.innerHTML = '<div class="q-produit-header" style="background: var(--blue-dark); color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; padding: 14px 24px; margin-top: -24px; margin-left: -24px; margin-right: -24px; margin-bottom: 28px; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; border-bottom: 4px solid var(--yellow);">' +
                       '<span>📋 ' + (prod ? prod.label : pid) + '</span>' +
                       '</div>';
@@ -898,6 +920,7 @@ function buildDiagnostic() {
           }
           optsDiv.appendChild(optDiv);
           
+          var otherInput = null; // Variable sécurisée localement
           if (String(optText).toLowerCase().indexOf('autre') !== -1) {
             otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
             otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
@@ -913,7 +936,19 @@ function buildDiagnostic() {
               document.querySelectorAll('.other-input-field[data-field="' + fid + '"]').forEach(function(x){ x.style.display = 'none'; x.value = ''; x.classList.remove('filled'); });
             }
             optDiv.classList.toggle('selected');
-            if (otherInput) { if (optDiv.classList.contains('selected')) { otherInput.style.display = 'block'; otherInput.focus(); } else { otherInput.style.display = 'none'; otherInput.value = ''; optDiv.setAttribute('data-val', optText); } }
+            
+            // Si c'est un champ contenant la logique "Autre"
+            if (otherInput) { 
+              if (optDiv.classList.contains('selected')) { 
+                otherInput.style.display = 'block'; 
+                otherInput.focus(); 
+              } else { 
+                otherInput.style.display = 'none'; 
+                otherInput.value = ''; 
+                optDiv.setAttribute('data-val', optText); 
+                otherInput.classList.remove('filled');
+              } 
+            }
           });
         });
         qDiv.appendChild(optsDiv);
@@ -921,6 +956,44 @@ function buildDiagnostic() {
       block.appendChild(qDiv);
     });
     container.appendChild(block);
+  });
+
+  // 💉 3. INJECTION DES RÉPONSES SAUVEGARDÉES (La magie opère ici)
+  Object.keys(savedAnswers).forEach(function(key) {
+    if (key.endsWith('_other')) return; // Les champs "Autre" sont gérés ci-dessous en cascade
+    
+    var val = savedAnswers[key];
+    var el = document.getElementById(key);
+    
+    if (el) { // S'il s'agit d'un champ texte ou d'une liste déroulante classique
+      el.value = val;
+    } else { // S'il s'agit d'un ensemble de boutons / checkbox / échelles
+      var valuesArray = Array.isArray(val) ? val : [val];
+      
+      valuesArray.forEach(function(v) {
+        var options = document.querySelectorAll('.q-option[data-field="' + key + '"], .q-scale-item[data-field="' + key + '"]');
+        
+        options.forEach(function(opt) {
+          var initVal = opt.getAttribute('data-initial-val') || opt.getAttribute('data-val');
+          
+          // Si on trouve une correspondance parfaite ou que ça commence par "Autre :"
+          if (v === initVal || (typeof v === 'string' && v.startsWith(String(initVal)))) {
+            opt.classList.add('selected');
+            opt.setAttribute('data-val', v);
+            
+            // On restaure le champ texte de l'option "Autre" s'il avait été rempli
+            if (savedAnswers[key + '_other'] && String(initVal).toLowerCase().indexOf('autre') !== -1) {
+              var siblingInput = opt.nextElementSibling;
+              if (siblingInput && siblingInput.classList.contains('other-input-field')) {
+                siblingInput.value = savedAnswers[key + '_other'];
+                siblingInput.style.display = 'block';
+                siblingInput.classList.add('filled');
+              }
+            }
+          }
+        });
+      });
+    }
   });
 }
   
