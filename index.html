@@ -818,7 +818,7 @@ function buildDiagnostic() {
   
   // Aspiration des champs textes et des listes déroulantes
   container.querySelectorAll('.q-text-input:not(.other-input-field), .fselect').forEach(function(el) {
-    if (el.id) savedAnswers[el.id] = el.value;
+    if (el.id && el.value.trim() !== '') savedAnswers[el.id] = el.value;
   });
 
   // Aspiration des cases cochées (Radios, Checkbox, Échelles)
@@ -835,7 +835,7 @@ function buildDiagnostic() {
     savedAnswers[fid + '_other'] = el.value;
   });
 
-  // 💥 2. ON VIDE LE CONTENEUR ET ON RECONSTRUIT LA STRUCTURE
+  // 💥 2. RECONSTRUCTION DE LA STRUCTURE
   container.innerHTML = '';
   
   if (!state.selectedProduits || !state.selectedProduits.length) {
@@ -881,7 +881,19 @@ function buildDiagnostic() {
       var fid = pid+'_'+q.id;
       
       if(q.type==='text' || q.type==='textarea') {
-        var inp = document.createElement(q.type==='text'?'input':'textarea'); inp.className='q-text-input'; inp.id=fid;
+        var inp = document.createElement(q.type==='text'?'input':'textarea'); 
+        inp.className='q-text-input'; 
+        inp.id=fid;
+        
+        // 🟢 Écouteur interactif pour gérer le style au moment où l'utilisateur tape
+        inp.addEventListener('input', function() {
+          if (this.value.trim() !== '') {
+            this.classList.add('filled');
+          } else {
+            this.classList.remove('filled');
+          }
+        });
+
         qDiv.appendChild(inp);
       } else if(q.type === 'dropdown') {
         var sel = document.createElement('select'); sel.className = 'fselect'; sel.id = fid;
@@ -889,6 +901,11 @@ function buildDiagnostic() {
           var optText = (typeof o === 'object' && o !== null) ? (o.text || '') : o;
           return '<option value="' + optText + '">' + optText + '</option>';
         }).join('');
+        
+        sel.addEventListener('change', function() {
+          if (this.value !== '') { this.classList.add('filled'); } else { this.classList.remove('filled'); }
+        });
+
         qDiv.appendChild(sel);
       } else if(q.type === 'scale') {
         var scaleWrapper = document.createElement('div'); scaleWrapper.className = 'q-scale-container';
@@ -920,7 +937,7 @@ function buildDiagnostic() {
           }
           optsDiv.appendChild(optDiv);
           
-          var otherInput = null; // Variable sécurisée localement
+          var otherInput = null;
           if (String(optText).toLowerCase().indexOf('autre') !== -1) {
             otherInput = document.createElement('input'); otherInput.type = 'text'; otherInput.className = 'q-text-input other-input-field'; otherInput.setAttribute('data-field', fid); otherInput.placeholder = 'Veuillez préciser...'; otherInput.style.cssText = 'display:none; margin-top:-4px; margin-bottom:10px; width:100%; border-color:var(--blue-mid);';
             otherInput.addEventListener('click', function(e) { e.stopPropagation(); });
@@ -937,7 +954,6 @@ function buildDiagnostic() {
             }
             optDiv.classList.toggle('selected');
             
-            // Si c'est un champ contenant la logique "Autre"
             if (otherInput) { 
               if (optDiv.classList.contains('selected')) { 
                 otherInput.style.display = 'block'; 
@@ -958,16 +974,24 @@ function buildDiagnostic() {
     container.appendChild(block);
   });
 
-  // 💉 3. INJECTION DES RÉPONSES SAUVEGARDÉES (La magie opère ici)
+  // 💉 3. INJECTION DES RÉPONSES ET DÉCLENCHEMENT DU STYLE VISUEL
   Object.keys(savedAnswers).forEach(function(key) {
-    if (key.endsWith('_other')) return; // Les champs "Autre" sont gérés ci-dessous en cascade
+    if (key.endsWith('_other')) return;
     
     var val = savedAnswers[key];
     var el = document.getElementById(key);
     
-    if (el) { // S'il s'agit d'un champ texte ou d'une liste déroulante classique
+    if (el) { 
+      // S'il s'agit d'un champ texte ou d'un menu déroulant
       el.value = val;
-    } else { // S'il s'agit d'un ensemble de boutons / checkbox / échelles
+      if (val && String(val).trim() !== '') {
+        el.classList.add('filled');
+        // Force l'envoi de l'événement 'input' pour simuler une saisie réelle
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    } else { 
+      // S'il s'agit de cases / échelles / options
       var valuesArray = Array.isArray(val) ? val : [val];
       
       valuesArray.forEach(function(v) {
@@ -976,12 +1000,10 @@ function buildDiagnostic() {
         options.forEach(function(opt) {
           var initVal = opt.getAttribute('data-initial-val') || opt.getAttribute('data-val');
           
-          // Si on trouve une correspondance parfaite ou que ça commence par "Autre :"
           if (v === initVal || (typeof v === 'string' && v.startsWith(String(initVal)))) {
             opt.classList.add('selected');
             opt.setAttribute('data-val', v);
             
-            // On restaure le champ texte de l'option "Autre" s'il avait été rempli
             if (savedAnswers[key + '_other'] && String(initVal).toLowerCase().indexOf('autre') !== -1) {
               var siblingInput = opt.nextElementSibling;
               if (siblingInput && siblingInput.classList.contains('other-input-field')) {
