@@ -1531,6 +1531,39 @@
       ]
     },
     {
+      "id": "q_1789739726096",
+      "label": "Type de sol",
+      "type": "radio",
+      "options": [
+        "Béton",
+        "Bitume",
+        "Plots bétons (à dimensionner)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_1789739640718",
+      "label": "Etat général du sol",
+      "type": "radio",
+      "options": [
+        "Bon état / sol plan (Planéité <20mm)",
+        "Présence d'une pente (Points relevés à indiquer sur le plan)",
+        "Présence de défauts importants (Relevés sur le plan)",
+        "Autre :"
+      ]
+    },
+    {
+      "id": "q_1789739774921",
+      "label": "Type d'ancrages",
+      "type": "radio",
+      "options": [
+        "Vis béton",
+        "Ancrages Inox",
+        "Ancrages chimiques",
+        "Autre :"
+      ]
+    },
+    {
       "id": "q_acc_accessoires",
       "label": "Accessoires",
       "type": "checkbox",
