@@ -254,6 +254,51 @@ td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle
     <div id="detail-body" style="overflow-y:auto;max-height:calc(85vh - 80px)"></div>
   </div>
 </div>
+<!-- ❓ MODALE : Édition et Ajout de questions -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Ajouter une question</div>
+    
+    <div class="frow">
+      <label class="flabel">Libellé de la question</label>
+      <input class="finput" id="m-label" placeholder="Ex : Hauteur disponible sous poutre (mm)">
+    </div>
+
+    <div class="frow">
+      <label class="flabel">Type de réponse</label>
+      <select class="fselect" id="m-type" onchange="toggleOptsSection()">
+        <option value="text">Texte court</option>
+        <option value="textarea">Zone de texte (longue)</option>
+        <option value="dropdown">Menu déroulant</option>
+        <option value="radio">Choix unique (Radio)</option>
+        <option value="checkbox">Choix multiple (Case à cocher)</option>
+        <option value="scale">Échelle 1 à 5</option>
+      </select>
+    </div>
+
+    <div class="frow">
+      <label class="flabel">Info-bulle d'aide / Placeholder (Optionnel)</label>
+      <input class="finput" id="m-hint" placeholder="Ex : Préciser le point le plus bas en mm">
+    </div>
+
+    <div class="frow">
+      <label class="flabel">Illustration / Schéma dynamique (Optionnel)</label>
+      <input type="file" accept="image/*" class="finput" onchange="handleImageUpload(this)">
+      <div id="m-image-preview" style="font-size: 11px; margin-top: 5px; color: var(--green); font-weight: 700;"></div>
+    </div>
+
+    <div class="frow" id="m-opts-section" style="display:none;">
+      <label class="flabel">Options de choix</label>
+      <div class="opts-list" id="m-opts-list"></div>
+      <button class="add-opt" type="button" onclick="addOpt()">+ Ajouter une option</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveModal()">Enregistrer la question</button>
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
 <script>
