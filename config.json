@@ -828,6 +828,17 @@
       ]
     },
     {
+      "id": "q_1789739051653",
+      "label": "Etat général du sol",
+      "type": "radio",
+      "options": [
+        "Bon état / sol plan (Planéité <20mm)",
+        "Présence d'une pente (Points relevés à indiquer sur le plan)",
+        "Présence de défauts importants (Relevés sur le plan)",
+        "Autre :"
+      ]
+    },
+    {
       "id": "q_1780473222910",
       "label": "Commentaires",
       "type": "textarea"
